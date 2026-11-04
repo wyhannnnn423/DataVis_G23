@@ -1,0 +1,33 @@
+/* Placeholder styles. Replace with the team's own design once the wireframes are agreed. */
+:root {
+  --bg: #ffffff;
+  --text: #1a1a1a;
+  --muted: #555555;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161a;
+    --text: #eceff4;
+    --muted: #a9b0bc;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+header, main, footer {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+section { margin-bottom: 3rem; }
+footer { color: var(--muted); font-size: 0.9rem; }
