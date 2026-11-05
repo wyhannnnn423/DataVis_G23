@@ -42,26 +42,28 @@
 
         <!-- Q1: scroll-driven chart -->
         <section class="story" id="q1" aria-labelledby="q1-h">
-            <header class="section-head reveal">
-                <p class="eyebrow">1 &middot; The big picture</p>
-                <h2 id="q1-h">How did non-fatal hospitalised road traffic injury counts change from 2011 to 2021, and how did the pattern in 2019-2021 compare with earlier years? </h2>
-            </header>
             <div class="scrolly">
                 <div class="sticky">
+                    <header class="section-head reveal">
+                        <p class="eyebrow">1 &middot; The big picture</p>
+                        <h2 id="q1-h">How did non-fatal hospitalised road traffic injury counts change from 2011 to 2021, and how did the pattern in 2019-2021 compare with earlier years?</h2>
+                    </header>
                     <figure class="chart-card">
                         <div id="q1-chart" aria-live="polite"></div>
                         <figcaption>Hospitalised road traffic injuries per year. Counts are absolute, not adjusted for population.</figcaption>
                     </figure>
                 </div>
                 <div class="steps">
-                    <div class="step" data-step="0">
-                        <p>Each year, tens of thousands of people are admitted to hospital after a road crash. In 2011 it was about 34,000; by 2021 about 39,500.</p>
-                    </div>
-                    <div class="step" data-step="1">
-                        <p>Two dashed lines mark changes in how Victoria (2012) and New South Wales (2017) record admissions. Part of the movement around those years reflects recording, not safety.</p>
-                    </div>
-                    <div class="step" data-step="2">
-                        <p>Counts dipped in 2020 and recovered in 2021. The data cannot show why.</p>
+                    <div class="steps-sticky-card">
+                        <div class="step is-shown is-active" data-step="0">
+                            <p>Each year, tens of thousands of people are admitted to hospital after a road crash. In 2011 it was about 34,000; by 2021 about 39,500.</p>
+                        </div>
+                        <div class="step" data-step="1">
+                            <p>Two dashed lines mark changes in how Victoria (2012) and New South Wales (2017) record admissions. Part of the movement around those years reflects recording, not safety.</p>
+                        </div>
+                        <div class="step" data-step="2">
+                            <p>Counts dipped in 2020 and recovered in 2021. The data cannot show why.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -71,7 +73,7 @@
         <section class="block" id="q2" aria-labelledby="q2-h">
             <header class="section-head reveal">
                 <p class="eyebrow">2 &middot; Who changed most</p>
-                <h2 id="q2-h">Which road user groups contributed most to the change in national counts between two selected years, and how did their shares of all road traffic injuries change? </h2>
+                <h2 id="q2-h">Which road user groups contributed most to the change in national counts between two selected years, and how did their shares of all road traffic injuries change?</h2>
             </header>
             <div class="block-grid reveal">
                 <div class="chart-card">
@@ -90,7 +92,7 @@
         <section class="block" id="q3" aria-labelledby="q3-h">
             <header class="section-head reveal">
                 <p class="eyebrow">3 &middot; Where it happens</p>
-                <h2 id="q3-h">How are hospitalised injury counts distributed across states and territories, and how has each jurisdiction’s share of the national total changed over time? </h2>
+                <h2 id="q3-h">How are hospitalised injury counts distributed across states and territories, and how has each jurisdiction’s share of the national total changed over time?</h2>
             </header>
             <div class="block-grid reveal">
                 <div class="chart-card">
@@ -109,7 +111,7 @@
         <section class="block" id="q4" aria-labelledby="q4-h">
             <header class="section-head reveal">
                 <p class="eyebrow">4 &middot; Age and sex</p>
-                <h2 id="q4-h">Which combinations of age group and road user type account for the largest numbers of hospitalised injuries at the national level, and how do these differ between males and females? </h2>
+                <h2 id="q4-h">Which combinations of age group and road user type account for the largest numbers of hospitalised injuries at the national level, and how do these differ between males and females?</h2>
             </header>
             <div class="block-grid reveal">
                 <div class="chart-card">
@@ -128,7 +130,7 @@
         <section class="block" id="q5" aria-labelledby="q5-h">
             <header class="section-head reveal">
                 <p class="eyebrow">5 &middot; First Nations peoples</p>
-                <h2 id="q5-h">How does the composition of hospitalised injuries among First Nations people (by road user type and age group) compare with that of non-Indigenous people? </h2>
+                <h2 id="q5-h">How does the composition of hospitalised injuries among First Nations people (by road user type and age group) compare with that of non-Indigenous people?</h2>
             </header>
             <div class="block-grid reveal">
                 <div class="chart-card">
@@ -151,6 +153,17 @@
             <p>[Two or three sentences that pull the five findings together, without claiming causes the data cannot support.]</p>
         </section>
     </main>
+
+    <!-- Back to Top Button with Circular Progress Ring & Chevron Icon -->
+    <a href="#hero" class="back-to-top" id="back-to-top" aria-label="Back to top" title="Back to top">
+        <svg class="btt-ring" viewBox="0 0 56 56" aria-hidden="true">
+            <circle class="btt-track" cx="28" cy="28" r="24"></circle>
+            <circle class="btt-progress" cx="28" cy="28" r="24"></circle>
+        </svg>
+        <svg class="btt-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6.5 14.5L12 9l5.5 5.5"></path>
+        </svg>
+    </a>
 
     <footer class="footer">
         <h2>About the data</h2>
