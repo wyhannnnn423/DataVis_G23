@@ -1,10 +1,8 @@
-/* Q1 chart.
-   Data: data/[file].csv (exported from KNIME).
-   Owner: [name]. Work on a feature branch and open a pull request. */
+/* Q1 National trend: scroll-driven area + line chart with animated annotations and crosshair tooltip.
+   Data: data/q1_national_trend.csv (year, hospitalisations).
+   Steps: 0 = national trajectory & KPI count-up, 1 = series-break annotations, 2 = 2019-2021 spotlight.
+   window.Q1.setStep(n) is called by main.js as the reader scrolls. */
 
-(function () {
-  // TODO: load the CSV with d3.csv(...) and draw the chart into #q1-chart
-})();
 (function() {
     const container = d3.select("#q1-chart");
     if (container.empty()) return;
@@ -357,4 +355,3 @@
         container.append("p").text("Sorry, the chart could not be loaded.");
     });
 })();
-
