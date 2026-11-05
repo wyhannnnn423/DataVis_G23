@@ -9,6 +9,10 @@
     --accent-bright: #3b82f6;
     --accent-soft: #e0f2fe;
     --highlight-warm: #f59e0b;
+<<<<<<< Updated upstream
+=======
+    --highlight-warm-soft: rgba(245, 158, 11, 0.16);
+>>>>>>> Stashed changes
     --shadow-sm: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
     --shadow-lg: 0 20px 40px -12px rgba(15, 23, 42, 0.10), 0 4px 16px -4px rgba(15, 23, 42, 0.04);
     --bar-h: 64px;
@@ -28,6 +32,10 @@
         --accent-bright: #4f8ff7;
         --accent-soft: #0c2a40;
         --highlight-warm: #fbbf24;
+<<<<<<< Updated upstream
+=======
+        --highlight-warm-soft: rgba(251, 191, 36, 0.18);
+>>>>>>> Stashed changes
         --shadow-sm: 0 4px 16px -2px rgba(0, 0, 0, 0.35);
         --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.55);
     }
@@ -66,10 +74,18 @@ a {
     background: var(--surface);
     padding: 8px 14px;
     border-radius: 8px;
+<<<<<<< Updated upstream
 }
 
 :focus-visible {
     outline: 3px solid var(--accent);
+=======
+    box-shadow: var(--shadow-sm);
+}
+
+:focus-visible {
+    outline: 3px solid var(--highlight-warm);
+>>>>>>> Stashed changes
     outline-offset: 2px;
 }
 
@@ -87,50 +103,115 @@ a {
     gap: 24px;
     padding: 0 max(3vw, 24px);
     background: color-mix(in srgb, var(--bg) 84%, transparent);
+<<<<<<< Updated upstream
     backdrop-filter: blur(12px);
     border-bottom: 1px solid transparent;
     transition: border-color .3s ease;
+=======
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s var(--ease-out-expo), box-shadow .3s var(--ease-out-expo);
+>>>>>>> Stashed changes
 }
 
 .topbar.scrolled {
     border-color: var(--line);
+<<<<<<< Updated upstream
+=======
+    box-shadow: var(--shadow-sm);
+>>>>>>> Stashed changes
 }
 
 .brand {
     font-weight: 800;
     font-size: 1.08rem;
+<<<<<<< Updated upstream
     color: var(--text);
     text-decoration: none;
     white-space: nowrap;
+=======
+    letter-spacing: -0.02em;
+    color: var(--text);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.25s ease, transform 0.25s var(--ease-out-expo);
+}
+
+.brand:hover {
+    color: var(--highlight-warm);
+    transform: translateY(-1px);
+>>>>>>> Stashed changes
 }
 
 .topbar nav {
     display: flex;
+<<<<<<< Updated upstream
     gap: 6px;
     overflow-x: auto;
 }
 
 .topbar nav a {
     padding: 7px 15px;
+=======
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0;
+}
+
+.topbar nav a {
+    position: relative;
+    padding: 7px 16px;
+>>>>>>> Stashed changes
     border-radius: 999px;
     color: var(--muted);
     text-decoration: none;
     font-size: 15px;
+<<<<<<< Updated upstream
     white-space: nowrap;
 }
 
 .topbar nav a:hover {
     color: var(--text);
+=======
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    transition: color 0.25s var(--ease-out-expo), background-color 0.25s var(--ease-out-expo), border-color 0.25s var(--ease-out-expo), transform 0.25s var(--ease-out-expo), box-shadow 0.25s var(--ease-out-expo);
+}
+
+.topbar nav a:hover {
+    color: var(--highlight-warm);
+    background: var(--highlight-warm-soft);
+    border-color: color-mix(in srgb, var(--highlight-warm) 50%, transparent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px -4px color-mix(in srgb, var(--highlight-warm) 35%, transparent);
+>>>>>>> Stashed changes
 }
 
 .topbar nav a.active {
     background: var(--accent-soft);
     color: var(--accent);
+<<<<<<< Updated upstream
     font-weight: 600;
 }
 
 
 /* Shared typography & containers */
+=======
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    font-weight: 600;
+}
+
+.topbar nav a.active:hover {
+    color: var(--highlight-warm);
+    background: var(--highlight-warm-soft);
+    border-color: var(--highlight-warm);
+}
+
+
+/* Typography & Layout */
+>>>>>>> Stashed changes
 
 .eyebrow {
     margin: 0 0 8px;
@@ -179,6 +260,14 @@ section {
     padding: 24px 28px 20px;
     margin: 0;
     box-shadow: var(--shadow-lg);
+<<<<<<< Updated upstream
+=======
+    transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo), border-color 0.4s ease;
+}
+
+.chart-card:hover {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+>>>>>>> Stashed changes
 }
 
 .chart-card figcaption {
@@ -190,15 +279,63 @@ section {
 }
 
 
+<<<<<<< Updated upstream
 /* Hero Section */
 
 .hero {
+=======
+/* Hero Section with Animated Crash Background */
+
+@keyframes heroZoom {
+    0% {
+        transform: scale(1) translate3d(0, 0, 0);
+    }
+    100% {
+        transform: scale(1.12) translate3d(-1.5%, -1%, 0);
+    }
+}
+
+.hero {
+    position: relative;
+>>>>>>> Stashed changes
     min-height: calc(90vh - var(--bar-h));
     display: flex;
     flex-direction: column;
     justify-content: center;
     max-width: var(--container-max);
+<<<<<<< Updated upstream
     margin: 0 auto;
+=======
+    margin: 20px auto 0;
+    padding: 64px clamp(28px, 5vw, 72px);
+    border-radius: 24px;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image: url("../img/hero-crash.jpg"), url("../img/hero-crash.jpg.jpg"), url("../img/hero-crash.jpg.png"), url("../img/hero-crash.png"), url("../img/hero-crash.jpeg"), url("img/hero-crash.jpg"), url("../hero-crash.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: saturate(1.1) contrast(1.06);
+    will-change: transform;
+    animation: heroZoom 14s ease-in-out infinite alternate;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient( 100deg, color-mix(in srgb, var(--bg) 86%, transparent) 0%, color-mix(in srgb, var(--bg) 68%, transparent) 45%, color-mix(in srgb, var(--bg) 32%, transparent) 100%);
+>>>>>>> Stashed changes
 }
 
 .hero h1 {
@@ -220,30 +357,63 @@ section {
 }
 
 .kpi {
+<<<<<<< Updated upstream
     background: var(--surface);
+=======
+    background: var(--surface-elevated);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+>>>>>>> Stashed changes
     border: 1px solid var(--line);
     border-radius: 16px;
     padding: 22px 26px;
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow-sm);
+<<<<<<< Updated upstream
+=======
+    transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s var(--ease-out-expo), border-color 0.35s var(--ease-out-expo);
+}
+
+.kpi:hover {
+    transform: translateY(-6px) scale(1.015);
+    border-color: var(--highlight-warm);
+    box-shadow: 0 16px 32px -8px color-mix(in srgb, var(--highlight-warm) 25%, rgba(0, 0, 0, 0.25));
+}
+
+.kpi:hover .kpi-num {
+    color: var(--highlight-warm);
+>>>>>>> Stashed changes
 }
 
 .kpi-num {
     font-size: clamp(2.2rem, 3vw, 2.75rem);
     font-weight: 800;
+<<<<<<< Updated upstream
     color: var(--accent);
     line-height: 1.1;
     margin-bottom: 6px;
+=======
+    letter-spacing: -0.03em;
+    color: var(--accent);
+    line-height: 1.1;
+    margin-bottom: 6px;
+    transition: color 0.3s ease;
+>>>>>>> Stashed changes
 }
 
 .kpi-label {
     font-size: 14.5px;
     color: var(--muted);
+<<<<<<< Updated upstream
+=======
+    font-weight: 500;
+>>>>>>> Stashed changes
 }
 
 .cue {
     margin-top: 48px;
+<<<<<<< Updated upstream
     color: var(--accent);
     text-decoration: none;
     font-weight: 600;
@@ -251,6 +421,32 @@ section {
 
 
 /* Scrollytelling */
+=======
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    width: fit-content;
+    padding: 11px 22px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    background: var(--accent-soft);
+    transition: all 0.3s var(--ease-out-expo);
+}
+
+.cue:hover {
+    color: var(--highlight-warm);
+    background: var(--highlight-warm-soft);
+    border-color: var(--highlight-warm);
+    transform: translateY(3px);
+    box-shadow: 0 8px 20px -4px color-mix(in srgb, var(--highlight-warm) 35%, transparent);
+}
+
+
+/* Q1 Scrollytelling: Question + Chart Lock Together on Left; Cumulative Stacked Cards on Right */
+>>>>>>> Stashed changes
 
 .scrolly {
     max-width: var(--container-max);
@@ -259,6 +455,11 @@ section {
     grid-template-columns: minmax(0, 1.85fr) minmax(340px, 1fr);
     gap: clamp(32px, 4.5vw, 72px);
     align-items: start;
+<<<<<<< Updated upstream
+=======
+    position: relative;
+    min-height: 220vh;
+>>>>>>> Stashed changes
 }
 
 .sticky {
@@ -271,6 +472,7 @@ section {
     margin: 0 0 20px;
 }
 
+<<<<<<< Updated upstream
 .steps {
     padding-top: var(--steps-pad-top, 240px);
     padding-bottom: var(--steps-pad-bottom, 340px);
@@ -311,6 +513,199 @@ section {
 
 
 /* Chart + Insight Blocks (Q2 - Q5) */
+=======
+
+/* Right Column: Sticky Card Stack Panel */
+
+.steps {
+    position: relative;
+    height: 100%;
+}
+
+.steps-sticky-card {
+    position: sticky;
+    top: var(--step-lock-top, calc(var(--bar-h) + 260px));
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+
+/* =========================================================
+   SPECIAL ENTRANCE EFFECTS FOR THE 3 STACKING CARDS
+   ========================================================= */
+
+@keyframes cardEntrancePop {
+    0% {
+        opacity: 0;
+        filter: blur(10px);
+        transform: translateY(28px) scale(0.95) rotateX(-8deg);
+    }
+    65% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(-4px) scale(1.02) rotateX(0deg);
+    }
+    100% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0) scale(1) rotateX(0deg);
+    }
+}
+
+@keyframes gleamSweep {
+    0% {
+        transform: translateX(-120%);
+    }
+    100% {
+        transform: translateX(200%);
+    }
+}
+
+.step {
+    perspective: 800px;
+}
+
+.step p {
+    position: relative;
+    background: var(--surface-elevated);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin: 0;
+    font-size: 1.02rem;
+    line-height: 1.62;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: all 0.35s ease;
+}
+
+
+/* Hidden by default before reveal */
+
+.step:not(.is-shown) {
+    display: none;
+}
+
+
+/* Entrance animation triggered on reveal */
+
+.step.is-shown {
+    display: block;
+    animation: cardEntrancePop 0.65s var(--ease-out-expo) forwards;
+}
+
+
+/* Holographic gleam sweep across the card on reveal */
+
+.step.is-active p::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient( 90deg, transparent 0%, color-mix(in srgb, var(--highlight-warm) 22%, transparent) 50%, transparent 100%);
+    transform: skewX(-20deg);
+    animation: gleamSweep 1.4s var(--ease-out-expo) 1;
+    pointer-events: none;
+}
+
+
+/* Active card highlight state */
+
+.step.is-active p {
+    border-left-color: var(--highlight-warm);
+    box-shadow: 0 14px 32px -6px color-mix(in srgb, var(--highlight-warm) 35%, rgba(0, 0, 0, 0.35)), 0 0 18px -2px color-mix(in srgb, var(--highlight-warm) 25%, transparent);
+}
+
+
+/* Passed steps stay calmly visible */
+
+.step.is-shown:not(.is-active) p {
+    opacity: 0.85;
+    border-left-color: var(--accent);
+    box-shadow: var(--shadow-sm);
+}
+
+
+/* Radar Beacon & Dash Stream Special Effects */
+
+@keyframes beaconPulse {
+    0% {
+        r: 6px;
+        opacity: 0.9;
+        stroke-width: 2px;
+    }
+    50% {
+        r: 18px;
+        opacity: 0.4;
+        stroke-width: 4px;
+    }
+    100% {
+        r: 28px;
+        opacity: 0;
+        stroke-width: 1px;
+    }
+}
+
+.beacon-wave {
+    fill: none;
+    stroke: var(--highlight-warm);
+    pointer-events: none;
+    animation: beaconPulse 2.4s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+}
+
+@keyframes dashStream {
+    to {
+        stroke-dashoffset: -24;
+    }
+}
+
+.step-breaks .break-line {
+    animation: dashStream 1.6s linear infinite;
+}
+
+
+/* Card Holographic Border Glow on Hover */
+
+.chart-card,
+.kpi,
+.insight {
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-card::before,
+.kpi::before,
+.insight::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: linear-gradient( 135deg, transparent 0%, color-mix(in srgb, var(--accent) 30%, transparent) 40%, color-mix(in srgb, var(--highlight-warm) 65%, transparent) 50%, color-mix(in srgb, var(--accent-bright) 40%, transparent) 60%, transparent 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
+}
+
+.chart-card:hover::before,
+.kpi:hover::before,
+.insight:hover::before {
+    opacity: 1;
+}
+
+
+/* Blocks Q2 to Q5 */
+>>>>>>> Stashed changes
 
 .block-grid {
     max-width: var(--container-max);
@@ -322,10 +717,25 @@ section {
 }
 
 .insight {
+<<<<<<< Updated upstream
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 18px;
     padding: 28px 30px;
+=======
+    background: var(--surface-elevated);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 28px 30px;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.insight:hover {
+    border-color: color-mix(in srgb, var(--highlight-warm) 45%, var(--line));
+    box-shadow: var(--shadow-lg);
+>>>>>>> Stashed changes
 }
 
 .insight p {
@@ -333,6 +743,13 @@ section {
     color: var(--muted);
 }
 
+<<<<<<< Updated upstream
+=======
+.insight p:last-child {
+    margin-bottom: 0;
+}
+
+>>>>>>> Stashed changes
 .controls {
     display: flex;
     flex-wrap: wrap;
@@ -350,11 +767,39 @@ section {
     color: var(--muted);
     border: 2px dashed var(--line);
     border-radius: 12px;
+<<<<<<< Updated upstream
 }
 
 .wrap {
     max-width: var(--container-max);
     margin: 0 auto;
+=======
+    background: color-mix(in srgb, var(--bg) 50%, transparent);
+}
+
+.placeholder small {
+    margin-top: 6px;
+    opacity: 0.8;
+}
+
+
+/* Wrap-up & Footer */
+
+.wrap {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    background: linear-gradient(135deg, var(--surface), var(--accent-soft));
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 56px clamp(28px, 5vw, 64px);
+    box-shadow: var(--shadow-lg);
+}
+
+.wrap p {
+    color: var(--muted);
+    max-width: 72ch;
+    font-size: 1.12rem;
+>>>>>>> Stashed changes
 }
 
 .footer {
@@ -366,21 +811,152 @@ section {
     font-size: 15px;
 }
 
+<<<<<<< Updated upstream
+=======
+.footer h2 {
+    font-size: 1.15rem;
+    color: var(--text);
+    margin-bottom: 12px;
+}
+
+
+/* Circular Progress Back-to-Top Button */
+
+.back-to-top {
+    position: fixed;
+    right: clamp(22px, 3vw, 38px);
+    bottom: clamp(22px, 3vw, 38px);
+    z-index: 60;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--muted);
+    text-decoration: none;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(16px) scale(0.9);
+    transition: opacity 0.35s var(--ease-out-expo), visibility 0.35s var(--ease-out-expo), transform 0.35s var(--ease-out-expo), color 0.25s var(--ease-out-expo), box-shadow 0.25s var(--ease-out-expo);
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.back-to-top .btt-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+    pointer-events: none;
+}
+
+.back-to-top .btt-track {
+    fill: none;
+    stroke: color-mix(in srgb, var(--line) 85%, transparent);
+    stroke-width: 3.5;
+}
+
+.back-to-top .btt-progress {
+    fill: none;
+    stroke: var(--accent-bright);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-dasharray: 150.8;
+    stroke-dashoffset: calc(150.8 * (1 - var(--scroll-progress, 0)));
+    transition: stroke 0.25s ease, stroke-dashoffset 0.08s linear;
+}
+
+.back-to-top .btt-icon {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.25s var(--ease-out-expo), stroke 0.25s ease;
+}
+
+.back-to-top:hover {
+    color: var(--highlight-warm);
+    transform: translateY(-4px) scale(1.07);
+    box-shadow: 0 12px 28px -4px color-mix(in srgb, var(--highlight-warm) 40%, rgba(0, 0, 0, 0.4));
+}
+
+.back-to-top:hover .btt-progress {
+    stroke: var(--highlight-warm);
+}
+
+.back-to-top:hover .btt-icon {
+    stroke: var(--highlight-warm);
+    transform: translateY(-2px);
+}
+
+
+/* SVG Chart Styles */
+
+>>>>>>> Stashed changes
 svg text {
     font-family: inherit;
 }
 
+<<<<<<< Updated upstream
 .js .reveal {
     opacity: 0;
     transform: translateY(28px);
     transition: opacity .65s ease, transform .65s ease;
+=======
+svg .pt {
+    cursor: pointer;
+    transition: r 0.25s var(--ease-out-expo), stroke-width 0.25s var(--ease-out-expo), fill 0.25s ease, stroke 0.25s ease, filter 0.25s ease;
+}
+
+svg .pt:hover,
+svg .pt:focus {
+    r: 9px !important;
+    fill: var(--highlight-warm) !important;
+    stroke: var(--surface) !important;
+    stroke-width: 3px !important;
+    filter: drop-shadow(0 0 8px var(--highlight-warm));
+}
+
+
+/* Scroll Reveals */
+
+.js .reveal {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(36px) scale(0.985);
+    transition: opacity 0.85s var(--ease-out-expo), transform 0.85s var(--ease-out-expo), filter 0.85s var(--ease-out-expo);
+    will-change: opacity, transform, filter;
+>>>>>>> Stashed changes
 }
 
 .js .reveal.in {
     opacity: 1;
+<<<<<<< Updated upstream
     transform: none;
 }
 
+=======
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+}
+
+
+/* Responsive Breakpoints */
+
+>>>>>>> Stashed changes
 @media (max-width: 1024px) {
     section {
         padding: 64px 20px;
@@ -390,6 +966,7 @@ svg text {
         grid-template-columns: 1fr;
         gap: 28px;
     }
+<<<<<<< Updated upstream
     .sticky {
         top: var(--bar-h);
         z-index: 10;
@@ -402,5 +979,43 @@ svg text {
     }
     .step p {
         position: static;
+=======
+    .scrolly {
+        min-height: auto;
+    }
+    .sticky {
+        top: var(--bar-h);
+        z-index: 10;
+        background: color-mix(in srgb, var(--bg) 92%, transparent);
+        backdrop-filter: blur(8px);
+        padding: 10px 0;
+    }
+    .steps-sticky-card {
+        position: static;
+        top: auto;
+    }
+    .step {
+        display: block !important;
+        margin-bottom: 12px;
+    }
+    .step p {
+        border-left: 4px solid var(--accent) !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+    .hero::before {
+        animation: none;
+    }
+    .js .reveal,
+    .step p {
+        opacity: 1;
+        filter: none;
+        transform: none;
+        transition: none;
+>>>>>>> Stashed changes
     }
 }
