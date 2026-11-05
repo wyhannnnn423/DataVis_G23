@@ -13,21 +13,48 @@
 </head>
 
 <body>
-    <a class="skip" href="#main">Skip to content</a>
+  <header>
+    <h1>Hospitalised road injuries in Australia, 2011-2021</h1>
+    <p>[One-sentence summary of the story goes here.]</p>
+  </header>
 
-    <header class="topbar" id="topbar">
-        <a class="brand" href="#hero">Road Injuries AU</a>
-        <nav aria-label="Story sections">
-            <a href="#q1" data-link="q1">Trend</a>
-            <a href="#q2" data-link="q2">Road users</a>
-            <a href="#q3" data-link="q3">States</a>
-            <a href="#q4" data-link="q4">Age and sex</a>
-            <a href="#q5" data-link="q5">First Nations</a>
-        </nav>
-    </header>
+  <main>
+    <section id="q1">
+      <h2>[Q1 headline]</h2>
+      <div id="q1-chart"></div>
+    </section>
 
-    <main id="main">
-        <!-- HERO -->
+    <section id="q2">
+      <h2>[Q2 headline]</h2>
+      <div id="q2-chart"></div>
+    </section>
+
+    <section id="q3">
+      <h2>[Q3 headline]</h2>
+      <div id="q3-chart"></div>
+    </section>
+
+    <section id="q4">
+      <h2>[Q4 headline]</h2>
+      <div id="q4-chart"></div>
+    </section>
+
+    <section id="q5">
+      <h2>[Q5 headline]</h2>
+      <div id="q5-chart"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Data: BITRE Hospitalised Injury data, 2011-2021. Counts are absolute and not adjusted for population.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script src="js/q1.js"></script>
+  <script src="js/q2.js"></script>
+  <script src="js/q3.js"></script>
+  <script src="js/q4.js"></script>
+  <script src="js/q5.js"></script>
         <section class="hero" id="hero">
             <p class="eyebrow">Australia, 2011-2021</p>
             <h1>Who is hurt on Australian roads, where, and is it changing?</h1>
@@ -37,10 +64,10 @@
                 <div class="kpi"><span class="kpi-num" id="kpi-2021">-</span><span class="kpi-label">hospitalised in 2021</span></div>
                 <div class="kpi"><span class="kpi-num" id="kpi-change">-</span><span class="kpi-label">change, 2011 to 2021</span></div>
             </div>
-            <a class="cue" href="#q1">Scroll to begin</a>
+            <a class="cue" href="#q1">Scroll to begin </span></a>
         </section>
 
-        <!-- Q1: scroll-driven chart (Question + Chart lock together) -->
+        <!-- Q1: scroll-driven chart (Question + Chart lock together at Fig 2 position) -->
         <section class="story" id="q1" aria-labelledby="q1-h">
             <div class="scrolly">
                 <div class="sticky">
@@ -152,6 +179,17 @@
         </section>
     </main>
 
+    <!-- Back to Top Button with Circular Progress Ring & Chevron Icon -->
+    <a href="#hero" class="back-to-top" id="back-to-top" aria-label="Back to top" title="Back to top">
+        <svg class="btt-ring" viewBox="0 0 56 56" aria-hidden="true">
+            <circle class="btt-track" cx="28" cy="28" r="24"></circle>
+            <circle class="btt-progress" cx="28" cy="28" r="24"></circle>
+        </svg>
+        <svg class="btt-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6.5 14.5L12 9l5.5 5.5"></path>
+        </svg>
+    </a>
+
     <footer class="footer">
         <h2>About the data</h2>
         <ul>
@@ -169,6 +207,7 @@
     <script src="js/q3.js"></script>
     <script src="js/q4.js"></script>
     <script src="js/q5.js"></script>
+
 </body>
 
 </html>

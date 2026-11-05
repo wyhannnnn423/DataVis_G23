@@ -1,19 +1,7 @@
 :root {
-    --bg: #f5f7fb;
-    --surface: #ffffff;
-    --surface-elevated: rgba(255, 255, 255, 0.88);
-    --text: #0f172a;
-    --muted: #475569;
-    --line: #e2e8f0;
-    --accent: #1d6fa5;
-    --accent-bright: #3b82f6;
-    --accent-soft: #e0f2fe;
-    --highlight-warm: #f59e0b;
-    --shadow-sm: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
-    --shadow-lg: 0 20px 40px -12px rgba(15, 23, 42, 0.10), 0 4px 16px -4px rgba(15, 23, 42, 0.04);
-    --bar-h: 64px;
-    --container-max: min(94vw, 1560px);
-    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --bg: #ffffff;
+  --text: #1a1a1a;
+  --muted: #555555;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -381,6 +369,8 @@ svg text {
     transform: none;
 }
 
+section { margin-bottom: 3rem; }
+footer { color: var(--muted); font-size: 0.9rem; }
 @media (max-width: 1024px) {
     section {
         padding: 64px 20px;
@@ -393,14 +383,35 @@ svg text {
     .sticky {
         top: var(--bar-h);
         z-index: 10;
-        background: var(--bg);
+        background: color-mix(in srgb, var(--bg) 92%, transparent);
+        backdrop-filter: blur(8px);
         padding: 10px 0;
     }
     .steps {
         padding-top: 2vh !important;
         padding-bottom: 8vh !important;
     }
+    .step {
+        min-height: 45vh;
+        margin-bottom: 8vh;
+    }
     .step p {
         position: static;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+    .hero::before {
+        animation: none;
+    }
+    .js .reveal,
+    .step p {
+        opacity: 1;
+        filter: none;
+        transform: none;
+        transition: none;
     }
 }
