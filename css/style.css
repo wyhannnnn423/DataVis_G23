@@ -812,8 +812,28 @@ svg .pt:focus {
         display: block !important;
         margin-bottom: 12px;
     }
+    .step {
+        min-height: 45vh;
+        margin-bottom: 8vh;
+    }
     .step p {
         border-left: 4px solid var(--accent) !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+    .hero::before {
+        animation: none;
+    }
+    .js .reveal,
+    .step p {
+        opacity: 1;
+        filter: none;
+        transform: none;
+        transition: none;
     }
 }
 

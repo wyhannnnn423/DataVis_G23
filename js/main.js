@@ -85,6 +85,7 @@
         } else {
             activeStep = 0;
         }
+    }
 
         // Cumulative visibility: Card 0 stays visible when Card 1 and Card 2 appear!
         stepEls.forEach((el, idx) => {
