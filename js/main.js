@@ -1,14 +1,12 @@
 /* Page behaviour: nav highlight, circular scroll progress button, kinetic scroll reveal,
-   and Fig 2 Question + Chart synchronised lock.
-   Owner: Han (website structure and integration). */
+   and Fig 2 Question + Chart lock with cumulative sequential card revelation.
+   Owner: Group 23. */
 
 (function() {
     const bar = document.getElementById("topbar");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const steps = Array.from(document.querySelectorAll(".step"));
-    let currentStep = -1;
 
-    // 1. Move Q1 Question (.section-head) inside .sticky automatically so Question + Chart lock TOGETHER at Fig 2 position!
+    // 1. Move Q1 Question (.section-head) inside .sticky automatically so Question + Chart lock together at Fig 2 position
     const q1Section = document.getElementById("q1");
     const q1Sticky = q1Section ? q1Section.querySelector(".sticky") : null;
     const q1Head = q1Section ? q1Section.querySelector(".section-head") : null;
@@ -16,28 +14,34 @@
         q1Sticky.insertBefore(q1Head, q1Sticky.firstChild);
     }
 
-    // 2. Dynamically calibrate right-column step lock position & bottom padding to match Question + Chart height
+    // 2. Ensure the 3 cards are wrapped inside .steps-sticky-card
+    const stepsWrapper = q1Section ? q1Section.querySelector(".steps") : null;
+    let stepsPanel = q1Section ? q1Section.querySelector(".steps-sticky-card") : null;
+    if (stepsWrapper && !stepsPanel) {
+        stepsPanel = document.createElement("div");
+        stepsPanel.className = "steps-sticky-card";
+        while (stepsWrapper.firstChild) {
+            stepsPanel.appendChild(stepsWrapper.firstChild);
+        }
+        stepsWrapper.appendChild(stepsPanel);
+    }
+
+    const stepEls = Array.from(document.querySelectorAll("#q1 .step"));
+    let currentStep = -1;
+
+    // 3. Calibrate vertical lock offset
     function syncScrollyGeometry() {
-        if (!q1Sticky || !q1Head || !steps.length) return;
+        if (!q1Sticky || !q1Head) return;
         const barH = bar ? bar.offsetHeight : 64;
         const headStyle = window.getComputedStyle(q1Head);
         const headTotalH = q1Head.offsetHeight + parseFloat(headStyle.marginBottom || 20);
-        const cardOffsetBelowChartTop = 52; // Matches Fig 2 card alignment relative to chart top
+        const cardOffsetBelowChartTop = 48;
 
-        const padTop = Math.round(headTotalH + cardOffsetBelowChartTop);
-        const lockTop = Math.round(barH + 18 + padTop);
-
-        const stickyTotalH = q1Sticky.offsetHeight;
-        const lastCard = steps[steps.length - 1].querySelector("p") || steps[steps.length - 1];
-        const lastCardH = lastCard ? lastCard.offsetHeight : 120;
-        const padBottom = Math.max(120, Math.round(stickyTotalH - padTop - lastCardH));
-
-        document.documentElement.style.setProperty("--steps-pad-top", padTop + "px");
+        const lockTop = Math.round(barH + 18 + headTotalH + cardOffsetBelowChartTop);
         document.documentElement.style.setProperty("--step-lock-top", lockTop + "px");
-        document.documentElement.style.setProperty("--steps-pad-bottom", padBottom + "px");
     }
 
-    // 3. Upgrade or create Back-to-Top button with SVG Circular Progress Ring + Chevron Icon
+    // 4. Ensure Back-to-Top button has SVG Circular Progress Ring and Chevron Icon
     const bttSvgMarkup = `
     <svg class="btt-ring" viewBox="0 0 56 56" aria-hidden="true">
       <circle class="btt-track" cx="28" cy="28" r="24"></circle>
@@ -61,29 +65,40 @@
         backToTop.innerHTML = bttSvgMarkup;
     }
 
-    // 4. Determine which step card (<p>) is active at Fig 2's lock position
-    function updateActiveStep() {
-        if (!steps.length) return;
-        const lockTopVar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--step-lock-top")) || 320;
-        const triggerY = lockTopVar + 140;
+    // 5. Sequential cumulative revelation based on scroll depth through Q1
+    function updateCumulativeSteps() {
+        if (!q1Section || !stepEls.length) return;
 
-        let activeIdx = 0;
-        steps.forEach((stepEl, i) => {
-            const card = stepEl.querySelector("p") || stepEl;
-            const rect = card.getBoundingClientRect();
-            if (rect.top <= triggerY) {
-                activeIdx = i;
-            }
+        const rect = q1Section.getBoundingClientRect();
+        const barH = bar ? bar.offsetHeight : 64;
+        const scrollDistance = (barH + 30) - rect.top;
+        const scrollableH = rect.height - window.innerHeight;
+
+        const ratio = scrollableH > 0 ? Math.min(Math.max(scrollDistance / scrollableH, 0), 1) : 0;
+
+        let activeStep = 0;
+        // Sequential thresholds: Card 0 initially, Card 1 at ~28%, Card 2 at ~58%
+        if (ratio >= 0.58) {
+            activeStep = 2;
+        } else if (ratio >= 0.28) {
+            activeStep = 1;
+        } else {
+            activeStep = 0;
+        }
+
+        // Cumulative visibility: Card 0 stays visible when Card 1 and Card 2 appear!
+        stepEls.forEach((el, idx) => {
+            el.classList.toggle("is-shown", idx <= activeStep);
+            el.classList.toggle("is-active", idx === activeStep);
         });
 
-        if (activeIdx !== currentStep) {
-            currentStep = activeIdx;
-            steps.forEach((s, i) => s.classList.toggle("is-active", i === activeIdx));
-            if (window.Q1) window.Q1.setStep(Number(steps[activeIdx].dataset.step));
+        if (activeStep !== currentStep) {
+            currentStep = activeStep;
+            if (window.Q1) window.Q1.setStep(activeStep);
         }
     }
 
-    // 5. Scroll listener: topbar state, circular progress ring, and active step
+    // 6. Scroll listener: calculate reading progress, back-to-top toggle, and update steps
     const onScroll = () => {
         const scrollTop = window.scrollY;
         if (bar) bar.classList.toggle("scrolled", scrollTop > 8);
@@ -92,13 +107,13 @@
         const docHeight = document.documentElement.scrollHeight - window.innerHeight;
         const progress = docHeight > 0 ? Math.min(Math.max(scrollTop / docHeight, 0), 1) : 0;
         document.documentElement.style.setProperty("--scroll-progress", progress.toFixed(4));
-        updateActiveStep();
+        updateCumulativeSteps();
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", () => {
         syncScrollyGeometry();
-        updateActiveStep();
+        updateCumulativeSteps();
     }, { passive: true });
     window.addEventListener("load", () => {
         syncScrollyGeometry();
@@ -107,11 +122,10 @@
 
     syncScrollyGeometry();
     onScroll();
-    // Re-sync after D3 finishes rendering the Q1 SVG chart
-    setTimeout(syncScrollyGeometry, 350);
-    setTimeout(syncScrollyGeometry, 1000);
+    setTimeout(syncScrollyGeometry, 300);
+    setTimeout(syncScrollyGeometry, 800);
 
-    // 6. Highlight the nav link of the section in view
+    // 7. Navigation link active highlight
     const links = document.querySelectorAll("[data-link]");
     const sections = ["q1", "q2", "q3", "q4", "q5"].map(id => document.getElementById(id));
     const navObs = new IntersectionObserver(entries => {
@@ -123,7 +137,7 @@
     }, { rootMargin: "-35% 0px -55% 0px" });
     sections.forEach(s => s && navObs.observe(s));
 
-    // 7. Staggered kinetic reveal as sections enter viewport
+    // 8. Kinetic scroll reveal
     const revealObs = new IntersectionObserver((entries, obs) => {
         entries.forEach(e => {
             if (e.isIntersecting) {
