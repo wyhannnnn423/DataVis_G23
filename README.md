@@ -8,12 +8,6 @@ Data source: Bureau of Infrastructure and Transport Research Economics (BITRE), 
 
 ## Team
 
-| Member | Main area |
-|---|---|
-| [YanHanWONG] (Project Manager) | D3 charts and interaction |
-| [ShanKaiLIU] | Data processing (KNIME) and data section of the Design Book |
-| [GeorgeYongHanTAN] | Design and delivery: wireframes, storyboard, usability testing, Vercel |
-
 | Member | Role | Core Responsibilities |
 |---|---|---|
 | **Yan Han WONG** | Project Manager & Lead Developer | • Overall website structure, navigation, responsive layout, and integration of all 5 charts<br>• Vercel deployment configuration and continuous deployment setup<br>• D3 prototype development: Q1 national trend line chart<br>• Implementation of Chart Q2 (Road Users) and Chart Q3 (States & Territories)<br>• Pull request code reviews, git hygiene, and repository organisation |
