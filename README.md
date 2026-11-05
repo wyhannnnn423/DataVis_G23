@@ -1,7 +1,7 @@
 # DataVis_G23
 
 COS30045 Data Visualisation, Project (2026 S2), Group 23.
-An interactive D3 data story about hospitalised injuries from road crashes in Australia, 2011-2021.
+An interactive D3 data story investigating hospitalised road traffic injuries across Australia from 2011 to 2021.
 
 Data source: Bureau of Infrastructure and Transport Research Economics (BITRE), Hospitalised Injury data
 (https://www.bitre.gov.au/publications/ongoing/hospitalised-injury).
@@ -14,40 +14,85 @@ Data source: Bureau of Infrastructure and Transport Research Economics (BITRE), 
 | [ShanKaiLIU] | Data processing (KNIME) and data section of the Design Book |
 | [GeorgeYongHanTAN] | Design and delivery: wireframes, storyboard, usability testing, Vercel |
 
-## Structure
+| Member | Role | Core Responsibilities |
+|---|---|---|
+| **Yan Han WONG** | Project Manager & Lead Developer | • Overall website structure, navigation, responsive layout, and integration of all 5 charts<br>• Vercel deployment configuration and continuous deployment setup<br>• D3 prototype development: Q1 national trend line chart<br>• Implementation of Chart Q2 (Road Users) and Chart Q3 (States & Territories)<br>• Pull request code reviews, git hygiene, and repository organisation |
+| **Shan Kai LIU** | Data Engineer & D3 Developer | • In-depth inspection and schema mapping of BITRE raw datasets<br>• Building and documenting KNIME workflows for data extraction, filtering, and aggregation<br>• Exporting cleaned CSV data files to the `data/` directory<br>• Drafting data processing and governance sections for the Design Book<br>• Implementation of Chart Q5 (First Nations Peoples) in D3.js |
+| **George Yong Han TAN** | UI/UX Designer & D3 Developer | • Wireframing and storyboarding for the page flow and all 5 charts<br>• Planning usability testing tasks and evaluating accessibility (WCAG compliance)<br>• UI visual polish, hero crash banner media, and progress interaction<br>• Implementation of Chart Q4 (Age, Sex & Road User) in D3.js based on wireframes |
+| **All Team Members** | Shared Academic Deliverables | • Reviewing and refining Design Book Sections 1.1 (Audience & Motivation) and 1.2 (Purpose & Questions)<br>• Reviewing and confirming data dictionary schemas, column naming conventions, and milestones<br>• Participating in weekly Stand-ups and completing individual reflection reports |
 
+## Repository Structure
 ```
-index.html      page layout, one section per research question
-css/style.css   styles
-js/q1.js ...    one D3 file per research question 
-data/           cleaned CSV files exported from KNIME
+DataVis_G23/
+├── index.html # Main data story page (semantic HTML5, section per research question)
+├── css/
+│ └── style.css # Responsive styling, dark/light themes, animations, layout grids
+├── js/
+│ ├── main.js # Global page interactions (nav spy, scroll reveals, back-to-top)
+│ ├── q1.js # Q1 National trend line/area chart (Owner: Yan Han)
+│ ├── q2.js # Q2 Road users distribution & shifts (Owner: Yan Han)
+│ ├── q3.js # Q3 States & territories geographic breakdown (Owner: Yan Han)
+│ ├── q4.js # Q4 Age group, sex, and user type matrix (Owner: George)
+│ └── q5.js # Q5 First Nations vs non-Indigenous comparison (Owner: Shan Kai)
+├── data/
+│ ├── q1_national_trend.csv # Cleaned yearly hospitalisation totals (2011–2021)
+│ ├── q2_road_users.csv # Annual injury counts by road user category
+│ ├── q3_states.csv # State and territory injury metrics
+│ ├── q4_age_road_user.csv # Cross-tabulated age, sex, and user type figures
+│ └── q5_first_nations.csv # Comparative metrics for Indigenous status
+└── docs/ # Design Book assets, wireframes, and usability test protocols
 ```
+---
 
-## Research questions
+## Research Questions & Chart Ownership
 
-1. Q1 National trend
-2. Q2 Road users
-3. Q3 States and territories
-4. Q4 Age, sex and road user
-5. Q5 First Nations peoples
+1. **Q1 · National Trend (Owner: Yan Han)**
+   *How did non-fatal hospitalised road traffic injury counts change from 2011 to 2021, and how did the pattern in 2019–2021 compare with earlier years?*
+   *Visualization:* Scroll-driven area + line chart with historical recording-break annotations (2012 VIC, 2017 NSW).
+
+2. **Q2 · Road Users (Owner: Yan Han)**
+   *Which road user groups contributed most to the change in national counts between two selected years, and how did their shares of all road traffic injuries change?*
+   *Visualization:* Interactive dumbbell / slope chart with category breakdown controls.
+
+3. **Q3 · States and Territories (Owner: Yan Han)**
+   *How are hospitalised injury counts distributed across states and territories, and how has each jurisdiction’s share of the national total changed over time?*
+   *Visualization:* Multi-series temporal chart / proportional representation illustrating state contributions.
+
+4. **Q4 · Age and Sex (Owner: George)**
+   *Which combinations of age group and road user type account for the largest numbers of hospitalised injuries at the national level, and how do these differ between males and females?*
+   *Visualization:* Grouped comparison chart / heatmap matrix with sex filtering.
+
+5. **Q5 · First Nations Peoples (Owner: Shan Kai)**
+   *How does the composition of hospitalised injuries among First Nations people (by road user type and age group) compare with that of non-Indigenous people?*
+   *Visualization:* 100% normalized stacked proportion visual comparing demographic structures.
+
+---
 
 ## Deploy
 
-Hosted on Vercel. Import this repo in Vercel (Framework Preset: Other, no build command).
-Every push to `main` redeploys.
+The website is hosted live on Vercel. Continuous deployment is triggered automatically on every pull request merged into `main`.
 
-## Team workflow
+## Team Workflow & Git Standards
 
-- Do not commit directly to `main`.
-- One branch per task, for example `feature/q1-line-chart`.
-- Open a pull request and ask a teammate to review before merging.
-- Pull often, and write commit messages that say what changed.
+---
 
-## Data notes
+- **Branching Strategy:** Do not commit directly to `main`. Create feature branches matching task ownership:
+  - `feature/q1-line-chart`
+  - `feature/q4-age-sex-chart`
+  - `feature/ui-design-polish`
+- **Pull Requests (PR):** Open a pull request targeting `main` upon completing a feature or milestone. Every PR requires at least one peer code review before merge.
+- **Commit Conventions:** Use concise, semantic commit messages (e.g., `feat: ...`, `style: ...`, `fix: ...`, `docs: ...`).
+- **Data Synchronization:** Always verify column names in cleaned CSV exports against the agreed specifications before committing to `data/`.
 
-- Counts are absolute numbers, not adjusted for population.
-- Series breaks: Victoria from 2012, New South Wales from 2017 (see the BITRE Data Dictionary).
+---
 
+## Data Notes & Ethical Considerations
+
+- **Absolute Counts:** Counts represent absolute hospitalised admissions and are not adjusted for population size. As documented by BITRE, absolute raw counts should not be used directly to evaluate or rank relative jurisdiction safety.
+- **Series Breaks:** Significant administrative coding and recording changes occurred in Victoria from 2012 and New South Wales from 2017. Movements around these periods must be contextualised accurately in the narrative.
+- **Suppressed Data:** For small cell counts in demographic subsets (particularly regarding Indigenous status), figures marked `n.p.` denote numbers that have been withheld for confidentiality.
+
+---
 
 # Website
 
@@ -57,8 +102,4 @@ Open with a local server (d3.csv cannot read files from a double-clicked page):
 
 then visit http://localhost:8000.
 
-- index.html: hero, five story sections, wrap-up, data notes
-- css/style.css: calm light/dark theme, responsive, reduced-motion support
-- js/main.js: nav highlight, scroll reveal, scroll steps
-- js/q1.js: working scroll-driven line chart (data/q1_national_trend.csv)
-- js/q2.js to q5.js: placeholders. Each draws into #qN-chart and puts filters in #qN-controls
+
