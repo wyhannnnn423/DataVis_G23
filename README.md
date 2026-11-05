@@ -8,18 +8,12 @@ Data source: Bureau of Infrastructure and Transport Research Economics (BITRE), 
 
 ## Team
 
-| Member | Main area |
-|---|---|
-| [YanHanWONG] (Project Manager) | D3 charts and interaction |
-| [ShanKaiLIU] | Data processing (KNIME) and data section of the Design Book |
-| [GeorgeYongHanTAN] | Design and delivery: wireframes, storyboard, usability testing, Vercel |
-
 | Member | Role | Core Responsibilities |
 |---|---|---|
 | **Yan Han WONG** | Project Manager & Lead Developer | • Overall website structure, navigation, responsive layout, and integration of all 5 charts<br>• Vercel deployment configuration and continuous deployment setup<br>• D3 prototype development: Q1 national trend line chart<br>• Implementation of Chart Q2 (Road Users) and Chart Q3 (States & Territories)<br>• Pull request code reviews, git hygiene, and repository organisation |
 | **Shan Kai LIU** | Data Engineer & D3 Developer | • In-depth inspection and schema mapping of BITRE raw datasets<br>• Building and documenting KNIME workflows for data extraction, filtering, and aggregation<br>• Exporting cleaned CSV data files to the `data/` directory<br>• Drafting data processing and governance sections for the Design Book<br>• Implementation of Chart Q5 (First Nations Peoples) in D3.js |
-| **George Yong Han TAN** | UI/UX Designer & D3 Developer | • Wireframing and storyboarding for the page flow and all 5 charts<br>• Planning usability testing tasks and evaluating accessibility (WCAG compliance)<br>• UI visual polish, hero crash banner media, and progress interaction<br>• Implementation of Chart Q4 (Age, Sex & Road User) in D3.js based on wireframes |
-| **All Team Members** | Shared Academic Deliverables | • Reviewing and refining Design Book Sections 1.1 (Audience & Motivation) and 1.2 (Purpose & Questions)<br>• Reviewing and confirming data dictionary schemas, column naming conventions, and milestones<br>• Participating in weekly Stand-ups and completing individual reflection reports |
+| **George Yong Han TAN** | UI/UX Designer & D3 Developer | • Wireframing and storyboarding for the page flow and all 5 charts<br>• Planning usability testing tasks and evaluating accessibility (WCAG compliance)<br>• UI visual polish, and progress interaction<br>• Implementation of Chart Q4 (Age, Sex & Road User) in D3.js based on wireframes |
+
 
 ## Repository Structure
 ```
