@@ -77,7 +77,7 @@ a {
 }
 
 
-/* Top bar */
+/* Top bar & Linear Reading Progress Bar */
 
 .topbar {
     position: sticky;
@@ -94,6 +94,21 @@ a {
     -webkit-backdrop-filter: blur(14px);
     border-bottom: 1px solid transparent;
     transition: border-color .3s var(--ease-out-expo), box-shadow .3s var(--ease-out-expo);
+}
+
+
+/* Restored Topbar Bottom Progress Line */
+
+.topbar::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    height: 2.5px;
+    width: calc(var(--scroll-progress, 0) * 100%);
+    background: linear-gradient(90deg, var(--accent), var(--highlight-warm));
+    box-shadow: 0 0 10px color-mix(in srgb, var(--highlight-warm) 50%, transparent);
+    transition: width 0.08s linear;
 }
 
 .topbar.scrolled {
@@ -135,6 +150,9 @@ a {
     border: 1px solid transparent;
     transition: color 0.25s var(--ease-out-expo), background-color 0.25s var(--ease-out-expo), border-color 0.25s var(--ease-out-expo), transform 0.25s var(--ease-out-expo), box-shadow 0.25s var(--ease-out-expo);
 }
+
+
+/* Vivid Yellow/Amber Hover Effect on Nav Links */
 
 .topbar nav a:hover {
     color: var(--highlight-warm);
@@ -395,9 +413,7 @@ section {
 }
 
 
-/* =========================================================
-   SPECIAL ENTRANCE EFFECTS FOR THE 3 STACKING CARDS
-   ========================================================= */
+/* Special Entrance Effects for the 3 Stacking Cards */
 
 @keyframes cardEntrancePop {
     0% {
