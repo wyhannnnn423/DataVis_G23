@@ -18,6 +18,7 @@
       <div id="q1-chart"></div>
     </section>
 
+<<<<<<< Updated upstream
     <section id="q2">
       <h2>[Q2 headline]</h2>
       <div id="q2-chart"></div>
@@ -49,5 +50,161 @@
   <script src="js/q3.js"></script>
   <script src="js/q4.js"></script>
   <script src="js/q5.js"></script>
+=======
+    <main id="main">
+        <!-- HERO (Automatically loads img/hero-crash.jpg with slow zoom animation) -->
+        <section class="hero" id="hero">
+            <p class="eyebrow">Australia, 2011-2021</p>
+            <h1>Who is hurt on Australian roads, where, and is it changing?</h1>
+            <p class="lede">Road deaths make headlines. This story looks at the much larger number of people who survive a crash but are admitted to hospital.</p>
+            <div class="kpis">
+                <div class="kpi"><span class="kpi-num" id="kpi-2011">-</span><span class="kpi-label">hospitalised in 2011</span></div>
+                <div class="kpi"><span class="kpi-num" id="kpi-2021">-</span><span class="kpi-label">hospitalised in 2021</span></div>
+                <div class="kpi"><span class="kpi-num" id="kpi-change">-</span><span class="kpi-label">change, 2011 to 2021</span></div>
+            </div>
+            <a class="cue" href="#q1">Scroll to begin </span></a>
+        </section>
+
+        <!-- Q1: scroll-driven chart (Question + Chart lock together at Fig 2 position) -->
+        <section class="story" id="q1" aria-labelledby="q1-h">
+            <div class="scrolly">
+                <div class="sticky">
+                    <header class="section-head reveal">
+                        <p class="eyebrow">1 &middot; The big picture</p>
+                        <h2 id="q1-h">How did non-fatal hospitalised road traffic injury counts change from 2011 to 2021, and how did the pattern in 2019-2021 compare with earlier years?</h2>
+                    </header>
+                    <figure class="chart-card">
+                        <div id="q1-chart" aria-live="polite"></div>
+                        <figcaption>Hospitalised road traffic injuries per year. Counts are absolute, not adjusted for population.</figcaption>
+                    </figure>
+                </div>
+                <div class="steps">
+                    <div class="step" data-step="0">
+                        <p>Each year, tens of thousands of people are admitted to hospital after a road crash. In 2011 it was about 34,000; by 2021 about 39,500.</p>
+                    </div>
+                    <div class="step" data-step="1">
+                        <p>Two dashed lines mark changes in how Victoria (2012) and New South Wales (2017) record admissions. Part of the movement around those years reflects recording, not safety.</p>
+                    </div>
+                    <div class="step" data-step="2">
+                        <p>Counts dipped in 2020 and recovered in 2021. The data cannot show why.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Q2 to Q5: chart + insight blocks, charts added when data is ready -->
+        <section class="block" id="q2" aria-labelledby="q2-h">
+            <header class="section-head reveal">
+                <p class="eyebrow">2 &middot; Who changed most</p>
+                <h2 id="q2-h">Which road user groups contributed most to the change in national counts between two selected years, and how did their shares of all road traffic injuries change?</h2>
+            </header>
+            <div class="block-grid reveal">
+                <div class="chart-card">
+                    <div class="controls" id="q2-controls"></div>
+                    <div id="q2-chart" class="placeholder">Chart coming soon<small>Needs data/q2_road_users.csv</small></div>
+                </div>
+                <aside class="insight">
+                    <h3>How to read this</h3>
+                    <p>[One or two sentences.]</p>
+                    <h3>What it shows</h3>
+                    <p>[Insight text.]</p>
+                </aside>
+            </div>
+        </section>
+
+        <section class="block" id="q3" aria-labelledby="q3-h">
+            <header class="section-head reveal">
+                <p class="eyebrow">3 &middot; Where it happens</p>
+                <h2 id="q3-h">How are hospitalised injury counts distributed across states and territories, and how has each jurisdiction’s share of the national total changed over time?</h2>
+            </header>
+            <div class="block-grid reveal">
+                <div class="chart-card">
+                    <div class="controls" id="q3-controls"></div>
+                    <div id="q3-chart" class="placeholder">Chart coming soon<small>Needs data/q3_states.csv</small></div>
+                </div>
+                <aside class="insight">
+                    <h3>How to read this</h3>
+                    <p>[One or two sentences.]</p>
+                    <h3>What it shows</h3>
+                    <p>[Insight text. Remind readers counts are not adjusted for population, and note the Victoria and NSW series breaks.]</p>
+                </aside>
+            </div>
+        </section>
+
+        <section class="block" id="q4" aria-labelledby="q4-h">
+            <header class="section-head reveal">
+                <p class="eyebrow">4 &middot; Age and sex</p>
+                <h2 id="q4-h">Which combinations of age group and road user type account for the largest numbers of hospitalised injuries at the national level, and how do these differ between males and females?</h2>
+            </header>
+            <div class="block-grid reveal">
+                <div class="chart-card">
+                    <div class="controls" id="q4-controls"></div>
+                    <div id="q4-chart" class="placeholder">Chart coming soon<small>Needs data/q4_age_road_user.csv</small></div>
+                </div>
+                <aside class="insight">
+                    <h3>How to read this</h3>
+                    <p>[One or two sentences.]</p>
+                    <h3>What it shows</h3>
+                    <p>[Insight text. Describe counts, not per-person risk.]</p>
+                </aside>
+            </div>
+        </section>
+
+        <section class="block" id="q5" aria-labelledby="q5-h">
+            <header class="section-head reveal">
+                <p class="eyebrow">5 &middot; First Nations peoples</p>
+                <h2 id="q5-h">How does the composition of hospitalised injuries among First Nations people (by road user type and age group) compare with that of non-Indigenous people?</h2>
+            </header>
+            <div class="block-grid reveal">
+                <div class="chart-card">
+                    <div class="controls" id="q5-controls"></div>
+                    <div id="q5-chart" class="placeholder">Chart coming soon<small>Needs data/q5_first_nations.csv</small></div>
+                </div>
+                <aside class="insight">
+                    <h3>How to read this</h3>
+                    <p>[One or two sentences.]</p>
+                    <h3>What it shows</h3>
+                    <p>[Insight text. Compare proportions, not totals; note suppressed values (n.p.).]</p>
+                </aside>
+            </div>
+        </section>
+
+        <!-- Wrap-up -->
+        <section class="wrap reveal" id="wrap" aria-labelledby="wrap-h">
+            <p class="eyebrow">What to take away</p>
+            <h2 id="wrap-h">[Closing headline]</h2>
+            <p>[Two or three sentences that pull the five findings together, without claiming causes the data cannot support.]</p>
+        </section>
+    </main>
+
+    <!-- Back to Top Button with Circular Progress Ring & Chevron Icon -->
+    <a href="#hero" class="back-to-top" id="back-to-top" aria-label="Back to top" title="Back to top">
+        <svg class="btt-ring" viewBox="0 0 56 56" aria-hidden="true">
+            <circle class="btt-track" cx="28" cy="28" r="24"></circle>
+            <circle class="btt-progress" cx="28" cy="28" r="24"></circle>
+        </svg>
+        <svg class="btt-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6.5 14.5L12 9l5.5 5.5"></path>
+        </svg>
+    </a>
+
+    <footer class="footer">
+        <h2>About the data</h2>
+        <ul>
+            <li>Source: Bureau of Infrastructure and Transport Research Economics (BITRE), Hospitalised Injury data, 2011-2021.</li>
+            <li>Counts are absolute and not adjusted for population, so jurisdictions should not be ranked by safety.</li>
+            <li>Series breaks: Victoria from 2012 and New South Wales from 2017 (see the BITRE Data Dictionary).</li>
+            <li>Group 23, COS30045 Data Visualisation, Swinburne University of Technology Sarawak.</li>
+        </ul>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/q1.js"></script>
+    <script src="js/q2.js"></script>
+    <script src="js/q3.js"></script>
+    <script src="js/q4.js"></script>
+    <script src="js/q5.js"></script>
+>>>>>>> Stashed changes
 </body>
 </html>
