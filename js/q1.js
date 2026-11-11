@@ -34,7 +34,7 @@
         }
         d3.select(el)
             .transition()
-            .duration(1400)
+            .duration(3000)
             .ease(d3.easeCubicOut)
             .tween("text", function() {
                 const interp = d3.interpolateNumber(0, endVal);
