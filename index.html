@@ -87,13 +87,13 @@
             <div class="block-grid reveal">
                 <div class="chart-card">
                     <div class="controls" id="q2-controls"></div>
-                    <div id="q2-chart" class="placeholder">Chart coming soon<small>Needs data/q2_road_users.csv</small></div>
+                    <div id="q2-chart" class="placeholder">Chart coming soon<small>Needs data/q2_road_users_by_year.csv</small></div>
                 </div>
                 <aside class="insight">
                     <h3>How to read this</h3>
-                    <p>[One or two sentences.]</p>
+                    <p>Each bar is one road user group. Bars to the right are increases between the two years you pick, bars to the left are decreases, and groups are sorted from biggest rise to biggest fall. Switch to &ldquo;Change in share&rdquo; to see percentage-point shifts in each group&rsquo;s share of all injuries, or open the Table for the exact numbers.</p>
                     <h3>What it shows</h3>
-                    <p>[Insight text.]</p>
+                    <p id="q2-insight">Loading&hellip;</p>
                 </aside>
             </div>
         </section>
@@ -106,13 +106,14 @@
             <div class="block-grid reveal">
                 <div class="chart-card">
                     <div class="controls" id="q3-controls"></div>
-                    <div id="q3-chart" class="placeholder">Chart coming soon<small>Needs data/q3_states.csv</small></div>
+                    <div id="q3-chart" class="placeholder">Chart coming soon<small>Needs data/q3_states_by_year.csv</small></div>
                 </div>
                 <aside class="insight">
                     <h3>How to read this</h3>
-                    <p>[One or two sentences.]</p>
+                    <p>Each tile is a state or territory, placed roughly where it sits on the map; brighter means a bigger share of the national total. Drag the slider or press Play to move through the years, and click a tile or bar to follow one jurisdiction in the line chart below.</p>
                     <h3>What it shows</h3>
-                    <p>[Insight text. Remind readers counts are not adjusted for population, and note the Victoria and NSW series breaks.]</p>
+                    <p id="q3-insight">Loading&hellip;</p>
+                    <p>Counts are not adjusted for population, so a larger share may partly reflect a larger population. Victoria (2012) and NSW (2017) changed how admissions are recorded, so movements around those years are partly recording, not safety.</p>
                 </aside>
             </div>
         </section>
