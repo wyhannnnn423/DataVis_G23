@@ -16,7 +16,7 @@
             DOWN = "#3b82f6",
             MUTED = "#475569";
         const W = 960,
-            rowH = 38;
+            rowH = 30; // Shrunk row height for sticky compaction
         const m = { top: 30, right: 80, bottom: 42, left: 250 };
 
         container.classed("placeholder", false).html("").style("position", "relative").text("Loading chart\u2026");
@@ -175,7 +175,7 @@
         function update() {
             const { rows, net } = compute();
             const count = S.mode === "count";
-            const t = d3.transition().duration(dur).ease(d3.easeCubicOut);
+            const t = d3.transition().duration(firstDraw ? 0 : dur).ease(d3.easeCubicOut);
             
             rows.sort((p, q) => valEnd(q) - valEnd(p));
 
@@ -284,7 +284,41 @@
                 (opp ? `The largest move the other way was ${esc(opp.cat)} (${signed(opp.change, fmt)}).` : ""));
         }
 
+        // First draw is instant and hidden; the entrance plays when the chart card scrolls into view.
+        let firstDraw = true;
         update();
+        firstDraw = false;
+
+        // Scroll-driven entrance: window.Q2.setProgress(p) is called by main.js while the reader scrolls (0 to 1).
+        const ease = d3.easeCubicOut, back = d3.easeBackOut.overshoot(2);
+        const stage = (p, lo, hi) => Math.max(0, Math.min(1, (p - lo) / (hi - lo)));
+        const cntText = (d, e) => S.mode === "count" ? signed(Math.round(d.change * e), fmt) : signed(+(d.dShare * e).toFixed(1), v => v.toFixed(1)) + " pp";
+        let done = false;
+        function setProgress(p) {
+            if (done && p >= 1) return;
+            done = p >= 1;
+            // chart rises from below
+            const e0 = ease(stage(p, 0, 0.25));
+            container.style("opacity", done ? null : e0).style("transform", done ? null : `translateY(${(1 - e0) * 48}px)`);
+            // data points appear one after another
+            const n = gRows.selectAll("g.row").size();
+            const step = n > 1 ? 0.55 / (n - 1) : 0;
+            gRows.selectAll("g.row").each(function (d, i) {
+                const g = d3.select(this);
+                const rp = stage(p, 0.1 + i * step, 0.1 + i * step + 0.35);
+                const x1 = x(valStart(d)), x2 = x(valEnd(d));
+                g.attr("opacity", done ? 1 : stage(rp, 0, 0.3));
+                g.select(".lab").attr("transform", done ? null : `translate(${-18 * (1 - ease(stage(rp, 0, 0.4)))},0)`);
+                g.select(".connector-line").attr("x1", x1).attr("x2", done ? x2 : x1 + (x2 - x1) * ease(stage(rp, 0.2, 0.75)));
+                g.select(".circle-end").attr("r", done ? 6 : 6 * back(stage(rp, 0.5, 1)));
+                g.select(".val").attr("opacity", done ? 1 : stage(rp, 0.4, 0.8))
+                    .text(done ? valText(d) : cntText(d, ease(stage(rp, 0.4, 1))));
+            });
+        }
+        if (!reduce) {
+            window.Q2 = { setProgress };
+            setProgress((window.chartProgress || {}).q2 || 0);
+        }
     }).catch(function (err) {
         console.error("Q2 failed to load data:", err);
         container.text("Sorry, the chart could not be loaded.");
