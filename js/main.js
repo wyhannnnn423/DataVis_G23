@@ -90,7 +90,8 @@
             const rect = s.sec.getBoundingClientRect();
             const barH = bar ? bar.offsetHeight : 64;
             const scrollDistance = (barH + 30) - rect.top;
-            const scrollableH = rect.height - window.innerHeight;
+            // keep the last 70vh of the section as a blank "hold" so the final card can be read before the section unpins (matches --scrolly-tail in CSS)
+            const scrollableH = rect.height - window.innerHeight - window.innerHeight * 0.7;
 
             const ratio = scrollableH > 0 ? Math.min(Math.max(scrollDistance / scrollableH, 0), 1) : 0;
 
