@@ -23,6 +23,7 @@
     const dur = reduce ? 0 : 750;
     const fmt = d3.format(",");
     let svg, x, y, breaksG, bandG, pts, areaPath, linePath, chartData, pending = 0;
+    let introApi = null, wantVisible = false; // graph intro play/hide, driven by main.js (same trigger as the step cards)
 
     // Bug-Fixed Animated KPI counter helper (selects the specific DOM node so transitions never overwrite each other)
     function animateKPI(id, endVal, formatter) {
@@ -34,8 +35,9 @@
         }
         d3.select(el)
             .transition()
-            .duration(3000)
-            .ease(d3.easeCubicOut)
+            .delay(1100) // wait for the KPI cards to fly in (see hero animation in style.css)
+            .duration(3500) // count-up time in ms: bigger = slower
+            .ease(d3.easeLinear) // constant speed (easeCubicOut starts very fast)
             .tween("text", function() {
                 const interp = d3.interpolateNumber(0, endVal);
                 return function(t) {
@@ -45,6 +47,11 @@
     }
 
     window.Q1 = {
+        // Called by main.js at the same moment the step cards appear / disappear
+        setVisible(v) {
+            wantVisible = v;
+            if (introApi) v ? introApi.play() : introApi.hide();
+        },
         setStep(n) {
             pending = n;
             if (!breaksG || !bandG || !pts) return;
@@ -188,9 +195,6 @@
             .attr("d", areaGen)
             .style("opacity", reduce ? 1 : 0);
 
-        if (!reduce) {
-            areaPath.transition().delay(250).duration(1000).ease(d3.easeCubicOut).style("opacity", 1);
-        }
 
         // Axes
         const xAxis = svg.append("g")
@@ -258,15 +262,52 @@
             .attr("stroke-linecap", "round")
             .attr("d", lineGen);
 
+        // Intro animation (area fades in, line draws itself).
+        // Driven by main.js with the same trigger as the three step cards:
+        // the graph appears when the cards appear and is removed when the cards are removed.
         if (!reduce) {
             const len = linePath.node().getTotalLength();
-            linePath
-                .attr("stroke-dasharray", len)
-                .attr("stroke-dashoffset", len)
-                .transition()
-                .duration(1300)
-                .ease(d3.easeCubicOut)
-                .attr("stroke-dashoffset", 0);
+
+            const LINE_MS = 1300; // how long the line takes to draw
+
+            const hide = () => {
+                areaPath.interrupt().style("opacity", 0);
+                linePath.interrupt()
+                    .attr("stroke-dasharray", len)
+                    .attr("stroke-dashoffset", len);
+                if (pts) {
+                    pts.interrupt("intro")
+                        .style("transform-box", "fill-box")
+                        .style("transform-origin", "center")
+                        .style("opacity", 0)
+                        .style("transform", "scale(0)")
+                        .style("pointer-events", "none");
+                }
+            };
+
+            const play = () => {
+                hide();
+                areaPath.transition().delay(250).duration(1000).ease(d3.easeCubicOut).style("opacity", 1);
+                linePath.transition().duration(LINE_MS).ease(d3.easeCubicOut).attr("stroke-dashoffset", 0);
+
+                // Each point pops in at the moment the line reaches it
+                if (pts && chartData) {
+                    const x0 = x(chartData[0].year);
+                    const x1 = x(chartData[chartData.length - 1].year);
+                    pts.style("pointer-events", null)
+                        .transition("intro")
+                        .delay(d => {
+                            const f = (x(d.year) - x0) / (x1 - x0);        // how far along the line (0 to 1)
+                            return LINE_MS * (1 - Math.pow(1 - f, 1 / 3));  // inverse of the cubic-out easing
+                        })
+                        .duration(450)
+                        .ease(d3.easeBackOut.overshoot(2.2))
+                        .style("opacity", 1)
+                        .style("transform", "scale(1)");
+                }
+            };
+
+            introApi = { play, hide };
         }
 
         // Hover crosshair guide line
@@ -286,6 +327,7 @@
             .style("pointer-events", "none")
             .style("opacity", 0)
             .style("padding", "10px 14px")
+            .style("white-space", "nowrap") // keep it on its own lines even when the point is near the right edge
             .style("font-size", "13.5px")
             .style("line-height", "1.45")
             .style("border-radius", "10px")
@@ -320,10 +362,20 @@
         <div><strong>${fmt(d.hospitalisations)}</strong> hospitalised injuries</div>
         ${deltaHtml}
       `)
-                .style("left", (r.left - c.left + r.width / 2) + "px")
-                .style("top", (r.top - c.top - 6) + "px")
-                .style("opacity", 1)
-                .style("transform", "translate(-50%, -115%)");
+                .style("opacity", 1);
+
+            // Place the tooltip above the point, but keep it inside the chart card
+            // (the card clips anything that sticks out): flip below if there is no room above,
+            // and nudge sideways near the left / right edges.
+            const tipW = tip.node().offsetWidth;
+            const tipH = tip.node().offsetHeight;
+            const px = r.left - c.left + r.width / 2;
+            const left = Math.max(tipW / 2 + 4, Math.min(c.width - tipW / 2 - 4, px));
+            const roomAbove = r.top - c.top - 10;
+            const flip = roomAbove < tipH;
+            tip.style("left", left + "px")
+                .style("top", (flip ? r.bottom - c.top + 10 : r.top - c.top - 10) + "px")
+                .style("transform", flip ? "translate(-50%, 0)" : "translate(-50%, -100%)");
         }
 
         function hideTip() {
@@ -348,6 +400,9 @@
             .on("focus", showTip)
             .on("mouseout", hideTip)
             .on("blur", hideTip);
+
+        // Start in the right state now that the points exist
+        if (introApi) wantVisible ? introApi.play() : introApi.hide();
 
         window.Q1.setStep(pending);
     }).catch(function(err) {

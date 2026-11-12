@@ -28,6 +28,7 @@
 
     const stepEls = Array.from(document.querySelectorAll("#q1 .step"));
     let currentStep = -1;
+    let graphShown = false;
 
     // 3. Calibrate vertical lock offset
     function syncScrollyGeometry() {
@@ -37,7 +38,11 @@
         const headTotalH = q1Head.offsetHeight + parseFloat(headStyle.marginBottom || 20);
         const cardOffsetBelowChartTop = 48;
 
-        const lockTop = Math.round(barH + 18 + headTotalH + cardOffsetBelowChartTop);
+        let lockTop = Math.round(barH + 18 + headTotalH + cardOffsetBelowChartTop);
+        if (window.matchMedia("(max-width: 1024px)").matches) {
+            // Mobile: cards lock directly under the pinned question + chart
+            lockTop = Math.round(barH + 8 + q1Sticky.offsetHeight + 10);
+        }
         document.documentElement.style.setProperty("--step-lock-top", lockTop + "px");
     }
 
@@ -87,9 +92,16 @@
         }
 
         // Cumulative visibility: Card 0 stays visible when Card 1 and Card 2 appear!
+        // Cards stay hidden until Q1 is actually coming into view,
+        // so their entrance animation is not used up while the reader is still at the top.
+        const entered = rect.top < window.innerHeight * 0.1;
+        if (window.Q1 && entered !== graphShown) {
+            graphShown = entered;
+            window.Q1.setVisible(entered); // graph follows the cards
+        }
         stepEls.forEach((el, idx) => {
-            el.classList.toggle("is-shown", idx <= activeStep);
-            el.classList.toggle("is-active", idx === activeStep);
+            el.classList.toggle("is-shown", entered && idx <= activeStep);
+            el.classList.toggle("is-active", entered && idx === activeStep);
         });
 
         if (activeStep !== currentStep) {
@@ -122,8 +134,30 @@
 
     syncScrollyGeometry();
     onScroll();
+    if (q1Sticky && window.ResizeObserver) {
+        new ResizeObserver(syncScrollyGeometry).observe(q1Sticky);
+    }
     setTimeout(syncScrollyGeometry, 300);
     setTimeout(syncScrollyGeometry, 800);
+
+    // Mobile hamburger menu
+    const navToggle = document.getElementById("nav-toggle");
+    const siteNav = document.getElementById("site-nav");
+
+    function setNav(open) {
+        if (!bar || !navToggle) return;
+        bar.classList.toggle("nav-open", open);
+        navToggle.setAttribute("aria-expanded", String(open));
+        navToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    }
+
+    if (bar && navToggle && siteNav) {
+        navToggle.addEventListener("click", () => setNav(!bar.classList.contains("nav-open")));
+        siteNav.addEventListener("click", e => { if (e.target.closest("a")) setNav(false); });
+        document.addEventListener("click", e => { if (!bar.contains(e.target)) setNav(false); });
+        document.addEventListener("keydown", e => { if (e.key === "Escape") setNav(false); });
+        window.matchMedia("(min-width: 861px)").addEventListener("change", e => { if (e.matches) setNav(false); });
+    }
 
     // 7. Navigation link active highlight
     const links = document.querySelectorAll("[data-link]");
