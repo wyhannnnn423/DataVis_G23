@@ -364,7 +364,7 @@ section {
     gap: clamp(32px, 4.5vw, 72px);
     align-items: start;
     position: relative;
-    min-height: 220vh;
+    min-height: calc(220vh + var(--scrolly-tail, 70vh));  /* extra blank scroll after the last card */
 }
 
 .sticky {
@@ -1000,7 +1000,7 @@ svg .pt:focus {
        (same behaviour as desktop, stacked vertically). */
     .scrolly {
         display: block;
-        min-height: 300vh;
+        min-height: calc(300vh + var(--scrolly-tail, 70vh));
     }
     .sticky {
         position: sticky;
@@ -1372,6 +1372,8 @@ svg .pt:focus {
 }
 
 .story .sticky .section-head h2 {
+    max-width: none !important;
+    /* let the question run the full width of the left column */
     font-size: clamp(1.2rem, 2vw, 1.55rem) !important;
     /* Slightly smaller text inside sticky to save layout space */
     line-height: 1.25 !important;
