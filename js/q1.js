@@ -23,7 +23,8 @@
     const dur = reduce ? 0 : 750;
     const fmt = d3.format(",");
     let svg, x, y, breaksG, bandG, pts, areaPath, linePath, chartData, pending = 0;
-    let introApi = null, wantVisible = false; // graph intro play/hide, driven by main.js (same trigger as the step cards)
+    let introApi = null,
+        wantVisible = false; // graph intro play/hide, driven by main.js (same trigger as the step cards)
 
     // Bug-Fixed Animated KPI counter helper (selects the specific DOM node so transitions never overwrite each other)
     function animateKPI(id, endVal, formatter) {
@@ -35,9 +36,9 @@
         }
         d3.select(el)
             .transition()
-            .delay(1100) // wait for the KPI cards to fly in (see hero animation in style.css)
-            .duration(3500) // count-up time in ms: bigger = slower
-            .ease(d3.easeLinear) // constant speed (easeCubicOut starts very fast)
+            .delay(900)
+            .duration(2000)
+            .ease(d3.easeLinear)
             .tween("text", function() {
                 const interp = d3.interpolateNumber(0, endVal);
                 return function(t) {
@@ -297,8 +298,8 @@
                     pts.style("pointer-events", null)
                         .transition("intro")
                         .delay(d => {
-                            const f = (x(d.year) - x0) / (x1 - x0);        // how far along the line (0 to 1)
-                            return LINE_MS * (1 - Math.pow(1 - f, 1 / 3));  // inverse of the cubic-out easing
+                            const f = (x(d.year) - x0) / (x1 - x0); // how far along the line (0 to 1)
+                            return LINE_MS * (1 - Math.pow(1 - f, 1 / 3)); // inverse of the cubic-out easing
                         })
                         .duration(450)
                         .ease(d3.easeBackOut.overshoot(2.2))
