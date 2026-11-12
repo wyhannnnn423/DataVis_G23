@@ -15,8 +15,8 @@
     const MINUS = "\u2212";
     const NAMES = { NSW: "New South Wales", Vic: "Victoria", Qld: "Queensland", WA: "Western Australia", SA: "South Australia", Tas: "Tasmania", NT: "Northern Territory", ACT: "Australian Capital Territory" };
     const BREAK = { Vic: 2012, NSW: 2017 };
-    const LOW = "#1b2f4a",
-        HIGH = "#62b8fb";
+    const LOW = "#7cc4fb",
+        HIGH = "#2f62a8";
 
     container.classed("placeholder", false).html("").style("position", "relative").text("Loading chart data\u2026");
     const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -142,6 +142,7 @@
                             [141.0, -28.2],
                             [153.5, -28.2],
                             [153.0, -31.5],
+                            [151.3, -34.0],
                             [151.3, -34.0],
                             [150.0, -36.3],
                             [150.0, -37.5],
@@ -354,18 +355,18 @@
             .attr("y", 12)
             .attr("font-size", 9.5);
 
-        // Bar layout settings
+        // Bar layout settings - Compact values
         const barX0 = 580,
             barMax = 290,
-            rowH = 46,
-            barY0 = 56;
+            rowH = 36, // Shrunk row height
+            barY0 = 48; // Compacted start position
         const xBar = d3.scaleLinear().range([0, barMax]);
         const gBars = svg.append("g");
 
         /* ---------- trend svg ---------- */
         const Wt = 960,
-            Ht = 270,
-            mt = { top: 40, right: 70, bottom: 32, left: 72 };
+            Ht = 180, // Shrunk height from 270 to 180 for sticky viewport safety
+            mt = { top: 30, right: 70, bottom: 28, left: 72 };
         const trendWrap = container.append("div").style("margin-top", "18px");
         const tsvg = trendWrap.append("svg").attr("viewBox", `0 0 ${Wt} ${Ht}`).attr("width", "100%").attr("role", "img")
             .style("display", "block").style("height", "auto").style("overflow", "visible");
@@ -373,7 +374,7 @@
         const tg = tsvg.append("g");
 
         container.append("p").attr("class", "chart-note").html(
-            "\u2020 Data break: Victoria\u2019s counts from 2012 and NSW\u2019s from 2017 follow recording changes, so they are not comparable with earlier years. " +
+            "\u2020 Data break: Victoria\u2019s counts from 2012 and NSW\u2019s from 2017 follow recording changes, so they are not comparable with earlier years. Because shares are relative, a recording change in one jurisdiction also shifts the other jurisdictions\u2019 shares. " +
             "Shares are of the national total; the eight jurisdictions add up to slightly less than it (for example " + fmt(d3.sum(states, s => cases(s, first))) + " against " + fmt(totals.get(first)) + " in " + first + "). Counts are not adjusted for population. Source: BITRE hospitalised injury data.");
 
         const insight = d3.select("#q3-insight").attr("aria-live", "polite");
@@ -386,7 +387,7 @@
         /* ---------- draw ---------- */
         function draw() {
             const share_ = S.metric === "share";
-            const t = d3.transition().duration(dur).ease(d3.easeCubicOut);
+            const t = d3.transition().duration(firstDraw ? 0 : dur).ease(d3.easeCubicOut);
             const mx = maxOf();
             cScale = v => v / mx;
             xBar.domain([0, mx]);
@@ -410,11 +411,13 @@
             // Update Map Labels
             labels.select(".tc")
                 .text(d => d.abbr + dagger(d.abbr, S.year))
-                .attr("fill", d => cScale(mv(d.abbr, S.year)) > 0.52 ? "#0b0f17" : "#f1f5f9");
+                .attr("fill", d => (d.abbr === "ACT" || d.abbr === "Tas") ? "#f1f5f9" : (cScale(mv(d.abbr, S.year)) < 0.48 ? "#0b0f17" : "#f1f5f9"))
+                .attr("stroke", d => (d.abbr === "ACT" || d.abbr === "Tas") ? "#0b0f17" : "none").attr("stroke-width", 3).attr("paint-order", "stroke");
 
             labels.select(".tv")
                 .text(d => mText(d.abbr, S.year))
-                .attr("fill", d => cScale(mv(d.abbr, S.year)) > 0.52 ? "#0b0f17" : "#f1f5f9");
+                .attr("fill", d => (d.abbr === "ACT" || d.abbr === "Tas") ? "#f1f5f9" : (cScale(mv(d.abbr, S.year)) < 0.48 ? "#0b0f17" : "#f1f5f9"))
+                .attr("stroke", d => (d.abbr === "ACT" || d.abbr === "Tas") ? "#0b0f17" : "none").attr("stroke-width", 3).attr("paint-order", "stroke");
 
             const order = states.slice().sort((p, q) => mv(q, S.year) - mv(p, S.year));
             const rows = gBars.selectAll("g.brow").data(order, s => s).join(enter => {
@@ -469,22 +472,31 @@
                 tg.append("text").attr("x", tx(y) + 5).attr("y", mt.top + 10).attr("font-size", 11.5).attr("fill", "var(--highlight-warm)").text(`${y} ${s}\u2020`);
             });
 
+            const selColor = color(cScale(mv(S.sel, S.year)));
             const line = d3.line().x(d => tx(d.year)).y(d => ty(d.v)).curve(d3.curveMonotoneX);
             const series = s => years.map(y => ({ year: y, v: mv(s, y) }));
             states.filter(s => s !== S.sel).forEach(s => {
                 tg.append("path").datum(series(s)).attr("d", line).attr("fill", "none").attr("stroke", "var(--muted)").attr("stroke-opacity", 0.4).attr("stroke-width", 1.6);
             });
-            tg.append("path").datum(series(S.sel)).attr("d", line).attr("fill", "none").attr("stroke", "var(--accent)").attr("stroke-width", 3.4).attr("stroke-linecap", "round");
+            tg.append("path").datum(series(S.sel)).attr("d", line).attr("fill", "none").attr("stroke", selColor).attr("stroke-width", 3.4).attr("stroke-linecap", "round");
+
+            // direct labels at the right end of every line
+            const endPos = states.map(st => ({ st, y: ty(mv(st, last)) })).sort((a, b) => a.y - b.y);
+            endPos.forEach((e, i) => { e.ly = i === 0 ? e.y : Math.max(e.y, endPos[i - 1].ly + 12); });
+            endPos.forEach(e => {
+                tg.append("text").attr("x", tx(last) + 8).attr("y", e.ly + 4).attr("font-size", e.st === S.sel ? 12.5 : 11)
+                    .attr("font-weight", e.st === S.sel ? 800 : 400).attr("fill", e.st === S.sel ? "currentColor" : "var(--muted)").text(e.st);
+            });
 
             // current-year marker
             tg.append("line").attr("x1", tx(S.year)).attr("x2", tx(S.year)).attr("y1", mt.top).attr("y2", Ht - mt.bottom)
                 .attr("stroke", "currentColor").attr("opacity", 0.5);
             states.forEach(s => {
                 tg.append("circle").attr("cx", tx(S.year)).attr("cy", ty(mv(s, S.year))).attr("r", s === S.sel ? 6.5 : 3.5)
-                    .attr("fill", s === S.sel ? "var(--accent)" : "var(--muted)").attr("stroke", "var(--surface)").attr("stroke-width", 2);
+                    .attr("fill", s === S.sel ? selColor : "var(--muted)").attr("stroke", s === S.sel ? "#f1f5f9" : "var(--surface)").attr("stroke-width", 2);
             });
             tg.append("text").attr("x", tx(S.year)).attr("y", ty(mv(S.sel, S.year)) - 12).attr("text-anchor", S.year > last - 2 ? "end" : "middle")
-                .attr("font-size", 13).attr("font-weight", 700).attr("fill", "var(--accent)").text(`${S.sel} ${mText(S.sel, S.year)}`);
+                .attr("font-size", 13).attr("font-weight", 700).attr("fill", "#f1f5f9").attr("stroke", "#0b0f17").attr("stroke-width", 3).attr("paint-order", "stroke").text(`${S.sel} ${mText(S.sel, S.year)}`);
 
             // click / drag on the chart to move the year
             tg.append("rect").attr("x", mt.left).attr("y", mt.top).attr("width", Wt - mt.left - mt.right).attr("height", Ht - mt.top - mt.bottom)
@@ -510,14 +522,79 @@
             let html = `In <strong>${S.year}</strong>, <strong>${esc(NAMES[lead] || lead)}</strong> had the largest share of hospitalised injuries (${share(lead, S.year).toFixed(1)}%, ${fmt(cases(lead, S.year))} cases), ahead of ${esc(NAMES[second] || second)} (${share(second, S.year).toFixed(1)}%). `;
             if (S.year > first) {
                 const d = share(S.sel, S.year) - share(S.sel, first);
-                html += `<strong>${esc(NAMES[S.sel] || S.sel)}</strong> went from ${share(S.sel, first).toFixed(1)}% in ${first} to ${share(S.sel, S.year).toFixed(1)}% (${sg(d)} pp).`;
+                const rankAt = y => states.slice().sort((a, b) => share(b, y) - share(a, y)).indexOf(S.sel) + 1;
+                const r0 = rankAt(first),
+                    r1 = rankAt(S.year);
+                html += `<strong>${esc(NAMES[S.sel] || S.sel)}</strong> went from ${share(S.sel, first).toFixed(1)}% in ${first} to ${share(S.sel, S.year).toFixed(1)}% (${sg(d)} pp)` +
+                    (r0 !== r1 ? `, moving from rank ${r0} to rank ${r1}. ` : `, ranked ${r1} in both years. `);
+                const ch = states.map(st => ({ st, d: share(st, S.year) - share(st, first) })).sort((a, b) => b.d - a.d);
+                const up = ch[0],
+                    dn = ch[ch.length - 1];
+                html += `Across all jurisdictions since ${first}, the biggest gain was ${esc(NAMES[up.st] || up.st)} (${sg(up.d)} pp) and the biggest fall was ${esc(NAMES[dn.st] || dn.st)} (${sg(dn.d)} pp).`;
+                const crossed = Object.entries(BREAK).filter(([st, y]) => y > first && y <= S.year);
+                if (crossed.length) {
+                    const names = crossed.map(([st, y]) => `${esc(NAMES[st] || st)} (${y})`).join(" and ");
+                    html += `<span style="display:block;margin-top:10px;color:var(--highlight-warm)"><strong>Caution:</strong> ${names} changed how admissions are recorded. Because shares are relative, this also shifts every other jurisdiction\u2019s share, so part of these changes reflects recording, not safety.</span>`;
+                }
             } else {
                 html += `Move the slider or press Play to see how each share changes. Click a state on the map or a bar to follow one jurisdiction.`;
             }
             insight.html(html);
         }
 
+        // First draw is instant and hidden; the entrance plays when the chart card scrolls into view.
+        let firstDraw = true;
         draw();
+        firstDraw = false;
+
+        // Scroll-driven entrance: window.Q3.setProgress(p) is called by main.js while the reader scrolls (0 to 1).
+        const ease = d3.easeCubicOut;
+        const stage = (p, lo, hi) => Math.max(0, Math.min(1, (p - lo) / (hi - lo)));
+        const cnt = (s, e) => S.metric === "share" ? (share(s, S.year) * e).toFixed(1) + "%" : fmt(Math.round(cases(s, S.year) * e));
+        const lens = paths.nodes().map(n => n.getTotalLength());
+        let done = false;
+
+        function setProgress(p) {
+            if (done && p >= 1) return;
+            done = p >= 1;
+            // 1. map: each state's outline draws itself, then its colour fills in
+            paths.each(function(d, i) {
+                const a = i * 0.06;
+                const draw = ease(stage(p, a, a + 0.2)),
+                    fill = ease(stage(p, a + 0.12, a + 0.3));
+                d3.select(this)
+                    .attr("stroke-dasharray", done ? null : lens[i])
+                    .attr("stroke-dashoffset", done ? null : lens[i] * (1 - draw))
+                    .attr("fill-opacity", done ? null : fill);
+            });
+            // 2. map labels rise into place and their values count up
+            labels.each(function(d, i) {
+                const a = 0.25 + i * 0.045,
+                    e = done ? 1 : ease(stage(p, a, a + 0.2));
+                const g = d3.select(this);
+                g.selectAll("text").attr("opacity", done ? null : e).attr("transform", done ? null : `translate(0,${(1 - e) * 10})`);
+                g.select(".tv").text(done ? mText(d.abbr, S.year) : cnt(d.abbr, e));
+            });
+            // 3. ranking bars grow from 0 (top rank first), names slide in, values count up
+            gBars.selectAll("g.brow").each(function(s, i) {
+                const g = d3.select(this);
+                const lo = 0.35 + i * 0.05,
+                    e = done ? 1 : ease(stage(p, lo, lo + 0.25));
+                const w = Math.max(2, xBar(mv(s, S.year)));
+                const cur = done ? w : w * e;
+                g.attr("opacity", done ? 1 : stage(p, lo, lo + 0.08));
+                g.select(".bl").attr("transform", done ? null : `translate(${-16 * (1 - e)},0)`);
+                g.select(".bb").attr("width", cur);
+                g.select(".bv").attr("x", barX0 + cur + 10);
+                g.select(".bv .m").text(done ? mText(s, S.year) : cnt(s, e));
+            });
+            // 4. share-over-time chart fades in last
+            tsvg.style("opacity", done ? null : stage(p, 0.8, 1));
+        }
+        if (!reduce) {
+            window.Q3 = { setProgress };
+            setProgress((window.chartProgress || {}).q3 || 0);
+        }
     }).catch(function(err) {
         console.error("Q3 failed to load data:", err);
         container.text("Sorry, the chart could not be loaded.");

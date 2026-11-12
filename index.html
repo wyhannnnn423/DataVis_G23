@@ -78,43 +78,61 @@
             </div>
         </section>
 
-        <!-- Q2 to Q5: chart + insight blocks, charts added when data is ready -->
-        <section class="block" id="q2" aria-labelledby="q2-h">
-            <header class="section-head reveal">
-                <p class="eyebrow">2 &middot; Who changed most</p>
-                <h2 id="q2-h">Which road user groups contributed most to the change in national counts between two selected years, and how did their shares of all road traffic injuries change?</h2>
-            </header>
-            <div class="block-grid reveal">
-                <div class="chart-card">
-                    <div class="controls" id="q2-controls"></div>
-                    <div id="q2-chart" class="placeholder">Chart coming soon<small>Needs data/q2_road_users_by_year.csv</small></div>
+        <section class="story" id="q2" aria-labelledby="q2-h">
+            <div class="scrolly">
+                <div class="sticky">
+                    <header class="section-head reveal">
+                        <p class="eyebrow">2 &middot; Who changed most</p>
+                        <h2 id="q2-h">Which road user groups contributed most to the change in national counts between two selected years, and how did their shares of all road traffic injuries change?</h2>
+                    </header>
+                    <div class="chart-card">
+                        <div class="controls" id="q2-controls"></div>
+                        <div id="q2-chart" class="placeholder">Chart coming soon<small>Needs data/q2_road_users_by_year.csv</small></div>
+                    </div>
                 </div>
-                <aside class="insight">
-                    <h3>How to read this</h3>
-                    <p>Each bar is one road user group. Bars to the right are increases between the two years you pick, bars to the left are decreases, and groups are sorted from biggest rise to biggest fall. Switch to &ldquo;Change in share&rdquo; to see percentage-point shifts in each group&rsquo;s share of all injuries, or open the Table for the exact numbers.</p>
-                    <h3>What it shows</h3>
-                    <p id="q2-insight">Loading&hellip;</p>
-                </aside>
+                <div class="steps">
+                    <div class="steps-sticky-card">
+                        <div class="step is-shown is-active" data-step="0">
+                            <h3>How to read this</h3>
+                            <p>Each bar is one road user group. Bars to the right are increases between the two years you pick, bars to the left are decreases, and groups are sorted from biggest rise to biggest fall. Switch to &ldquo;Change in share&rdquo;
+                                to see percentage-point shifts in each group&rsquo;s share of all injuries, or open the Table for the exact numbers.</p>
+                        </div>
+                        <div class="step" data-step="1">
+                            <h3>What it shows</h3>
+                            <p id="q2-insight">Loading&hellip;</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section class="block" id="q3" aria-labelledby="q3-h">
-            <header class="section-head reveal">
-                <p class="eyebrow">3 &middot; Where it happens</p>
-                <h2 id="q3-h">How are hospitalised injury counts distributed across states and territories, and how has each jurisdiction’s share of the national total changed over time?</h2>
-            </header>
-            <div class="block-grid reveal">
-                <div class="chart-card">
-                    <div class="controls" id="q3-controls"></div>
-                    <div id="q3-chart" class="placeholder">Chart coming soon<small>Needs data/q3_states_by_year.csv</small></div>
+        <section class="story" id="q3" aria-labelledby="q3-h">
+            <div class="scrolly">
+                <div class="sticky">
+                    <header class="section-head reveal">
+                        <p class="eyebrow">3 &middot; Where it happens</p>
+                        <h2 id="q3-h">How are hospitalised injury counts distributed across states and territories, and how has each jurisdiction’s share of the national total changed over time?</h2>
+                    </header>
+                    <div class="chart-card">
+                        <div class="controls" id="q3-controls"></div>
+                        <div id="q3-chart" class="placeholder">Chart coming soon<small>Needs data/q3_states_by_year.csv</small></div>
+                    </div>
                 </div>
-                <aside class="insight">
-                    <h3>How to read this</h3>
-                    <p>Each tile is a state or territory, placed roughly where it sits on the map; brighter means a bigger share of the national total. Drag the slider or press Play to move through the years, and click a tile or bar to follow one jurisdiction in the line chart below.</p>
-                    <h3>What it shows</h3>
-                    <p id="q3-insight">Loading&hellip;</p>
-                    <p>Counts are not adjusted for population, so a larger share may partly reflect a larger population. Victoria (2012) and NSW (2017) changed how admissions are recorded, so movements around those years are partly recording, not safety.</p>
-                </aside>
+                <div class="steps">
+                    <div class="steps-sticky-card">
+                        <div class="step is-shown is-active" data-step="0">
+                            <h3>How to read this</h3>
+                            <p>Each tile is a state or territory, placed roughly where it sits on the map; brighter means a bigger share of the national total. Drag the slider or press Play to move through the years, and click a tile or bar to follow one
+                                jurisdiction in the line chart below.</p>
+                        </div>
+                        <div class="step" data-step="1">
+                            <h3>What it shows</h3>
+                            <p id="q3-insight">Loading&hellip;</p>
+                            <p style="margin-top: 10px;">Counts are not adjusted for population, so a state with more people will naturally have more injuries: a larger share does not mean a more dangerous state. Victoria (2012) and NSW (2017) changed how admissions are recorded;
+                                because shares are relative, this shifts every jurisdiction’s share, not just its own.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 

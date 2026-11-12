@@ -1,52 +1,64 @@
 /* Page behaviour: nav highlight, circular scroll progress button, kinetic scroll reveal,
-   and Fig 2 Question + Chart lock with cumulative sequential card revelation.
+   and Q1/Q2/Q3 Question + Chart lock with cumulative sequential card revelation.
    Owner: Group 23. */
 
 (function() {
     const bar = document.getElementById("topbar");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // 1. Move Q1 Question (.section-head) inside .sticky automatically so Question + Chart lock together at Fig 2 position
-    const q1Section = document.getElementById("q1");
-    const q1Sticky = q1Section ? q1Section.querySelector(".sticky") : null;
-    const q1Head = q1Section ? q1Section.querySelector(".section-head") : null;
-    if (q1Sticky && q1Head && q1Head.parentElement !== q1Sticky) {
-        q1Sticky.insertBefore(q1Head, q1Sticky.firstChild);
-    }
+    // Set up scrollytelling sections for Q1, Q2, and Q3
+    const scrollySections = ["q1", "q2", "q3"].map(id => {
+        const sec = document.getElementById(id);
+        if (!sec) return null;
 
-    // 2. Ensure the 3 cards are wrapped inside .steps-sticky-card
-    const stepsWrapper = q1Section ? q1Section.querySelector(".steps") : null;
-    let stepsPanel = q1Section ? q1Section.querySelector(".steps-sticky-card") : null;
-    if (stepsWrapper && !stepsPanel) {
-        stepsPanel = document.createElement("div");
-        stepsPanel.className = "steps-sticky-card";
-        while (stepsWrapper.firstChild) {
-            stepsPanel.appendChild(stepsWrapper.firstChild);
+        const sticky = sec.querySelector(".sticky");
+        const head = sec.querySelector(".section-head");
+        if (sticky && head && head.parentElement !== sticky) {
+            sticky.insertBefore(head, sticky.firstChild);
         }
-        stepsWrapper.appendChild(stepsPanel);
-    }
 
-    const stepEls = Array.from(document.querySelectorAll("#q1 .step"));
-    let currentStep = -1;
-    let graphShown = false;
+        const stepsWrapper = sec.querySelector(".steps");
+        let stepsPanel = sec.querySelector(".steps-sticky-card");
+        if (stepsWrapper && !stepsPanel) {
+            stepsPanel = document.createElement("div");
+            stepsPanel.className = "steps-sticky-card";
+            while (stepsWrapper.firstChild) {
+                stepsPanel.appendChild(stepsWrapper.firstChild);
+            }
+            stepsWrapper.appendChild(stepsPanel);
+        }
 
-    // 3. Calibrate vertical lock offset
+        const stepEls = Array.from(sec.querySelectorAll(".step"));
+        return {
+            id,
+            sec,
+            sticky,
+            head,
+            stepEls,
+            currentStep: -1,
+            graphShown: false
+        };
+    }).filter(Boolean);
+
+    // Calibrate vertical lock offset for each scrollytelling section
     function syncScrollyGeometry() {
-        if (!q1Sticky || !q1Head) return;
-        const barH = bar ? bar.offsetHeight : 64;
-        const headStyle = window.getComputedStyle(q1Head);
-        const headTotalH = q1Head.offsetHeight + parseFloat(headStyle.marginBottom || 20);
-        const cardOffsetBelowChartTop = 48;
+        scrollySections.forEach(s => {
+            if (!s.sticky || !s.head) return;
+            const barH = bar ? bar.offsetHeight : 64;
+            const headStyle = window.getComputedStyle(s.head);
+            const headTotalH = s.head.offsetHeight + parseFloat(headStyle.marginBottom || 20);
+            const cardOffsetBelowChartTop = 48;
 
-        let lockTop = Math.round(barH + 18 + headTotalH + cardOffsetBelowChartTop);
-        if (window.matchMedia("(max-width: 1024px)").matches) {
-            // Mobile: cards lock directly under the pinned question + chart
-            lockTop = Math.round(barH + 8 + q1Sticky.offsetHeight + 10);
-        }
-        document.documentElement.style.setProperty("--step-lock-top", lockTop + "px");
+            let lockTop = Math.round(barH + 18 + headTotalH + cardOffsetBelowChartTop);
+            if (window.matchMedia("(max-width: 1024px)").matches) {
+                // Mobile: cards lock directly under the pinned question + chart
+                lockTop = Math.round(barH + 8 + s.sticky.offsetHeight + 10);
+            }
+            s.sec.style.setProperty("--step-lock-top", lockTop + "px");
+        });
     }
 
-    // 4. Ensure Back-to-Top button has SVG Circular Progress Ring and Chevron Icon
+    // Ensure Back-to-Top button has SVG Circular Progress Ring and Chevron Icon
     const bttSvgMarkup = `
     <svg class="btt-ring" viewBox="0 0 56 56" aria-hidden="true">
       <circle class="btt-track" cx="28" cy="28" r="24"></circle>
@@ -70,47 +82,71 @@
         backToTop.innerHTML = bttSvgMarkup;
     }
 
-    // 5. Sequential cumulative revelation based on scroll depth through Q1
+    // Update cumulative steps and trigger animations for Q1, Q2, and Q3
     function updateCumulativeSteps() {
-        if (!q1Section || !stepEls.length) return;
+        scrollySections.forEach(s => {
+            if (!s.sec || !s.stepEls.length) return;
 
-        const rect = q1Section.getBoundingClientRect();
-        const barH = bar ? bar.offsetHeight : 64;
-        const scrollDistance = (barH + 30) - rect.top;
-        const scrollableH = rect.height - window.innerHeight;
+            const rect = s.sec.getBoundingClientRect();
+            const barH = bar ? bar.offsetHeight : 64;
+            const scrollDistance = (barH + 30) - rect.top;
+            const scrollableH = rect.height - window.innerHeight;
 
-        const ratio = scrollableH > 0 ? Math.min(Math.max(scrollDistance / scrollableH, 0), 1) : 0;
+            const ratio = scrollableH > 0 ? Math.min(Math.max(scrollDistance / scrollableH, 0), 1) : 0;
 
-        let activeStep = 0;
-        // Sequential thresholds: Card 0 initially, Card 1 at ~28%, Card 2 at ~58%
-        if (ratio >= 0.58) {
-            activeStep = 2;
-        } else if (ratio >= 0.28) {
-            activeStep = 1;
-        } else {
-            activeStep = 0;
-        }
+            let activeStep = 0;
+            if (s.stepEls.length === 3) {
+                // Q1: 3 cards
+                if (ratio >= 0.58) {
+                    activeStep = 2;
+                } else if (ratio >= 0.28) {
+                    activeStep = 1;
+                } else {
+                    activeStep = 0;
+                }
+            } else if (s.stepEls.length === 2) {
+                // Q2, Q3: 2 cards
+                if (ratio >= 0.5) {
+                    activeStep = 1;
+                } else {
+                    activeStep = 0;
+                }
+            }
 
-        // Cumulative visibility: Card 0 stays visible when Card 1 and Card 2 appear!
-        // Cards stay hidden until Q1 is actually coming into view,
-        // so their entrance animation is not used up while the reader is still at the top.
-        const entered = rect.top < window.innerHeight * 0.1;
-        if (window.Q1 && entered !== graphShown) {
-            graphShown = entered;
-            window.Q1.setVisible(entered); // graph follows the cards
-        }
-        stepEls.forEach((el, idx) => {
-            el.classList.toggle("is-shown", entered && idx <= activeStep);
-            el.classList.toggle("is-active", entered && idx === activeStep);
+            const entered = rect.top < window.innerHeight * 0.4 && rect.bottom > window.innerHeight * 0.1;
+            const apiName = s.id.toUpperCase(); // "Q1", "Q2", "Q3"
+
+            if (window[apiName] && entered !== s.graphShown) {
+                s.graphShown = entered;
+                if (typeof window[apiName].setVisible === "function") {
+                    window[apiName].setVisible(entered);
+                }
+            }
+
+            s.stepEls.forEach((el, idx) => {
+                el.classList.toggle("is-shown", entered && idx <= activeStep);
+                el.classList.toggle("is-active", entered && idx === activeStep);
+            });
+
+            if (activeStep !== s.currentStep) {
+                s.currentStep = activeStep;
+                if (window[apiName] && typeof window[apiName].setStep === "function") {
+                    window[apiName].setStep(activeStep);
+                }
+            }
+
+            // Sync progress for Q2 and Q3 dumbbell/map animations
+            if (window[apiName] && typeof window[apiName].setProgress === "function") {
+                if (reduce) {
+                    window[apiName].setProgress(1);
+                } else {
+                    window[apiName].setProgress(ratio);
+                }
+            }
         });
-
-        if (activeStep !== currentStep) {
-            currentStep = activeStep;
-            if (window.Q1) window.Q1.setStep(activeStep);
-        }
     }
 
-    // 6. Scroll listener: calculate reading progress, back-to-top toggle, and update steps
+    // Scroll listener: calculate reading progress, back-to-top toggle, and update steps
     const onScroll = () => {
         const scrollTop = window.scrollY;
         if (bar) bar.classList.toggle("scrolled", scrollTop > 8);
@@ -134,9 +170,11 @@
 
     syncScrollyGeometry();
     onScroll();
-    if (q1Sticky && window.ResizeObserver) {
-        new ResizeObserver(syncScrollyGeometry).observe(q1Sticky);
-    }
+    scrollySections.forEach(s => {
+        if (s.sticky && window.ResizeObserver) {
+            new ResizeObserver(syncScrollyGeometry).observe(s.sticky);
+        }
+    });
     setTimeout(syncScrollyGeometry, 300);
     setTimeout(syncScrollyGeometry, 800);
 
@@ -159,7 +197,7 @@
         window.matchMedia("(min-width: 861px)").addEventListener("change", e => { if (e.matches) setNav(false); });
     }
 
-    // 7. Navigation link active highlight
+    // Navigation link active highlight
     const links = document.querySelectorAll("[data-link]");
     const sections = ["q1", "q2", "q3", "q4", "q5"].map(id => document.getElementById(id));
     const navObs = new IntersectionObserver(entries => {
@@ -171,7 +209,7 @@
     }, { rootMargin: "-35% 0px -55% 0px" });
     sections.forEach(s => s && navObs.observe(s));
 
-    // 8. Kinetic scroll reveal
+    // Kinetic scroll reveal
     const revealObs = new IntersectionObserver((entries, obs) => {
         entries.forEach(e => {
             if (e.isIntersecting) {
