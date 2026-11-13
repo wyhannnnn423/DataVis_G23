@@ -2,7 +2,7 @@
 <img width="800" height="430" alt="HERO-1-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/a7ae1fab-64b1-4b6e-aa7f-c7a9f7566c2b" />
 
 # Q1
-<img width="800" height="430" alt="Q1-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/951b1d3b-e632-42a8-bcad-6960adcb5eec" />
+<img width="800" height="430" alt="Q1-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/a99d91a0-3083-43ac-be82-6a79b65f83ba" />
 
 # Q2
 <img width="800" height="392" alt="Q2-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/d0e3bba0-55ed-430b-8891-e27a230e79e0" />
