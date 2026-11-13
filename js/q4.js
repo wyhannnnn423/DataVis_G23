@@ -1,6 +1,6 @@
-/* Q4 chart. Draw into #q4-chart (replace the placeholder text first) and add filters to #q4-controls.
-   Owner: [name]. Work on a feature branch and open a pull request. */
+/* Q4 图表：绘制到 #q4-chart（先替换掉占位文字），筛选控件加到 #q4-controls。
+   负责人：[姓名]。请在功能分支上开发并提交 pull request。 */
 
 (function () {
-  // TODO: d3.csv("data/....csv", d3.autoType).then(...)
+  // 待办：d3.csv("data/....csv", d3.autoType).then(...)
 })();
