@@ -1,11 +1,19 @@
+# Hero
+<img width="800" height="393" alt="image" src="https://github.com/user-attachments/assets/42670f37-47b2-45da-b470-b8654399cb03" />
 
-https://github.com/user-attachments/assets/0bdd4149-127b-43b6-bfaa-480b681fdf89
+# Q1
+<img width="800" height="393" alt="image" src="https://github.com/user-attachments/assets/5e88d15f-9afa-45e4-8d3f-e4a697953014" />
 
-https://github.com/user-attachments/assets/378d0ad4-93dc-4af4-9859-38af51690cca
+# Q2
+<img width="800" height="392" alt="image" src="https://github.com/user-attachments/assets/e4df9565-8d02-4d8c-802b-5380c8a252c4" />
 
-https://github.com/user-attachments/assets/f4f88c58-2e7d-4fc0-ba32-1c76b411fd3c
+# Q3
+<img width="800" height="394" alt="image" src="https://github.com/user-attachments/assets/23902c5f-8323-40e6-bac2-daef002f25a3" />
 
-https://github.com/user-attachments/assets/d9ff9376-5159-4930-86b8-8b6b888e0108
+# Video
+<img width="960" height="516" alt="image" src="https://github.com/user-attachments/assets/281cd1e5-fd4f-4c6f-a7df-de5cb9447493" />
+
+
 
 # DataVis_G23
 
