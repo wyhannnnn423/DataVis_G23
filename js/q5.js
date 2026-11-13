@@ -1,6 +1,6 @@
-/* Q5 chart. Draw into #q5-chart (replace the placeholder text first) and add filters to #q5-controls.
-   Owner: [name]. Work on a feature branch and open a pull request. */
+/* Q5 Chart: Rendered to #q5-chart (replacing placeholder text), filter controls added to #q5-controls.
+   Owner: [Name]. Please develop on a feature branch and submit a pull request. */
 
-(function () {
-  // TODO: d3.csv("data/....csv", d3.autoType).then(...)
+(function() {
+    // TODO: d3.csv("data/....csv", d3.autoType).then(...)
 })();
