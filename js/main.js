@@ -1,230 +1,409 @@
-/* Page behaviour: nav highlight, circular scroll progress button, kinetic scroll reveal,
-   and Q1/Q2/Q3 Question + Chart lock with cumulative sequential card revelation.
-   Owner: Group 23. */
+/* Page behaviors:
+   1. Scale Hero and each scrollytelling section based on screen size (--u variable, see css/style.css)
+   2. Q1–Q5 scrollytelling: Question + chart pinned on the left, right-hand step cards appear sequentially on scroll
+   3. Navigation: Clicking navigation links jumps directly to the "completed" state of that section (no animation); normal scroll preserves all animations
+   4. Navigation highlighting, top progress bar, back-to-top button, mobile menu, scroll fade-in
+   Owner: Group 23 */
 
 (function() {
-    const bar = document.getElementById("topbar");
+    "use strict";
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const root = document.documentElement;
+    const topbar = document.querySelector(".topbar");
+    const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+    const isNarrow = () => window.matchMedia("(max-width: 1024px)").matches;
+    const barHeight = () => (topbar ? topbar.offsetHeight : 56);
 
-    // Set up scrollytelling sections for Q1, Q2, and Q3
-    const scrollySections = ["q1", "q2", "q3"].map(id => {
-        const sec = document.getElementById(id);
+    // Each chart module (q1.js...) reads this object to get the initial progress
+    window.chartProgress = {};
+
+
+    /* ======================================================================
+       1. Configuration
+       ====================================================================== */
+
+    const HERO_SCALE = { ref: 1536, max: 1.25 };
+
+    const STORY_CONFIGS = [
+        { id: "q1", scale: { ref: 1536, max: 1.25 }, lockTo: "head", tail: 70 },
+        { id: "q2", scale: { ref: 1745, max: 1.1 }, lockTo: "chart", tail: 55 },
+        { id: "q3", scale: { ref: 1920, max: 1 }, lockTo: "chart", tail: 55 },
+        { id: "q4", scale: { ref: 1920, max: 1 }, lockTo: "chart", tail: 55 }, // Placeholder
+        { id: "q5", scale: { ref: 1920, max: 1 }, lockTo: "chart", tail: 55 } // Placeholder
+    ];
+
+    const MIN_SCALE = 0.72;
+    const BOTTOM_GAP = 16;
+
+    const stories = STORY_CONFIGS.map(cfg => {
+        const sec = document.getElementById(cfg.id + "-section");
         if (!sec) return null;
-
-        const sticky = sec.querySelector(".sticky");
-        const head = sec.querySelector(".section-head");
-        if (sticky && head && head.parentElement !== sticky) {
-            sticky.insertBefore(head, sticky.firstChild);
-        }
-
-        const stepsWrapper = sec.querySelector(".steps");
-        let stepsPanel = sec.querySelector(".steps-sticky-card");
-        if (stepsWrapper && !stepsPanel) {
-            stepsPanel = document.createElement("div");
-            stepsPanel.className = "steps-sticky-card";
-            while (stepsWrapper.firstChild) {
-                stepsPanel.appendChild(stepsWrapper.firstChild);
-            }
-            stepsWrapper.appendChild(stepsPanel);
-        }
-
+        const scrolly = sec.querySelector(".scrolly");
+        const stage = sec.querySelector(".scrolly-stage");
+        const stack = sec.querySelector(".step-stack");
         const stepEls = Array.from(sec.querySelectorAll(".step"));
+        if (!scrolly || !stage || !stack || stepEls.length === 0) return null;
         return {
-            id,
+            id: cfg.id,
+            scale: cfg.scale,
+            lockTo: cfg.lockTo,
+            tail: cfg.tail,
             sec,
-            sticky,
-            head,
+            scrolly,
+            stage,
+            stack,
             stepEls,
+            pinTop: 0,
+            ratio: 0,
+            entered: false,
             currentStep: -1,
-            graphShown: false
+            graphShown: false,
+            instant: false
         };
     }).filter(Boolean);
 
-    // Calibrate vertical lock offset for each scrollytelling section
-    function syncScrollyGeometry() {
-        scrollySections.forEach(s => {
-            if (!s.sticky || !s.head) return;
-            const barH = bar ? bar.offsetHeight : 64;
-            const headStyle = window.getComputedStyle(s.head);
-            const headTotalH = s.head.offsetHeight + parseFloat(headStyle.marginBottom || 20);
-            const cardOffsetBelowChartTop = 48;
 
-            let lockTop = Math.round(barH + 18 + headTotalH + cardOffsetBelowChartTop);
-            if (window.matchMedia("(max-width: 1024px)").matches) {
-                // Mobile: cards lock directly under the pinned question + chart
-                lockTop = Math.round(barH + 8 + s.sticky.offsetHeight + 10);
-            }
-            s.sec.style.setProperty("--step-lock-top", lockTop + "px");
-        });
+    /* ======================================================================
+       2. Scaling & Layout
+       ====================================================================== */
+
+    function setScale(el, k) {
+        el.style.setProperty("--u", k.toFixed(3) + "px");
     }
 
-    // Ensure Back-to-Top button has SVG Circular Progress Ring and Chevron Icon
-    const bttSvgMarkup = `
-    <svg class="btt-ring" viewBox="0 0 56 56" aria-hidden="true">
-      <circle class="btt-track" cx="28" cy="28" r="24"></circle>
-      <circle class="btt-progress" cx="28" cy="28" r="24"></circle>
-    </svg>
-    <svg class="btt-icon" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M6.5 14.5L12 9l5.5 5.5"></path>
-    </svg>
-  `;
-    let backToTop = document.getElementById("back-to-top");
-    if (!backToTop) {
-        backToTop = document.createElement("a");
-        backToTop.href = "#hero";
-        backToTop.id = "back-to-top";
-        backToTop.className = "back-to-top";
-        backToTop.setAttribute("aria-label", "Back to top");
-        backToTop.setAttribute("title", "Back to top");
-        document.body.appendChild(backToTop);
-    }
-    if (!backToTop.querySelector(".btt-ring")) {
-        backToTop.innerHTML = bttSvgMarkup;
+    function widthScale(cfg) {
+        return isNarrow() ? 1 : clamp(window.innerWidth / cfg.ref, 1, cfg.max);
     }
 
-    // Update cumulative steps and trigger animations for Q1, Q2, and Q3
-    function updateCumulativeSteps() {
-        scrollySections.forEach(s => {
-            if (!s.sec || !s.stepEls.length) return;
-
-            const rect = s.sec.getBoundingClientRect();
-            const barH = bar ? bar.offsetHeight : 64;
-            const scrollDistance = (barH + 30) - rect.top;
-            // keep the last 70vh of the section as a blank "hold" so the final card can be read before the section unpins (matches --scrolly-tail in CSS)
-            const scrollableH = rect.height - window.innerHeight - window.innerHeight * 0.7;
-
-            const ratio = scrollableH > 0 ? Math.min(Math.max(scrollDistance / scrollableH, 0), 1) : 0;
-
-            let activeStep = 0;
-            if (s.stepEls.length === 3) {
-                // Q1: 3 cards
-                if (ratio >= 0.58) {
-                    activeStep = 2;
-                } else if (ratio >= 0.28) {
-                    activeStep = 1;
-                } else {
-                    activeStep = 0;
-                }
-            } else if (s.stepEls.length === 2) {
-                // Q2, Q3: 2 cards
-                if (ratio >= 0.5) {
-                    activeStep = 1;
-                } else {
-                    activeStep = 0;
-                }
-            }
-
-            const entered = rect.top < window.innerHeight * 0.4 && rect.bottom > window.innerHeight * 0.1;
-            const apiName = s.id.toUpperCase(); // "Q1", "Q2", "Q3"
-
-            if (window[apiName] && entered !== s.graphShown) {
-                s.graphShown = entered;
-                if (typeof window[apiName].setVisible === "function") {
-                    window[apiName].setVisible(entered);
-                }
-            }
-
-            s.stepEls.forEach((el, idx) => {
-                el.classList.toggle("is-shown", entered && idx <= activeStep);
-                el.classList.toggle("is-active", entered && idx === activeStep);
-            });
-
-            if (activeStep !== s.currentStep) {
-                s.currentStep = activeStep;
-                if (window[apiName] && typeof window[apiName].setStep === "function") {
-                    window[apiName].setStep(activeStep);
-                }
-            }
-
-            // Sync progress for Q2 and Q3 dumbbell/map animations
-            if (window[apiName] && typeof window[apiName].setProgress === "function") {
-                if (reduce) {
-                    window[apiName].setProgress(1);
-                } else {
-                    window[apiName].setProgress(ratio);
-                }
-            }
-        });
+    function fullStackHeight(s) {
+        s.stack.classList.add("is-measuring");
+        const h = s.stack.offsetHeight;
+        s.stack.classList.remove("is-measuring");
+        return h;
     }
 
-    // Scroll listener: calculate reading progress, back-to-top toggle, and update steps
-    const onScroll = () => {
-        const scrollTop = window.scrollY;
-        if (bar) bar.classList.toggle("scrolled", scrollTop > 8);
-        if (backToTop) backToTop.classList.toggle("visible", scrollTop > 320);
+    function updateStepTop(s, avail) {
+        let top = s.pinTop;
+        if (isNarrow()) {
+            top = s.pinTop + s.stage.offsetHeight + 12;
+        } else {
+            let offset = 0;
+            if (s.lockTo === "chart") {
+                const head = s.stage.querySelector(".section-head");
+                if (head) offset = head.offsetHeight + parseFloat(getComputedStyle(head).marginBottom || 0);
+            }
+            top += clamp(avail - fullStackHeight(s), 0, offset);
+        }
+        s.stack.style.setProperty("--step-top", top + "px");
+    }
 
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = docHeight > 0 ? Math.min(Math.max(scrollTop / docHeight, 0), 1) : 0;
-        document.documentElement.style.setProperty("--scroll-progress", progress.toFixed(4));
-        updateCumulativeSteps();
+    function fitStory(s) {
+        let k = widthScale(s.scale);
+        setScale(s.sec, k);
+        s.pinTop = parseFloat(getComputedStyle(s.stage).top) || barHeight() + 14;
+        const avail = window.innerHeight - s.pinTop - BOTTOM_GAP;
+
+        if (!isNarrow()) {
+            for (let i = 0; i < 5 && k > MIN_SCALE; i++) {
+                const need = Math.max(s.stage.offsetHeight, fullStackHeight(s));
+                if (need <= avail + 0.5) break;
+                k = Math.max(MIN_SCALE, k * avail / need);
+                setScale(s.sec, k);
+            }
+        }
+
+        const n = s.stepEls.length;
+        s.scrolly.style.setProperty("--scrolly-length", (isNarrow() ? 120 + 60 * n : 40 + 60 * n) + "vh");
+        s.scrolly.style.setProperty("--scrolly-tail", s.tail + "vh");
+        updateStepTop(s, avail);
+    }
+
+    function fitAll() {
+        const hero = document.getElementById("hero");
+        if (hero) setScale(hero, widthScale(HERO_SCALE));
+        stories.forEach(fitStory);
+    }
+
+    window.Layout = {
+        refit() {
+            fitAll();
+            requestUpdate();
+        }
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", () => {
-        syncScrollyGeometry();
-        updateCumulativeSteps();
+
+    /* ======================================================================
+       3. Scroll Progress
+       ====================================================================== */
+
+    function measure(s) {
+        const rect = s.scrolly.getBoundingClientRect();
+        const tailPx = s.tail / 100 * window.innerHeight;
+        const span = Math.max(1, rect.height - s.stage.offsetHeight - tailPx);
+        s.ratio = clamp((s.pinTop - rect.top) / span, 0, 1);
+        s.entered = rect.top < window.innerHeight * 0.4 && rect.bottom > window.innerHeight * 0.1;
+    }
+
+    function startY(s) {
+        return Math.max(0, Math.round(window.scrollY + s.scrolly.getBoundingClientRect().top - s.pinTop));
+    }
+
+    function finishedY(s) {
+        const rect = s.scrolly.getBoundingClientRect();
+        const span = rect.height - s.stage.offsetHeight - s.tail / 100 * window.innerHeight;
+        return Math.max(0, Math.round(window.scrollY + rect.top - s.pinTop + span + 1));
+    }
+
+    function stepFor(ratio, n) {
+        if (n === 3) return ratio >= 0.58 ? 2 : ratio >= 0.28 ? 1 : 0;
+        if (n === 2) return ratio >= 0.5 ? 1 : 0;
+        return Math.min(n - 1, Math.floor(ratio * n));
+    }
+
+    function updateStory(s) {
+        const wasEntered = s.entered;
+        measure(s);
+        const justEntered = s.entered && !wasEntered;
+
+        if (justEntered && nav.active) s.instant = true;
+        if (!s.entered && !nav.active) s.instant = false;
+        const noMotion = s.instant && (nav.active || justEntered);
+
+        const api = window[s.id.toUpperCase()];
+        if (api && s.entered !== s.graphShown) {
+            s.graphShown = s.entered;
+            if (typeof api.setVisible === "function") api.setVisible(s.entered, s.entered && s.instant);
+        }
+
+        const prog = (reduce || s.instant) ? 1 : s.ratio;
+        window.chartProgress[s.id] = prog;
+        if (api && typeof api.setProgress === "function") api.setProgress(prog);
+
+        const step = stepFor(s.ratio, s.stepEls.length);
+        if (step !== s.currentStep) {
+            s.currentStep = step;
+            if (api && typeof api.setStep === "function") api.setStep(step);
+        }
+
+        s.stepEls.forEach((el, i) => {
+            const show = s.entered && i <= step;
+            if (show && noMotion && !el.classList.contains("is-shown")) el.classList.add("is-instant");
+            if (!show) el.classList.remove("is-instant");
+            el.classList.toggle("is-shown", show);
+            el.classList.toggle("is-active", s.entered && i === step);
+        });
+    }
+
+    const btt = document.querySelector(".back-to-top");
+    if (btt && !btt.querySelector("svg")) {
+        btt.innerHTML = `
+      <svg class="btt-ring" viewBox="0 0 52 52">
+        <circle class="btt-track" cx="26" cy="26" r="24"></circle>
+        <circle class="btt-progress" cx="26" cy="26" r="24"></circle>
+      </svg>
+      <svg class="btt-icon" viewBox="0 0 24 24">
+        <path d="M12 19V5M12 5L5 12M12 5L19 12"></path>
+      </svg>
+    `;
+    }
+
+    let frame = 0;
+
+    function requestUpdate() {
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+            frame = 0;
+            update();
+        });
+    }
+
+    function update() {
+        const y = window.scrollY;
+        const docH = root.scrollHeight - window.innerHeight;
+        root.style.setProperty("--scroll-progress", docH > 0 ? clamp(y / docH, 0, 1).toFixed(4) : 0);
+        if (topbar) topbar.classList.toggle("is-scrolled", y > 12);
+        if (btt) btt.classList.toggle("is-visible", y > 280);
+        stories.forEach(updateStory);
+        updateSpy();
+    }
+
+    window.addEventListener("scroll", () => {
+        if (nav.active) endNavSoon();
+        requestUpdate();
     }, { passive: true });
-    window.addEventListener("load", () => {
-        syncScrollyGeometry();
-        onScroll();
+
+
+    /* ======================================================================
+       4. Navigation
+       ====================================================================== */
+
+    const navLinks = Array.from(document.querySelectorAll(".topbar nav a"));
+    const nav = { active: false, timer: null };
+
+    function endNavSoon() {
+        clearTimeout(nav.timer);
+        nav.timer = setTimeout(() => {
+            nav.active = false;
+            requestUpdate();
+        }, 180);
+    }
+
+    function cancelNav() {
+        if (!nav.active) return;
+        nav.active = false;
+        clearTimeout(nav.timer);
+        stories.forEach(s => { if (!s.entered) s.instant = false; });
+        requestUpdate();
+    }
+    window.addEventListener("wheel", cancelNav, { passive: true });
+    window.addEventListener("touchstart", cancelNav, { passive: true });
+    window.addEventListener("keydown", e => {
+        if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key)) cancelNav();
     });
 
-    syncScrollyGeometry();
-    onScroll();
-    scrollySections.forEach(s => {
-        if (s.sticky && window.ResizeObserver) {
-            new ResizeObserver(syncScrollyGeometry).observe(s.sticky);
+    function revealInstantly(targetY) {
+        const y0 = window.scrollY;
+        const lo = Math.min(y0, targetY) - 50;
+        const hi = Math.max(y0, targetY) + window.innerHeight;
+        document.querySelectorAll(".reveal:not(.is-in)").forEach(el => {
+            const top = el.getBoundingClientRect().top + y0;
+            if (top >= lo && top <= hi) {
+                el.classList.add("is-instant", "is-in");
+                revealObserver.unobserve(el);
+            }
+        });
+    }
+
+    function startInstantNav(targetY, story) {
+        nav.active = true;
+        revealInstantly(targetY);
+        if (story) {
+            story.instant = true;
+            const api = window[story.id.toUpperCase()];
+            if (story.entered && api && typeof api.setVisible === "function") api.setVisible(true, true);
         }
-    });
-    setTimeout(syncScrollyGeometry, 300);
-    setTimeout(syncScrollyGeometry, 800);
-
-    // Mobile hamburger menu
-    const navToggle = document.getElementById("nav-toggle");
-    const siteNav = document.getElementById("site-nav");
-
-    function setNav(open) {
-        if (!bar || !navToggle) return;
-        bar.classList.toggle("nav-open", open);
-        navToggle.setAttribute("aria-expanded", String(open));
-        navToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+        endNavSoon();
+        update();
     }
 
-    if (bar && navToggle && siteNav) {
-        navToggle.addEventListener("click", () => setNav(!bar.classList.contains("nav-open")));
-        siteNav.addEventListener("click", e => { if (e.target.closest("a")) setNav(false); });
-        document.addEventListener("click", e => { if (!bar.contains(e.target)) setNav(false); });
-        document.addEventListener("keydown", e => { if (e.key === "Escape") setNav(false); });
-        window.matchMedia("(min-width: 861px)").addEventListener("change", e => { if (e.matches) setNav(false); });
+    function scrollToY(y) {
+        window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
     }
 
-    // Navigation link active highlight
-    const links = document.querySelectorAll("[data-link]");
-    const sections = ["q1", "q2", "q3", "q4", "q5"].map(id => document.getElementById(id));
-    const navObs = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-            if (e.isIntersecting) {
-                links.forEach(l => l.classList.toggle("active", l.dataset.link === e.target.id));
-            }
-        });
-    }, { rootMargin: "-35% 0px -55% 0px" });
-    sections.forEach(s => s && navObs.observe(s));
+    function goTo(link, e) {
+        const href = link.getAttribute("href");
+        if (!href || href.charAt(0) !== "#") return;
+        const id = href.slice(1);
+        const inNav = !!link.closest(".topbar nav");
 
-    // Kinetic scroll reveal
-    const revealObs = new IntersectionObserver((entries, obs) => {
-        entries.forEach(e => {
-            if (e.isIntersecting) {
-                e.target.classList.add("in");
-                obs.unobserve(e.target);
-            }
-        });
-    }, { threshold: 0.1, rootMargin: "0px 0px -60px 0px" });
+        if (!id) {
+            e.preventDefault();
+            startInstantNav(0, null);
+            scrollToY(0);
+            return;
+        }
 
-    document.querySelectorAll(".reveal").forEach(el => {
-        if (reduce) {
-            el.classList.add("in");
+        const target = document.getElementById(id);
+        if (!target) return;
+        e.preventDefault();
+
+        const story = stories.find(s => s.sec === target);
+        let y;
+        if (story) {
+            y = inNav ? finishedY(story) : startY(story);
         } else {
-            revealObs.observe(el);
+            y = Math.round(target.getBoundingClientRect().top + window.scrollY - barHeight() - 16);
         }
+
+        if (inNav) {
+            startInstantNav(y, story);
+            setActive(id);
+        }
+        scrollToY(Math.max(0, y));
+        if (history.pushState) history.pushState(null, "", href);
+    }
+
+    navLinks.concat(Array.from(document.querySelectorAll(".brand, .cue, .back-to-top"))).forEach(link => {
+        link.addEventListener("click", e => goTo(link, e));
     });
+
+    const spySections = ["q1", "q2", "q3", "q4", "q5", "summary"]
+        .map(name => document.getElementById(name + "-section")).filter(Boolean);
+
+    function setActive(sectionId) {
+        navLinks.forEach(a => a.classList.toggle("is-active", a.getAttribute("href") === "#" + sectionId));
+    }
+
+    function updateSpy() {
+        if (nav.active) return;
+        const line = window.innerHeight * 0.4;
+        let current = "";
+        spySections.forEach(sec => {
+            const r = sec.getBoundingClientRect();
+            if (r.top <= line && r.bottom > line) current = sec.id;
+        });
+        setActive(current);
+    }
+
+
+    /* ======================================================================
+       5. Mobile Menu
+       ====================================================================== */
+
+    const toggle = document.querySelector(".nav-toggle");
+    if (toggle && topbar) {
+        toggle.addEventListener("click", () => {
+            const open = topbar.classList.toggle("is-open");
+            toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        });
+        navLinks.forEach(link => {
+            link.addEventListener("click", () => {
+                topbar.classList.remove("is-open");
+                toggle.setAttribute("aria-expanded", "false");
+            });
+        });
+    }
+
+
+    /* ======================================================================
+       6. Scroll Fade-In
+       ====================================================================== */
+
+    const revealObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("is-in");
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { rootMargin: "0px 0px -8% 0px" });
+
+    document.querySelectorAll(".reveal").forEach(el => revealObserver.observe(el));
+
+
+    /* ======================================================================
+       7. Initialization
+       ====================================================================== */
+
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(window.Layout.refit, 120);
+    });
+
+    fitAll();
+    update();
+    window.addEventListener("load", () => {
+        fitAll();
+        const hash = location.hash.slice(1);
+        const story = stories.find(s => s.sec.id === hash);
+        if (story) {
+            const y = finishedY(story);
+            startInstantNav(y, story);
+            window.scrollTo({ top: y, behavior: "auto" });
+        }
+        update();
+    });
+    setTimeout(window.Layout.refit, 600);
 })();
