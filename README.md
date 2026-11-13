@@ -1,19 +1,14 @@
 # Hero
-<img width="800" height="393" alt="image" src="https://github.com/user-attachments/assets/42670f37-47b2-45da-b470-b8654399cb03" />
+<img width="800" height="430" alt="HERO-1-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/a7ae1fab-64b1-4b6e-aa7f-c7a9f7566c2b" />
 
 # Q1
-<img width="800" height="393" alt="image" src="https://github.com/user-attachments/assets/5e88d15f-9afa-45e4-8d3f-e4a697953014" />
+<img width="800" height="430" alt="Q1-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/951b1d3b-e632-42a8-bcad-6960adcb5eec" />
 
 # Q2
-<img width="800" height="392" alt="image" src="https://github.com/user-attachments/assets/e4df9565-8d02-4d8c-802b-5380c8a252c4" />
+<img width="800" height="392" alt="Q2-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/d0e3bba0-55ed-430b-8891-e27a230e79e0" />
 
 # Q3
-<img width="800" height="394" alt="image" src="https://github.com/user-attachments/assets/23902c5f-8323-40e6-bac2-daef002f25a3" />
-
-# Video
-<img width="960" height="516" alt="image" src="https://github.com/user-attachments/assets/281cd1e5-fd4f-4c6f-a7df-de5cb9447493" />
-
-
+<img width="800" height="394" alt="Q3-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/e0699ba4-f5fb-4322-9aac-141c4befeb4b" />
 
 # DataVis_G23
 
