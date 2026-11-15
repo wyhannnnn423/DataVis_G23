@@ -9,19 +9,47 @@
     #q4 .ctl-select { font: inherit; font-size: 14px; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; cursor: pointer; }
     #q4 .ctl-select:focus-visible { outline: 3px solid var(--highlight-warm); outline-offset: 2px; }
     /* Right-hand panel: one calm card with plain text (the shared .step p glow cards are switched off for Q4 only). */
-    #q4 .step-card-content { padding: 22px; border: 1px solid rgba(255, 176, 32, .55); border-radius: 18px; background: var(--surface-elevated, rgba(15, 23, 42, .8)); }
+    #q4 .step-card-content { padding: 20px 22px; border: 1px solid rgba(148, 163, 184, .42); border-radius: 16px; background: var(--surface-elevated, rgba(15, 23, 42, .8)); }
+    #q4 .scrolly-steps .step { min-height: 0; margin-bottom: 0; opacity: 1; transform: none; }
+    #q4 .scrolly-steps .step::before, #q4 .scrolly-steps .step::after { display: none; }
+    #q4 .scrolly-steps .step-card-content { animation: none; }
+    #q4 .step-card-content h3 { color: var(--text); font-size: 15px; font-weight: 750; margin: 18px 0 6px; }
+    #q4 .step-card-content > h3:first-of-type { margin-top: 0; }
+    #q4 .step-card-content > p { font-size: 14px !important; line-height: 1.6 !important; color: var(--muted) !important; margin: 0 0 14px !important; padding: 0 !important; border: 0 !important; border-left: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; filter: none !important; opacity: 1 !important; transform: none !important; position: static !important; animation: none !important; }
+    #q4 .step-card-content > p::before, #q4 .step-card-content > p::after { display: none !important; }
+    #q4 .step-card-content { box-shadow: none !important; }
+    #q4 .q4-rowlabel, #q4 .q4-col-label { fill: #f1f5f9 !important; }
+    #q4 .q4-count { paint-order: normal; }
+    #q4 .step-card-content .q4-find p { margin: 0; }
+    #q4 .step-card-content .chart-note { font-size: 12px; margin-top: 12px; border-top: 1px solid var(--line); padding-top: 12px; }
+    #q4 .step-card-content .q4-find-out { color: var(--text); }
+    #q4 .step-card-content .q4-find-out small { color: var(--muted); }
+    #q4 .q4-find .segmented button[aria-pressed="true"] { color: var(--accent); }
+    #q4 .step-card-content .q4-find { background: rgba(255, 176, 32, .075); }
     #q4 .insight p { margin: 0 0 10px; padding: 0; background: none; border: 0; border-radius: 0; box-shadow: none; backdrop-filter: none; overflow: visible; opacity: 1 !important; font-size: 14.5px; line-height: 1.6; color: var(--muted); }
     #q4 .insight p::after { display: none !important; }
     #q4 .insight h3 { margin: 16px 0 6px; font-size: 15px; font-weight: 700; color: var(--text); }
-    #q4 .insight .q4-find h3 { margin-top: 0; }
+    #q4 .q4-find h3 { margin-top: 0; color: var(--text); }
     #q4 .insight .chart-note { font-size: 13px; }
     #q4 .insight .q4-find-out { font-size: 15px; color: var(--text); margin: 0; }
-    .q4-find { margin-bottom: 18px; padding: 14px; border-radius: 14px; border: 1px solid rgba(255, 176, 32, .65); background: rgba(255, 176, 32, .10); }
+    #q4 .q4-find { margin-bottom: 18px; padding: 14px; border-radius: 14px; border: 1px solid rgba(255, 176, 32, .65); background: rgba(255, 176, 32, .10); }
     .q4-find h3 { margin-top: 0; }
     .q4-find-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
     .q4-find-seg { margin-bottom: 10px; }
     .q4-find-out { margin: 0; font-size: 15px; line-height: 1.5; }
     .q4-find-out small { font-size: 13px; opacity: .75; }
+    /* Q4 legend: readable labels and the original blue colour ramp. */
+    #q4 .q4-legend {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      color: #cbd5e1; font-size: 12px; line-height: 1.5;
+      margin: 16px 0 10px;
+    }
+    #q4 .q4-legend span { color: #cbd5e1; white-space: nowrap; }
+    #q4 .q4-legend .q4-gradient {
+      display: inline-block; width: 106px; height: 10px; flex: 0 0 106px;
+      border-radius: 3px;
+      background: linear-gradient(to right, #eef6ff, #c9e2f5, #76b9df, #3189c8, #0b468e);
+    }
     .q4-tile .q4-cell { cursor: pointer; }
     .q4-tile.q4-hl .q4-cell { stroke: #ffb020; stroke-width: 5; filter: drop-shadow(0 0 6px #ffb020) drop-shadow(0 0 14px #ff8a00); animation: q4pulse 1.6s ease-in-out infinite; }
     @keyframes q4pulse { 50% { stroke-opacity: .65; } }
@@ -38,7 +66,7 @@
     const ages = [...new Set(rows.map(d => d.age_group))].filter(d => d !== 'Missing').sort((a,b) => parseInt(a,10)-parseInt(b,10));
     const sexValues = ['All', 'Male', 'Female'];
     const state = {year: years.at(-1), sex:'All'};
-    const aside = d3.select('#q4 .insight');
+    const aside = d3.select('#q4 .step-card-content');
     controls.html('');
     const yearLabel = controls.append('label').attr('class','control-group');
     yearLabel.append('span').attr('class','control-label').text('Choose year');
@@ -115,7 +143,7 @@
         .attr('width',x.bandwidth()).attr('height',y.bandwidth()).attr('rx',6).attr('fill',d=>color(d.value));
       g.append('text').attr('class','q4-count').attr('x',d=>x(d.age)+x.bandwidth()/2)
         .attr('y',d=>y(d.user)+y.bandwidth()/2).attr('text-anchor','middle').attr('dominant-baseline','middle')
-        .attr('fill',d=>d.value/scaleMax>.31?'#fff':'#14283d').text(d=>fmt(d.value));
+        .style('fill',d=>d.value/scaleMax>.31?'#ffffff':'#14283d','important').text(d=>fmt(d.value));
       g.append('title').text(d=>`${d.user}, age ${d.age}: ${fmt(d.value)} hospitalisations`);
       legend.html('');
       legend.append('span').text('Fewer injuries');
@@ -129,14 +157,14 @@
       userSel.property('value',find.user); ageSel.property('value',find.age);
       sexSeg.selectAll('button').attr('aria-pressed',d=>String(d===state.sex));
       const pick = cells.find(c=>c.user===find.user && c.age===find.age);
-      const userAll = d3.sum(yearRows.filter(d=>d.road_user===find.user),d=>d.hospitalisations);
+      const userAll = d3.sum(filtered.filter(d=>d.road_user===find.user),d=>d.hospitalisations);
       const rank = [...cells].sort((a,b)=>b.value-a.value).indexOf(pick)+1;
       const pct = userAll ? pick.value/userAll*100 : 0;
       const who = state.sex==='All' ? 'all sexes' : state.sex.toLowerCase()+'s';
       findOut.text('');
       if (pick.value) {
         findOut.append('strong').text(`${fmt(pick.value)} injuries`);
-        findOut.append('span').text(` — ${pct<1 ? 'less than 1' : Math.round(pct)}% of all ${find.user.toLowerCase()} cases in ${state.year}`);
+        findOut.append('span').text(` — ${pct<1 ? 'less than 1' : Math.round(pct)}% of ${find.user.toLowerCase()} cases for ${who} in ${state.year}`);
         findOut.append('br');
         findOut.append('small').text(`${who}, age ${find.age} · #${rank} of ${cells.length} squares`);
       } else findOut.text(`No records for ${who}, age ${find.age}, ${find.user.toLowerCase()} in ${state.year}.`);
