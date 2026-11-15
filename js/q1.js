@@ -1,22 +1,46 @@
-/* Q1 National trend: scroll-driven area + line chart with animated annotations and crosshair tooltip.
+/* Q1 National Trend: Scroll-driven area + line chart with animated annotations and crosshair tooltip.
    Data: data/q1_national_trend.csv (year, hospitalisations).
-   Steps: 0 = national trajectory & KPI count-up, 1 = series-break annotations, 2 = 2019-2021 spotlight.
-   window.Q1.setStep(n) is called by main.js as the reader scrolls. */
+   Steps: 0 = Overall trend & KPI number counter, 1 = Recording method change annotations, 2 = 2019-2021 focus period. */
 
 (function() {
     const container = d3.select("#q1-chart");
     if (container.empty()) return;
 
-    // Wider & taller HD canvas for modern widescreen layouts
-    const W = 960,
-        H = 520;
-    const m = { top: 44, right: 36, bottom: 52, left: 72 };
-    const innerW = W - m.left - m.right;
-    const innerH = H - m.top - m.bottom;
+    // Layout state. Desktop keeps the original 960x580 viewBox (scaled by CSS).
+    // On phones ("compact") the SVG is drawn at its real pixel width so text keeps its true size.
+    const COMPACT_BP = 760; // container width (px) below which the compact layout is used
+    let W = 960,
+        H = 580,
+        m = { top: 44, right: 36, bottom: 52, left: 72 },
+        innerW, innerH,
+        compact = false,
+        rBase = 5.5, // normal marker radius
+        rHi = 7.5; // highlighted marker radius
+
+    function layout() {
+        const cw = Math.round(container.node().clientWidth || 960);
+        compact = cw < COMPACT_BP;
+        if (compact) {
+            W = Math.max(260, cw);
+            // Keep the pinned stage short enough to leave room for the step card below it
+            H = Math.round(Math.max(210, Math.min(W * 0.82, window.innerHeight * 0.34)));
+            m = { top: 52, right: 14, bottom: 40, left: 44 }; // extra top room: title row + band-label row
+            rBase = 4.5;
+            rHi = 6.5;
+        } else {
+            W = 960;
+            H = 580;
+            m = { top: 44, right: 36, bottom: 52, left: 72 };
+            rBase = 5.5;
+            rHi = 7.5;
+        }
+        innerW = W - m.left - m.right;
+        innerH = H - m.top - m.bottom;
+    }
 
     const breaks = [
-        { year: 2012, label: "2012: Victoria recording change", dy: -16 },
-        { year: 2017, label: "2017: NSW recording change", dy: -42 }
+        { year: 2012, label: "2012: Victoria recording change", short: "2012 VIC", dy: -16 },
+        { year: 2017, label: "2017: NSW recording change", short: "2017 NSW", dy: -42 }
     ];
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -24,9 +48,9 @@
     const fmt = d3.format(",");
     let svg, x, y, breaksG, bandG, pts, areaPath, linePath, chartData, pending = 0;
     let introApi = null,
-        wantVisible = false; // graph intro play/hide, driven by main.js (same trigger as the step cards)
+        wantVisible = false,
+        wantInstant = false;
 
-    // Bug-Fixed Animated KPI counter helper (selects the specific DOM node so transitions never overwrite each other)
     function animateKPI(id, endVal, formatter) {
         const el = document.getElementById(id);
         if (!el) return;
@@ -48,10 +72,10 @@
     }
 
     window.Q1 = {
-        // Called by main.js at the same moment the step cards appear / disappear
-        setVisible(v) {
+        setVisible(v, instant) {
             wantVisible = v;
-            if (introApi) v ? introApi.play() : introApi.hide();
+            wantInstant = !!instant;
+            if (introApi) v ? (instant ? introApi.show() : introApi.play()) : introApi.hide();
         },
         setStep(n) {
             pending = n;
@@ -59,7 +83,6 @@
 
             const t = d3.transition().duration(dur).ease(d3.easeCubicOut);
 
-            // Step 1: Animate series-break dashed lines growing vertically + badge slide-in
             breaksG.selectAll(".break-line")
                 .transition(t)
                 .attr("y2", n >= 1 ? H - m.bottom : m.top)
@@ -70,7 +93,6 @@
                 .attr("transform", d => `translate(${x(d.year)}, ${n >= 1 ? H - m.bottom + d.dy : H - m.bottom})`)
                 .style("opacity", n >= 1 ? 1 : 0);
 
-            // Step 2: Expand 2019-2021 spotlight curtain (using fill-opacity so it stays translucent!)
             bandG.select(".band-rect")
                 .transition(t)
                 .attr("width", n >= 2 ? x(2021) - x(2019) : 0)
@@ -82,12 +104,11 @@
                 .attr("y", n >= 2 ? m.top - 10 : m.top)
                 .style("opacity", n >= 2 ? 1 : 0);
 
-            // Emphasise relevant points per step
             pts.transition(t)
                 .attr("r", d => {
-                    if (n === 1 && (d.year === 2012 || d.year === 2017)) return 7.5;
-                    if (n >= 2 && d.year >= 2019) return 7.5;
-                    return 5.5;
+                    if (n === 1 && (d.year === 2012 || d.year === 2017)) return rHi;
+                    if (n >= 2 && d.year >= 2019) return rHi;
+                    return rBase;
                 })
                 .attr("fill", d => {
                     if (n === 1 && (d.year === 2012 || d.year === 2017)) return "var(--highlight-warm)";
@@ -115,11 +136,16 @@
         animateKPI("kpi-2021", last.hospitalisations, v => fmt(Math.round(v)));
         animateKPI("kpi-change", pct, v => (v >= 0 ? "+" : "") + v.toFixed(0) + "%");
 
+        // Draws (or redraws) the whole chart for the current container width.
+        function render(isRerender) {
+        layout();
+        container.selectAll("*").remove();
+        const data = chartData;
+
         x = d3.scaleLinear()
             .domain(d3.extent(data, d => d.year))
             .range([m.left, W - m.right]);
 
-        // Zero baseline preserved so magnitude of change is truthful
         y = d3.scaleLinear()
             .domain([0, d3.max(data, d => d.hospitalisations) * 1.12])
             .nice()
@@ -134,7 +160,6 @@
             .style("height", "auto")
             .style("overflow", "visible");
 
-        // Gradient definition for modern area fill
         const defs = svg.append("defs");
         const grad = defs.append("linearGradient")
             .attr("id", "q1-area-grad")
@@ -143,10 +168,9 @@
         grad.append("stop").attr("offset", "0%").attr("stop-color", "var(--accent)").attr("stop-opacity", 0.28);
         grad.append("stop").attr("offset", "100%").attr("stop-color", "var(--accent)").attr("stop-opacity", 0.0);
 
-        // Subtle horizontal gridlines
         svg.append("g")
             .selectAll("line")
-            .data(y.ticks(6))
+            .data(y.ticks(compact ? 4 : 6))
             .join("line")
             .attr("x1", m.left)
             .attr("x2", W - m.right)
@@ -156,7 +180,6 @@
             .attr("stroke-dasharray", d => d === 0 ? null : "3 5")
             .attr("opacity", d => d === 0 ? 0.25 : 0.12);
 
-        // 2019-2021 highlight band (Step 2) - uses fill-opacity so it stays translucent!
         bandG = svg.append("g").attr("class", "step-band");
         bandG.append("rect")
             .attr("class", "band-rect")
@@ -171,19 +194,17 @@
             .attr("stroke-opacity", 0)
             .attr("stroke-dasharray", "4 4");
 
-        // Right-aligned at x(2021) above the band so it never collides with the line or gets covered
         bandG.append("text")
             .attr("class", "band-label")
             .attr("x", x(2021))
             .attr("y", m.top)
             .attr("text-anchor", "end")
-            .attr("font-size", 12.5)
+            .attr("font-size", compact ? 11.5 : 12.5)
             .attr("font-weight", 700)
             .attr("fill", "var(--highlight-warm)")
             .style("opacity", 0)
-            .text("2019–2021: COVID Dip & Rebound");
+            .text(compact ? "COVID dip & rebound" : "2019–2021: COVID Dip & Rebound");
 
-        // Area under curve
         const areaGen = d3.area()
             .x(d => x(d.year))
             .y0(H - m.bottom)
@@ -196,30 +217,29 @@
             .attr("d", areaGen)
             .style("opacity", reduce ? 1 : 0);
 
-
-        // Axes
         const xAxis = svg.append("g")
             .attr("transform", `translate(0,${H - m.bottom})`)
-            .call(d3.axisBottom(x).ticks(data.length).tickFormat(d3.format("d")).tickSizeOuter(0))
-            .attr("font-size", 13);
+            .call(d3.axisBottom(x)
+                .tickValues(compact ? data.map(d => d.year).filter((yr, i) => i % 2 === 0) : data.map(d => d.year)) // every 2nd year on phones
+                .tickFormat(d3.format("d")).tickSizeOuter(0))
+            .attr("font-size", compact ? 11 : 13);
         xAxis.select(".domain").attr("stroke-opacity", 0.25);
 
         const yAxis = svg.append("g")
             .attr("transform", `translate(${m.left},0)`)
-            .call(d3.axisLeft(y).ticks(6).tickFormat(fmt).tickSize(0).tickPadding(10))
-            .attr("font-size", 13);
+            .call(d3.axisLeft(y).ticks(compact ? 4 : 6).tickFormat(compact ? d3.format("~s") : fmt).tickSize(0).tickPadding(compact ? 6 : 10))
+            .attr("font-size", compact ? 11 : 13);
         yAxis.select(".domain").remove();
 
         svg.append("text")
             .attr("x", m.left)
-            .attr("y", 18)
-            .attr("font-size", 13)
+            .attr("y", compact ? 14 : 18)
+            .attr("font-size", compact ? 11.5 : 13)
             .attr("font-weight", 600)
             .attr("fill", "currentColor")
             .attr("opacity", 0.75)
-            .text("Hospitalised injuries per year (Australia)");
+            .text(compact ? "Hospitalised injuries per year" : "Hospitalised injuries per year (Australia)");
 
-        // Series breaks (Step 1)
         breaksG = svg.append("g").attr("class", "step-breaks");
         breaks.forEach(b => {
             breaksG.append("line")
@@ -243,13 +263,12 @@
             badge.append("text")
                 .attr("x", 8)
                 .attr("y", 0)
-                .attr("font-size", 12.5)
+                .attr("font-size", compact ? 11 : 12.5)
                 .attr("font-weight", 600)
                 .attr("fill", "currentColor")
-                .text(b.label);
+                .text(compact ? b.short : b.label);
         });
 
-        // Smooth curve line
         const lineGen = d3.line()
             .x(d => x(d.year))
             .y(d => y(d.hospitalisations))
@@ -263,13 +282,9 @@
             .attr("stroke-linecap", "round")
             .attr("d", lineGen);
 
-        // Intro animation (area fades in, line draws itself).
-        // Driven by main.js with the same trigger as the three step cards:
-        // the graph appears when the cards appear and is removed when the cards are removed.
         if (!reduce) {
             const len = linePath.node().getTotalLength();
-
-            const LINE_MS = 1300; // how long the line takes to draw
+            const LINE_MS = 1300;
 
             const hide = () => {
                 areaPath.interrupt().style("opacity", 0);
@@ -286,20 +301,32 @@
                 }
             };
 
+            const show = () => {
+                areaPath.interrupt().style("opacity", 1);
+                linePath.interrupt()
+                    .attr("stroke-dasharray", null)
+                    .attr("stroke-dashoffset", null);
+                if (pts) {
+                    pts.interrupt("intro")
+                        .style("pointer-events", null)
+                        .style("opacity", 1)
+                        .style("transform", "scale(1)");
+                }
+            };
+
             const play = () => {
                 hide();
                 areaPath.transition().delay(250).duration(1000).ease(d3.easeCubicOut).style("opacity", 1);
                 linePath.transition().duration(LINE_MS).ease(d3.easeCubicOut).attr("stroke-dashoffset", 0);
 
-                // Each point pops in at the moment the line reaches it
                 if (pts && chartData) {
                     const x0 = x(chartData[0].year);
                     const x1 = x(chartData[chartData.length - 1].year);
                     pts.style("pointer-events", null)
                         .transition("intro")
                         .delay(d => {
-                            const f = (x(d.year) - x0) / (x1 - x0); // how far along the line (0 to 1)
-                            return LINE_MS * (1 - Math.pow(1 - f, 1 / 3)); // inverse of the cubic-out easing
+                            const f = (x(d.year) - x0) / (x1 - x0);
+                            return LINE_MS * (1 - Math.pow(1 - f, 1 / 3));
                         })
                         .duration(450)
                         .ease(d3.easeBackOut.overshoot(2.2))
@@ -308,10 +335,9 @@
                 }
             };
 
-            introApi = { play, hide };
+            introApi = { play, hide, show };
         }
 
-        // Hover crosshair guide line
         const hoverLine = svg.append("line")
             .attr("y1", m.top)
             .attr("y2", H - m.bottom)
@@ -321,14 +347,13 @@
             .style("opacity", 0)
             .style("pointer-events", "none");
 
-        // Rich Tooltip with YoY Delta
         const tip = container.append("div")
             .attr("role", "status")
             .style("position", "absolute")
             .style("pointer-events", "none")
             .style("opacity", 0)
             .style("padding", "10px 14px")
-            .style("white-space", "nowrap") // keep it on its own lines even when the point is near the right edge
+            .style("white-space", "nowrap")
             .style("font-size", "13.5px")
             .style("line-height", "1.45")
             .style("border-radius", "10px")
@@ -365,9 +390,6 @@
       `)
                 .style("opacity", 1);
 
-            // Place the tooltip above the point, but keep it inside the chart card
-            // (the card clips anything that sticks out): flip below if there is no room above,
-            // and nudge sideways near the left / right edges.
             const tipW = tip.node().offsetWidth;
             const tipH = tip.node().offsetHeight;
             const px = r.left - c.left + r.width / 2;
@@ -384,28 +406,70 @@
             tip.style("opacity", 0).style("transform", "translate(-50%, -105%)");
         }
 
-        // Data points
+        // Invisible overlay: on touch/pen, dragging horizontally snaps to the nearest year.
+        // touch-action: pan-y keeps vertical page scrolling working. Mouse input keeps the original hover behaviour.
+        svg.append("rect")
+            .attr("class", "q1-scrub")
+            .attr("x", m.left).attr("y", m.top)
+            .attr("width", innerW).attr("height", innerH)
+            .attr("fill", "transparent")
+            .style("touch-action", "pan-y")
+            .on("pointerdown pointermove", function(e) {
+                if (e.pointerType === "mouse") return;
+                const px = d3.pointer(e, svg.node())[0];
+                const d = d3.least(data, dd => Math.abs(x(dd.year) - px));
+                const node = pts.filter(p => p === d).node();
+                if (d && node) showTip.call(node, e, d);
+            });
+        // Tapping outside the chart dismisses the tooltip
+        d3.select(document).on("pointerdown.q1tip", e => {
+            if (!container.node().contains(e.target)) hideTip();
+        });
+
         pts = svg.selectAll("circle.pt")
             .data(data)
             .join("circle")
             .attr("class", "pt")
             .attr("cx", d => x(d.year))
             .attr("cy", d => y(d.hospitalisations))
-            .attr("r", 5.5)
+            .attr("r", rBase)
             .attr("fill", "var(--surface)")
             .attr("stroke", "var(--accent)")
             .attr("stroke-width", 2.5)
             .attr("tabindex", 0)
             .attr("aria-label", d => `${d.year}: ${fmt(d.hospitalisations)} hospitalised injuries`)
             .on("mouseover", showTip)
+            .on("pointerdown", showTip) // tap on a marker (touch)
             .on("focus", showTip)
             .on("mouseout", hideTip)
             .on("blur", hideTip);
 
-        // Start in the right state now that the points exist
-        if (introApi) wantVisible ? introApi.play() : introApi.hide();
+        // On a redraw, show the line instantly instead of replaying the intro animation
+        if (introApi) wantVisible ? ((wantInstant || isRerender) ? introApi.show() : introApi.play()) : introApi.hide();
 
         window.Q1.setStep(pending);
+        if (window.Layout) window.Layout.refit();
+        } // end render()
+
+        render(false);
+
+        // Redraw when the container crosses the compact breakpoint, or (when compact) changes width.
+        // Desktop width changes need no redraw because the SVG simply scales.
+        let lastW = Math.round(container.node().clientWidth),
+            lastCompact = compact,
+            resizeTimer = null;
+        new ResizeObserver(() => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const cw = Math.round(container.node().clientWidth);
+                if (!cw) return;
+                const willCompact = cw < COMPACT_BP;
+                if (willCompact === lastCompact && (!willCompact || Math.abs(cw - lastW) < 4)) return;
+                lastCompact = willCompact;
+                lastW = cw;
+                render(true);
+            }, 150);
+        }).observe(container.node());
     }).catch(function(err) {
         console.error("Q1 failed to load data:", err);
         container.append("p").text("Sorry, the chart could not be loaded.");
