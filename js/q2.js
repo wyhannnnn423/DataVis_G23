@@ -1,6 +1,6 @@
-/* Q2 Road users: Dumbbell (lollipop) chart of the change between two selected years.
+/* Q2 Road Users: Dumbbell chart showing changes between two selected years.
    Data: data/q2_road_users_by_year.csv (year, national_total, road_user, road_user_cases, share_pct).
-   Controls: From / To year range sliders, presets, measure (change in count or in share), table view.
+   Controls: Start/end year sliders, presets, measure toggle (count or share), table view.
    Owner: Yan Han. */
 
 (function() {
@@ -12,17 +12,39 @@
         const dur = reduce ? 0 : 600;
         const fmt = d3.format(",");
         const MINUS = "\u2212";
-        const UP = "#e5666e",
-            DOWN = "#3b82f6",
-            MUTED = "#475569";
-        const W = 960,
-            rowH = 30; // Shrunk row height for sticky compaction
-        const m = { top: 30, right: 80, bottom: 42, left: 250 };
+        // Layout state. Desktop keeps the original 960-unit viewBox (scaled by CSS).
+        // Narrow screens (phones) draw the SVG at its real pixel width so text stays readable,
+        // put each category label above its row, and show only the top rows until "Show all" is tapped.
+        const NARROW_BP = 760; // container width (px) below which the narrow layout is used
+        const TOP_N = 6; // rows shown by default on narrow screens
+        let W = 960,
+            rowH = 35,
+            H = 0,
+            narrow = false,
+            dotY = 0, // vertical offset of the dots inside a row (label sits above them when narrow)
+            showAll = false;
+        let m = { top: 30, right: 80, bottom: 42, left: 250 };
+
+        function layout() {
+            const cw = Math.round(container.node().clientWidth || 960);
+            narrow = cw < NARROW_BP;
+            if (narrow) {
+                W = Math.max(260, cw);
+                rowH = 54; // tall rows: label on top, dots below, comfortable touch target
+                dotY = 11;
+                m = { top: 8, right: 70, bottom: 34, left: 12 };
+            } else {
+                W = 960;
+                rowH = 35;
+                dotY = 0;
+                m = { top: 30, right: 80, bottom: 42, left: 250 };
+            }
+        }
 
         container.classed("placeholder", false).html("").style("position", "relative").text("Loading chart\u2026");
 
-        const signed = (n, f) => (n > 0 ? "+" : n < 0 ? MINUS : "") + f(Math.abs(n));
         const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+        const signed = (n, f) => (n > 0 ? "+" : n < 0 ? MINUS : "") + f(Math.abs(n));
 
         d3.csv("data/q2_road_users_by_year.csv", d3.autoType).then(function(raw) {
                     container.text("");
@@ -32,18 +54,17 @@
                     const totals = new Map(raw.map(d => [d.year, d.national_total]));
                     const cats = Array.from(new Set(raw.map(d => d.road_user)));
                     const get = (c, y) => cell.get(c + "|" + y) || { road_user_cases: 0, share_pct: 0 };
-                    const H = m.top + cats.length * rowH + m.bottom;
+                    layout();
 
                     const S = { a: years[0], b: years[years.length - 1], mode: "count", table: false };
 
-                    /* ---------- controls ---------- */
-                    const grp = controls.append("div").attr("class", "ctl-group slider-group");
-                    grp.append("label").attr("class", "ctl-label").attr("for", "q2-from").text("From");
+                    const grp = controls.append("div").attr("class", "control-group slider-group");
+                    grp.append("label").attr("class", "control-label").attr("for", "q2-from").text("From");
                     const selA = grp.append("input").attr("type", "range").attr("id", "q2-from").attr("class", "year-slider")
                         .attr("min", years[0]).attr("max", years[years.length - 1]).attr("step", 1).attr("value", S.a);
                     const outA = grp.append("output").attr("class", "year-out").attr("for", "q2-from");
 
-                    grp.append("label").attr("class", "ctl-label").attr("for", "q2-to").text("To");
+                    grp.append("label").attr("class", "control-label").attr("for", "q2-to").text("To");
                     const selB = grp.append("input").attr("type", "range").attr("id", "q2-to").attr("class", "year-slider")
                         .attr("min", years[0]).attr("max", years[years.length - 1]).attr("step", 1).attr("value", S.b);
                     const outB = grp.append("output").attr("class", "year-out").attr("for", "q2-to");
@@ -61,7 +82,7 @@
                             update();
                         });
 
-                    const seg = controls.append("div").attr("class", "seg").attr("role", "group").attr("aria-label", "Measure");
+                    const seg = controls.append("div").attr("class", "segmented").attr("role", "group").attr("aria-label", "Measure");
                     [
                         ["count", "Change in count"],
                         ["share", "Change in share"]
@@ -101,7 +122,6 @@
                         update();
                     });
 
-                    /* ---------- layout ---------- */
                     const title = container.append("h4").attr("class", "chart-title");
                     const legend = container.append("div").attr("class", "legend-inline");
                     legend.html(`
@@ -110,7 +130,7 @@
             <span><i class="swatch" style="background:#38bdf8;border-radius:50%;width:10px;height:10px;"></i>End Year (Decrease)</span>
         `);
                     const chartDiv = container.append("div");
-                    const tableDiv = container.append("div").attr("class", "tbl-wrap").style("display", "none");
+                    const tableDiv = container.append("div").attr("class", "data-table-wrap").style("display", "none");
                     const summary = container.append("p").attr("class", "chart-summary");
                     const note = container.append("p").attr("class", "chart-note");
                     const tip = container.append("div").attr("role", "status").attr("class", "chart-tip").style("opacity", 0);
@@ -118,12 +138,16 @@
 
                     const svg = chartDiv.append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("width", "100%").attr("role", "img")
                         .style("display", "block").style("height", "auto").style("overflow", "visible");
+                    const moreBtn = chartDiv.append("button").attr("type", "button").attr("class", "chip more-btn")
+                        .style("display", "none").on("click", () => {
+                            showAll = !showAll;
+                            update();
+                        });
                     const gGrid = svg.append("g");
                     const gRows = svg.append("g");
                     const gAxis = svg.append("g").attr("transform", `translate(0,${H - m.bottom})`).attr("font-size", 13);
                     const x = d3.scaleLinear().range([m.left, W - m.right]);
 
-                    /* ---------- data for the current selection ---------- */
                     function compute() {
                         const rows = cats.map(c => {
                             const A = get(c, S.a),
@@ -152,7 +176,6 @@
                     const valEnd = d => S.mode === "count" ? d.vb : d.sb;
                     const valText = d => S.mode === "count" ? signed(d.change, fmt) : signed(+d.dShare.toFixed(1), v => v.toFixed(1)) + " pp";
 
-                    /* ---------- tooltip ---------- */
                     function showTip(d, node) {
                         const r = node.getBoundingClientRect(),
                             c = container.node().getBoundingClientRect();
@@ -170,14 +193,28 @@
                 .style("transform", "translateX(-50%)");
         }
         const hideTip = () => tip.style("opacity", 0);
+        // Tapping anywhere outside a row dismisses the tooltip (needed on touch screens)
+        d3.select(document).on("pointerdown.q2tip", e => {
+            if (!(e.target.closest && e.target.closest("g.row"))) hideTip();
+        });
 
-        /* ---------- render ---------- */
         function update() {
             const { rows, net } = compute();
             const count = S.mode === "count";
             const t = d3.transition().duration(firstDraw ? 0 : dur).ease(d3.easeCubicOut);
             
             rows.sort((p, q) => valEnd(q) - valEnd(p));
+
+            // On narrow screens only the top rows are drawn unless "Show all" is on
+            const shown = narrow && !showAll ? rows.slice(0, TOP_N) : rows;
+            moreBtn.style("display", narrow && rows.length > TOP_N && !S.table ? null : "none")
+                .text(showAll ? `Show top ${TOP_N} only` : `Show all ${rows.length} road users`);
+
+            // Chart height follows the number of visible rows
+            H = m.top + shown.length * rowH + m.bottom;
+            svg.attr("viewBox", `0 0 ${W} ${H}`);
+            x.range([m.left, W - m.right]);
+            gAxis.attr("transform", `translate(0,${H - m.bottom})`).attr("font-size", narrow ? 11 : 13);
 
             selA.property("value", S.a); outA.text(S.a); selB.property("value", S.b); outB.text(S.b);
             seg.selectAll("button").attr("aria-pressed", function () { return this.dataset.mode === S.mode; });
@@ -189,12 +226,12 @@
 
             title.text(count ? `Comparison of hospitalisations by road user, ${S.a} vs ${S.b}` : `Comparison of hospitalisation share by road user, ${S.a} vs ${S.b}`);
 
-            const allVals = rows.flatMap(d => [valStart(d), valEnd(d)]);
+            const allVals = shown.flatMap(d => [valStart(d), valEnd(d)]);
             const lo = d3.min(allVals), hi = d3.max(allVals), pad = (hi - lo) * 0.08 || 1;
             x.domain([Math.max(0, lo - pad), hi + pad]).nice();
             
-            const tickFmt = count ? fmt : v => v.toFixed(1) + "%";
-            const ticks = x.ticks(7);
+            const tickFmt = count ? (narrow ? d3.format(".2~s") : fmt) : v => v.toFixed(1) + "%";
+            const ticks = x.ticks(narrow ? 4 : 7); // fewer ticks on narrow screens
 
             gGrid.selectAll("line").data(ticks).join("line").attr("y1", m.top).attr("y2", H - m.bottom)
                 .attr("stroke", "currentColor").attr("opacity", 0.08)
@@ -208,33 +245,37 @@
 
             const yPos = i => m.top + i * rowH + rowH / 2;
             
-            const merged = gRows.selectAll("g.row").data(rows, d => d.cat).join(
+            const merged = gRows.selectAll("g.row").data(shown, d => d.cat).join(
                 enter => {
                     const g = enter.append("g").attr("class", "row").attr("tabindex", 0)
                         .attr("transform", (d, i) => `translate(0,${yPos(i)})`);
                     
-                    g.append("text").attr("class", "lab").attr("x", m.left - 24).attr("y", 5).attr("text-anchor", "end")
-                        .attr("font-size", 14).attr("fill", "currentColor").text(d => d.cat);
+                    g.append("text").attr("class", "lab")
+                        .attr("x", narrow ? m.left : m.left - 24).attr("y", narrow ? -rowH / 2 + 16 : 5)
+                        .attr("text-anchor", narrow ? "start" : "end").attr("font-size", narrow ? 13 : 14).attr("fill", "currentColor").text(d => d.cat);
                     
                     g.append("line").attr("class", "track-line").attr("x1", m.left).attr("x2", W - m.right)
-                        .attr("y1", 0).attr("y2", 0).attr("stroke", "currentColor").attr("stroke-opacity", 0.06).attr("stroke-width", 4);
+                        .attr("y1", dotY).attr("y2", dotY).attr("stroke", "currentColor").attr("stroke-opacity", 0.06).attr("stroke-width", 4);
 
                     g.append("line").attr("class", "connector-line")
-                        .attr("y1", 0).attr("y2", 0)
+                        .attr("y1", dotY).attr("y2", dotY)
                         .attr("stroke-width", 3).attr("stroke-linecap", "round");
                     
-                    g.append("circle").attr("class", "circle-start").attr("r", 4.5)
+                    g.append("circle").attr("class", "circle-start").attr("cy", dotY).attr("r", narrow ? 5 : 4.5)
                         .attr("fill", "var(--surface)").attr("stroke", "#94a3b8").attr("stroke-width", 2);
 
-                    g.append("circle").attr("class", "circle-end").attr("r", 6.0);
+                    g.append("circle").attr("class", "circle-end").attr("cy", dotY).attr("r", 6.0);
 
-                    g.append("text").attr("class", "val").attr("y", 5).attr("font-size", 12.5).attr("font-weight", 700);
+                    g.append("text").attr("class", "val").attr("y", dotY + 5).attr("font-size", narrow ? 12 : 12.5).attr("font-weight", 700);
 
                     g.append("rect").attr("class", "hit").attr("x", 0).attr("y", -rowH / 2).attr("width", W).attr("height", rowH).attr("fill", "transparent");
                     
-                    g.on("mouseenter", function (e, d) { showTip(d, this.querySelector(".circle-end")); })
+                    // pointerenter covers mouse hover, pointerdown covers taps on touch screens
+                    g.on("pointerenter", function (e, d) { showTip(d, this.querySelector(".circle-end")); })
+                        .on("pointerdown", function (e, d) { showTip(d, this.querySelector(".circle-end")); })
                         .on("focus", function (e, d) { showTip(d, this.querySelector(".circle-end")); })
-                        .on("mouseleave", hideTip).on("blur", hideTip);
+                        .on("pointerleave", function (e) { if (e.pointerType === "mouse") hideTip(); }) // touch: keep the tip until the next tap
+                        .on("blur", hideTip);
                     return g;
                 });
 
@@ -257,20 +298,17 @@
                 .attr("fill", d => d.change >= 0 ? "var(--highlight-warm)" : "var(--accent)")
                 .attr("x", d => Math.max(x(valStart(d)), x(valEnd(d))) + 16);
 
-            /* table view */
             const cols = ["Road user", `${S.a}`, `${S.b}`, "Change", `Share ${S.a}`, `Share ${S.b}`, "Share change"];
             tableDiv.html("");
-            const tb = tableDiv.append("table").attr("class", "tbl");
+            const tb = tableDiv.append("table").attr("class", "data-table");
             tb.append("thead").append("tr").selectAll("th").data(cols).join("th").text(d => d);
             const trs = tb.append("tbody").selectAll("tr").data(rows.slice().sort((p, q) => q.vb - p.vb)).join("tr");
             trs.selectAll("td").data(d => [d.cat, fmt(d.va), fmt(d.vb), signed(d.change, fmt), d.sa.toFixed(1) + "%", d.sb.toFixed(1) + "%", signed(+d.dShare.toFixed(1), v => v.toFixed(1)) + " pp"])
                 .join("td").text(d => d);
 
-            /* summary under the chart */
             summary.text(`Net change ${S.a} to ${S.b}: ${signed(net, fmt)}. Largest rise: ${rows.find(r => r.change === d3.max(rows, d => d.change)).cat} (${signed(d3.max(rows, d => d.change), fmt)}). Start Year (${S.a}) is shown in grey, End Year (${S.b}) is highlighted.`);
             note.text("Counts are absolute and not adjusted for population. Source: BITRE hospitalised injury data, cleaned in KNIME.");
 
-            /* insight text (aside) */
             const byAbs = rows.slice().sort((p, q) => Math.abs(q.change) - Math.abs(p.change));
             const top = byAbs[0];
             const opp = byAbs.find(r => Math.sign(r.change) === -Math.sign(top.change));
@@ -284,41 +322,108 @@
                 (opp ? `The largest move the other way was ${esc(opp.cat)} (${signed(opp.change, fmt)}).` : ""));
         }
 
-        // First draw is instant and hidden; the entrance plays when the chart card scrolls into view.
         let firstDraw = true;
         update();
         firstDraw = false;
 
-        // Scroll-driven entrance: window.Q2.setProgress(p) is called by main.js while the reader scrolls (0 to 1).
-        const ease = d3.easeCubicOut, back = d3.easeBackOut.overshoot(2);
+        const ease = d3.easeCubicOut, back = d3.easeBackOut.overshoot(1.5);
         const stage = (p, lo, hi) => Math.max(0, Math.min(1, (p - lo) / (hi - lo)));
         const cntText = (d, e) => S.mode === "count" ? signed(Math.round(d.change * e), fmt) : signed(+(d.dShare * e).toFixed(1), v => v.toFixed(1)) + " pp";
         let done = false;
+
+        let curP = (window.chartProgress || {}).q2 || 0; // last scroll progress, re-applied after a relayout
         function setProgress(p) {
+            curP = p;
             if (done && p >= 1) return;
             done = p >= 1;
-            // chart rises from below
-            const e0 = ease(stage(p, 0, 0.25));
-            container.style("opacity", done ? null : e0).style("transform", done ? null : `translateY(${(1 - e0) * 48}px)`);
-            // data points appear one after another
+
+            const e0 = ease(stage(p, 0, 0.15));
+            container.style("opacity", done ? null : e0).style("transform", done ? null : `translateY(${(1 - e0) * 32}px)`);
+
+            const gridP = stage(p, 0.0, 0.20);
+            gGrid.selectAll("line").style("opacity", done ? 0.08 : 0.08 * ease(gridP));
+            gRows.selectAll(".track-line").style("opacity", done ? 0.06 : 0.06 * ease(gridP));
+
             const n = gRows.selectAll("g.row").size();
-            const step = n > 1 ? 0.55 / (n - 1) : 0;
+            const catP = stage(p, 0.20, 0.40);
+            const axisP = stage(p, 0.40, 0.55);
+            const ticksCount = gAxis.selectAll(".tick").size();
+            gAxis.selectAll(".tick").each(function(d, i) {
+                const tickG = d3.select(this);
+                const localAxisP = stage(axisP, i / ticksCount * 0.7, i / ticksCount * 0.7 + 0.3);
+                tickG.style("opacity", done ? 0.7 : 0.7 * ease(localAxisP));
+            });
+
+            const ptsP = stage(p, 0.55, 0.75); 
+            const moveP = stage(p, 0.75, 1.0); 
+
             gRows.selectAll("g.row").each(function (d, i) {
                 const g = d3.select(this);
-                const rp = stage(p, 0.1 + i * step, 0.1 + i * step + 0.35);
+                
+                const localCatP = stage(catP, i / n * 0.7, i / n * 0.7 + 0.3);
+                g.select(".lab")
+                    .style("opacity", done ? 1 : ease(localCatP))
+                    .attr("transform", done ? null : `translate(${-12 * (1 - ease(localCatP))},0)`);
+
                 const x1 = x(valStart(d)), x2 = x(valEnd(d));
-                g.attr("opacity", done ? 1 : stage(rp, 0, 0.3));
-                g.select(".lab").attr("transform", done ? null : `translate(${-18 * (1 - ease(stage(rp, 0, 0.4)))},0)`);
-                g.select(".connector-line").attr("x1", x1).attr("x2", done ? x2 : x1 + (x2 - x1) * ease(stage(rp, 0.2, 0.75)));
-                g.select(".circle-end").attr("r", done ? 6 : 6 * back(stage(rp, 0.5, 1)));
-                g.select(".val").attr("opacity", done ? 1 : stage(rp, 0.4, 0.8))
-                    .text(done ? valText(d) : cntText(d, ease(stage(rp, 0.4, 1))));
+                const localPtsP = stage(ptsP, i / n * 0.7, i / n * 0.7 + 0.3);
+                
+                g.select(".circle-start")
+                    .style("opacity", done ? 1 : ease(localPtsP))
+                    .attr("r", done ? 4.5 : 4.5 * back(localPtsP))
+                    .attr("cx", x1);
+
+                const localMoveP = stage(moveP, i / n * 0.6, i / n * 0.6 + 0.4);
+                const currentX2 = done ? x2 : x1 + (x2 - x1) * ease(localMoveP);
+
+                g.select(".circle-end")
+                    .style("opacity", done ? 1 : ease(localPtsP))
+                    .attr("r", done ? 6 : 6 * back(localPtsP))
+                    .attr("cx", currentX2);
+
+                g.select(".connector-line")
+                    .style("opacity", done ? 1 : ease(localMoveP))
+                    .attr("x1", x1)
+                    .attr("x2", currentX2);
+
+                g.select(".val")
+                    .style("opacity", done ? 1 : stage(localMoveP, 0.4, 0.9))
+                    .attr("x", Math.max(x1, currentX2) + 16)
+                    .text(done ? valText(d) : cntText(d, ease(localMoveP)));
             });
         }
         if (!reduce) {
             window.Q2 = { setProgress };
             setProgress((window.chartProgress || {}).q2 || 0);
         }
+
+        // Redraw when the container crosses the narrow breakpoint, or (when narrow) changes width.
+        // Desktop width changes need no redraw because the SVG simply scales.
+        let lastW = Math.round(container.node().clientWidth),
+            lastNarrow = narrow,
+            resizeTimer = null;
+        new ResizeObserver(() => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const cw = Math.round(container.node().clientWidth);
+                if (!cw) return;
+                const willNarrow = cw < NARROW_BP;
+                if (willNarrow === lastNarrow && (!willNarrow || Math.abs(cw - lastW) < 4)) return;
+                lastNarrow = willNarrow;
+                lastW = cw;
+                layout();
+                gRows.selectAll("*").remove(); // rows are rebuilt with the new geometry
+                gGrid.selectAll("*").remove();
+                firstDraw = true;
+                update();
+                firstDraw = false;
+                if (!reduce && !done) setProgress(curP);
+                if (window.Layout) window.Layout.refit();
+            }, 150);
+        }).observe(container.node());
+
+        if (window.Layout) window.Layout.refit();
+
     }).catch(function (err) {
         console.error("Q2 failed to load data:", err);
         container.text("Sorry, the chart could not be loaded.");
