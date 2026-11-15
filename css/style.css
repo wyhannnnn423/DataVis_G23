@@ -1148,3 +1148,27 @@ svg .pt:focus {
 #q3-chart .tile:focus-visible rect, #q3-chart .brow:focus-visible .hit { outline: none; stroke: var(--highlight-warm); }
 #q3-chart .tile, #q3-chart .brow { cursor: pointer; outline: none; }
 #q2-chart .row { outline: none; }
+
+/* Q4 age / road user heatmap */
+#q4-chart { position: relative; min-width: 0; }
+.q4-subtitle { color: var(--text); font-size: 15px; font-weight: 700; margin: 8px 0 14px; }
+.q4-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.q4-rowlabel { font-size: 10px; fill: var(--muted); }
+.q4-col-label { font-size: 11px; fill: var(--text); }
+.q4-cell { stroke: #fff; stroke-width: 1px; cursor: help; }
+.q4-cell:hover, .q4-cell:focus-visible { stroke: #f59e0b; stroke-width: 2.5px; outline: none; }
+.q4-legend { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin: 8px 0 12px; }
+.q4-gradient { width: 140px; height: 13px; border-radius: 4px; background: linear-gradient(90deg,#f7fbff,#c6dbef,#6baed6,#2171b5,#08306b); }
+@media (max-width: 650px) { .q4-rowlabel { font-size: 9px; } .q4-col-label { font-size: 10px; } }
+
+/* Question 4 — simplified, labelled heatmap */
+#q4-chart .q4-helper { margin: -5px 0 14px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+#q4-chart .q4-scroll { width: 100%; overflow-x: auto; overflow-y: hidden; }
+#q4-chart .q4-svg { min-width: 730px; width: 100%; height: auto; }
+#q4-chart .q4-rowlabel { font-size: 13px; fill: var(--text); }
+#q4-chart .q4-col-label { font-size: 13px; fill: var(--text); }
+#q4-chart .q4-count { font-size: 12px; font-weight: 700; pointer-events: none; }
+#q4-chart .q4-cell { stroke: var(--surface); stroke-width: 2px; }
+#q4-chart .q4-tile:hover .q4-cell, #q4-chart .q4-tile:focus-visible .q4-cell { stroke: #fbbf24; stroke-width: 3px; }
+#q4-chart .q4-tile:focus-visible { outline: none; }
+#q4-chart .q4-note { line-height: 1.55; }
