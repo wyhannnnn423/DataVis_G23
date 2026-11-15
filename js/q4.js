@@ -6,6 +6,16 @@
   // Styles for the Q4 "Find your profile" widget live here so this feature only touches Q4 (no other file changes).
   const style = document.createElement('style');
   style.textContent = `
+    #q4 .ctl-select { font: inherit; font-size: 14px; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; cursor: pointer; }
+    #q4 .ctl-select:focus-visible { outline: 3px solid var(--highlight-warm); outline-offset: 2px; }
+    /* Right-hand panel: one calm card with plain text (the shared .step p glow cards are switched off for Q4 only). */
+    #q4 .step-card-content { padding: 22px; border: 1px solid rgba(255, 176, 32, .55); border-radius: 18px; background: var(--surface-elevated, rgba(15, 23, 42, .8)); }
+    #q4 .insight p { margin: 0 0 10px; padding: 0; background: none; border: 0; border-radius: 0; box-shadow: none; backdrop-filter: none; overflow: visible; opacity: 1 !important; font-size: 14.5px; line-height: 1.6; color: var(--muted); }
+    #q4 .insight p::after { display: none !important; }
+    #q4 .insight h3 { margin: 16px 0 6px; font-size: 15px; font-weight: 700; color: var(--text); }
+    #q4 .insight .q4-find h3 { margin-top: 0; }
+    #q4 .insight .chart-note { font-size: 13px; }
+    #q4 .insight .q4-find-out { font-size: 15px; color: var(--text); margin: 0; }
     .q4-find { margin-bottom: 18px; padding: 14px; border-radius: 14px; border: 1px solid rgba(255, 176, 32, .65); background: rgba(255, 176, 32, .10); }
     .q4-find h3 { margin-top: 0; }
     .q4-find-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
@@ -30,14 +40,14 @@
     const state = {year: years.at(-1), sex:'All'};
     const aside = d3.select('#q4 .insight');
     controls.html('');
-    const yearLabel = controls.append('label').attr('class','ctl-group');
-    yearLabel.append('span').attr('class','ctl-label').text('Choose year');
+    const yearLabel = controls.append('label').attr('class','control-group');
+    yearLabel.append('span').attr('class','control-label').text('Choose year');
     const yearSelect = yearLabel.append('select').attr('class','ctl-select').attr('aria-label','Choose year');
     yearSelect.selectAll('option').data(years).join('option').attr('value',d=>d).text(d=>d);
     yearSelect.property('value',state.year).on('change',event=>{state.year=+event.target.value; render();});
-    const sexGroup = controls.append('div').attr('class','ctl-group');
-    sexGroup.append('span').attr('class','ctl-label').text('Compare sex');
-    const seg = sexGroup.append('div').attr('class','seg').attr('role','group').attr('aria-label','Choose sex');
+    const sexGroup = controls.append('div').attr('class','control-group');
+    sexGroup.append('span').attr('class','control-label').text('Compare sex');
+    const seg = sexGroup.append('div').attr('class','segmented').attr('role','group').attr('aria-label','Choose sex');
     seg.selectAll('button').data(sexValues).join('button').attr('type','button').text(d=>d)
       .on('click',(event,d)=>{state.sex=d;render();});
 
@@ -57,7 +67,7 @@
     const ageSel = row.append('select').attr('class','ctl-select').attr('aria-label','Age group');
     ageSel.selectAll('option').data(ages).join('option').attr('value',d=>d).text(d=>'Age '+d);
     const userSel = row.append('select').attr('class','ctl-select').attr('aria-label','Road user type');
-    const sexSeg = box.append('div').attr('class','seg q4-find-seg').attr('role','group').attr('aria-label','Choose sex for the profile');
+    const sexSeg = box.append('div').attr('class','segmented q4-find-seg').attr('role','group').attr('aria-label','Choose sex for the profile');
     sexSeg.selectAll('button').data(sexValues).join('button').attr('type','button').text(d=>d).on('click',(event,d)=>{state.sex=d;render();});
     const findOut = box.append('p').attr('class','q4-find-out').attr('aria-live','polite');
     ageSel.on('change',event=>{find.age=event.target.value;render();});
