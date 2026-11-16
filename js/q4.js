@@ -1,11 +1,11 @@
 /* Q4 — readable age × road-user heatmap. Uses the original BITRE-derived CSV. */
 (() => {
-  const chart = d3.select('#q4-chart');
-  const controls = d3.select('#q4-controls');
-  if (chart.empty()) return;
-  // Styles for the Q4 "Find your profile" widget live here so this feature only touches Q4 (no other file changes).
-  const style = document.createElement('style');
-  style.textContent = `
+        const chart = d3.select('#q4-chart');
+        const controls = d3.select('#q4-controls');
+        if (chart.empty()) return;
+        // Styles for the Q4 "Find your profile" widget live here so this feature only touches Q4 (no other file changes).
+        const style = document.createElement('style');
+        style.textContent = `
     #q4 .ctl-select { font: inherit; font-size: 14px; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; cursor: pointer; }
     #q4 .ctl-select:focus-visible { outline: 3px solid var(--highlight-warm); outline-offset: 2px; }
     /* Right-hand panel: one calm card with plain text (the shared .step p glow cards are switched off for Q4 only). */
@@ -55,78 +55,93 @@
     @keyframes q4pulse { 50% { stroke-opacity: .65; } }
     @media (prefers-reduced-motion: reduce) { .q4-tile.q4-hl .q4-cell { animation: none; } }
   `;
-  document.head.appendChild(style);
-  const fmt = d3.format(',');
-  chart.classed('placeholder', false).text('Loading age and road-user data…');
+        document.head.appendChild(style);
+        const fmt = d3.format(',');
+        chart.classed('placeholder', false).text('Loading age and road-user data…');
 
-  d3.csv('data/q4_age_sex_road_user_by_year.csv', d3.autoType).then(data => {
-    const rows = data.filter(d => Number.isFinite(d.year) && Number.isFinite(d.hospitalisations));
-    if (!rows.length) throw Error('No valid Q4 rows');
-    const years = [...new Set(rows.map(d => d.year))].sort((a,b) => a-b);
-    const ages = [...new Set(rows.map(d => d.age_group))].filter(d => d !== 'Missing').sort((a,b) => parseInt(a,10)-parseInt(b,10));
-    const sexValues = ['All', 'Male', 'Female'];
-    const state = {year: years.at(-1), sex:'All'};
-    const aside = d3.select('#q4 .step-card-content');
-    controls.html('');
-    const yearLabel = controls.append('label').attr('class','control-group');
-    yearLabel.append('span').attr('class','control-label').text('Choose year');
-    const yearSelect = yearLabel.append('select').attr('class','ctl-select').attr('aria-label','Choose year');
-    yearSelect.selectAll('option').data(years).join('option').attr('value',d=>d).text(d=>d);
-    yearSelect.property('value',state.year).on('change',event=>{state.year=+event.target.value; render();});
-    const sexGroup = controls.append('div').attr('class','control-group');
-    sexGroup.append('span').attr('class','control-label').text('Compare sex');
-    const seg = sexGroup.append('div').attr('class','segmented').attr('role','group').attr('aria-label','Choose sex');
-    seg.selectAll('button').data(sexValues).join('button').attr('type','button').text(d=>d)
-      .on('click',(event,d)=>{state.sex=d;render();});
+        d3.csv('data/q4_age_sex_road_user_by_year.csv', d3.autoType).then(data => {
+                    const rows = data.filter(d => Number.isFinite(d.year) && Number.isFinite(d.hospitalisations));
+                    if (!rows.length) throw Error('No valid Q4 rows');
+                    const years = [...new Set(rows.map(d => d.year))].sort((a, b) => a - b);
+                    const ages = [...new Set(rows.map(d => d.age_group))].filter(d => d !== 'Missing').sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+                    const sexValues = ['All', 'Male', 'Female'];
+                    const state = { year: years.at(-1), sex: 'All' };
+                    const aside = d3.select('#q4 .step-card-content');
+                    controls.html('');
+                    const yearLabel = controls.append('label').attr('class', 'control-group');
+                    yearLabel.append('span').attr('class', 'control-label').text('Choose year');
+                    const yearSelect = yearLabel.append('select').attr('class', 'ctl-select').attr('aria-label', 'Choose year');
+                    yearSelect.selectAll('option').data(years).join('option').attr('value', d => d).text(d => d);
+                    yearSelect.property('value', state.year).on('change', event => {
+                        state.year = +event.target.value;
+                        render();
+                    });
+                    const sexGroup = controls.append('div').attr('class', 'control-group');
+                    sexGroup.append('span').attr('class', 'control-label').text('Compare sex');
+                    const seg = sexGroup.append('div').attr('class', 'segmented').attr('role', 'group').attr('aria-label', 'Choose sex');
+                    seg.selectAll('button').data(sexValues).join('button').attr('type', 'button').text(d => d)
+                        .on('click', (event, d) => {
+                            state.sex = d;
+                            render();
+                        });
 
-    chart.html('');
-    const title = chart.append('p').attr('class','q4-subtitle');
-    const help = chart.append('p').attr('class','q4-helper').text('Each square shows hospitalisations for one age group and road user type. A darker square means a higher count.');
-    const svgHolder = chart.append('div').attr('class','q4-scroll');
-    const legend = chart.append('div').attr('class','q4-legend');
-    const note = chart.append('p').attr('class','chart-note q4-note').text('Shows the six highest-count road user types for the selected year (ranked across all sexes). Other types are not displayed. “Missing” age is excluded from the heatmap but included in the overall total. These are counts, not population-adjusted rates.');
-    aside.html('<h3>How to read this</h3><p><strong>Across:</strong> age groups. <strong>Down:</strong> road user types. Each square shows the number of people hospitalised. Darker blue means more injuries.</p><h3>What it shows</h3><p id="q4-insight"></p><p id="q4-compare"></p><p class="chart-note">Use the Male and Female buttons to compare patterns. The colour scale stays the same for both, so the colours are comparable.</p>');
+                    chart.html('');
+                    const title = chart.append('p').attr('class', 'q4-subtitle');
+                    const help = chart.append('p').attr('class', 'q4-helper').text('Each square shows hospitalisations for one age group and road user type. A darker square means a higher count.');
+                    const svgHolder = chart.append('div').attr('class', 'q4-scroll');
+                    const legend = chart.append('div').attr('class', 'q4-legend');
+                    const note = chart.append('p').attr('class', 'chart-note q4-note').text('Shows the six highest-count road user types for the selected year (ranked across all sexes). Other types are not displayed. “Missing” age is excluded from the heatmap but included in the overall total. These are counts, not population-adjusted rates.');
+                    aside.html('<h3>How to read this</h3><p><strong>Across:</strong> age groups. <strong>Down:</strong> road user types. Each square shows the number of people hospitalised. Darker blue means more injuries.</p><h3>What it shows</h3><p id="q4-insight"></p><p id="q4-compare"></p><p class="chart-note">Use the Male and Female buttons to compare patterns. The colour scale stays the same for both, so the colours are comparable.</p>');
 
-    // "Find your profile": pick an age group, road user and sex; the matching heatmap square glows and a short stat appears.
-    const find = {user:null, age:null};
-    const box = aside.insert('div', ':first-child').attr('class','q4-find');
-    box.append('h3').text('Find your profile');
-    const row = box.append('div').attr('class','q4-find-row');
-    const ageSel = row.append('select').attr('class','ctl-select').attr('aria-label','Age group');
-    ageSel.selectAll('option').data(ages).join('option').attr('value',d=>d).text(d=>'Age '+d);
-    const userSel = row.append('select').attr('class','ctl-select').attr('aria-label','Road user type');
-    const sexSeg = box.append('div').attr('class','segmented q4-find-seg').attr('role','group').attr('aria-label','Choose sex for the profile');
-    sexSeg.selectAll('button').data(sexValues).join('button').attr('type','button').text(d=>d).on('click',(event,d)=>{state.sex=d;render();});
-    const findOut = box.append('p').attr('class','q4-find-out').attr('aria-live','polite');
-    ageSel.on('change',event=>{find.age=event.target.value;render();});
-    userSel.on('change',event=>{find.user=event.target.value;render();});
+                    // "Find your profile": pick an age group, road user and sex; the matching heatmap square glows and a short stat appears.
+                    const find = { user: null, age: null };
+                    const box = aside.insert('div', ':first-child').attr('class', 'q4-find');
+                    box.append('h3').text('Find your profile');
+                    const row = box.append('div').attr('class', 'q4-find-row');
+                    const ageSel = row.append('select').attr('class', 'ctl-select').attr('aria-label', 'Age group');
+                    ageSel.selectAll('option').data(ages).join('option').attr('value', d => d).text(d => 'Age ' + d);
+                    const userSel = row.append('select').attr('class', 'ctl-select').attr('aria-label', 'Road user type');
+                    const sexSeg = box.append('div').attr('class', 'segmented q4-find-seg').attr('role', 'group').attr('aria-label', 'Choose sex for the profile');
+                    sexSeg.selectAll('button').data(sexValues).join('button').attr('type', 'button').text(d => d).on('click', (event, d) => {
+                        state.sex = d;
+                        render();
+                    });
+                    const findOut = box.append('p').attr('class', 'q4-find-out').attr('aria-live', 'polite');
+                    ageSel.on('change', event => {
+                        find.age = event.target.value;
+                        render();
+                    });
+                    userSel.on('change', event => {
+                        find.user = event.target.value;
+                        render();
+                    });
 
-    function render() {
-      seg.selectAll('button').attr('aria-pressed',d=>String(d===state.sex));
-      const yearRows = rows.filter(d=>d.year===state.year);
-      const filtered = yearRows.filter(d=>state.sex==='All' || d.sex===state.sex);
-      const totalsByUser = d3.rollups(yearRows, v=>d3.sum(v,d=>d.hospitalisations),d=>d.road_user)
-        .sort((a,b)=>b[1]-a[1]);
-      const topUsers = totalsByUser.slice(0,6).map(d=>d[0]);
-      const counts = d3.rollup(filtered,v=>d3.sum(v,d=>d.hospitalisations),d=>d.road_user,d=>d.age_group);
-      const cells = topUsers.flatMap(user=>ages.map(age=>({user,age,value:counts.get(user)?.get(age)||0})));
-      // Use a common maximum across Male and Female for the selected year, so switching sex does not change the legend.
-      const sexMax = d3.max(yearRows.filter(d=>d.sex==='Male'||d.sex==='Female'), d=>d.hospitalisations) || 1;
-      const allMax = d3.max(yearRows.filter(d=>topUsers.includes(d.road_user)),d=>d.hospitalisations) || 1;
-      const allCells = d3.rollups(yearRows,v=>d3.sum(v,d=>d.hospitalisations),d=>d.road_user,d=>d.age_group).flatMap(([user,group])=>group.map(([age,n])=>({user,age,n})));
-      const scaleMax = d3.max(allCells.filter(d=>topUsers.includes(d.user)),d=>d.n) || Math.max(sexMax,allMax);
-      const color = d3.scaleSequentialSqrt([0,scaleMax],d3.interpolateBlues);
-      const highest = [...cells].sort((a,b)=>b.value-a.value)[0];
-      const total = d3.sum(filtered,d=>d.hospitalisations);
-      title.text(`Hospitalised road injuries by age and road user — ${state.year} (${state.sex})`);
-      d3.select('#q4-insight').text(`Highest combination: ${highest.user}, age ${highest.age} (${fmt(highest.value)} hospitalisations). Total for ${state.sex.toLowerCase()} records in ${state.year}: ${fmt(total)}.`);
-      const sexTop = ['Male','Female'].map(sex=>{
-        const s = yearRows.filter(d=>d.sex===sex && d.age_group!=='Missing' && topUsers.includes(d.road_user));
-        const byPair = d3.rollups(s,v=>d3.sum(v,d=>d.hospitalisations),d=>d.road_user,d=>d.age_group)
-          .flatMap(([user,groups])=>groups.map(([age,n])=>({user,age,n}))).sort((a,b)=>b.n-a.n);
-        return {sex,peak:byPair[0]};
-      });
-      d3.select('#q4-compare').text(sexTop.map(d=>`${d.sex}: ${d.peak ? `${d.peak.user}, age ${d.peak.age} (${fmt(d.peak.n)})` : 'no records'}`).join('  •  '));
+                    function render() {
+                        seg.selectAll('button').attr('aria-pressed', d => String(d === state.sex));
+                        const yearRows = rows.filter(d => d.year === state.year);
+                        const filtered = yearRows.filter(d => state.sex === 'All' || d.sex === state.sex);
+                        const totalsByUser = d3.rollups(yearRows, v => d3.sum(v, d => d.hospitalisations), d => d.road_user)
+                            .sort((a, b) => b[1] - a[1]);
+                        const topUsers = totalsByUser.slice(0, 6).map(d => d[0]);
+                        const counts = d3.rollup(filtered, v => d3.sum(v, d => d.hospitalisations), d => d.road_user, d => d.age_group);
+                        const cells = topUsers.flatMap(user => ages.map(age => ({ user, age, value: counts.get(user) ? .get(age) || 0 })));
+                        // Use a common maximum across Male and Female for the selected year, so switching sex does not change the legend.
+                        const sexMax = d3.max(yearRows.filter(d => d.sex === 'Male' || d.sex === 'Female'), d => d.hospitalisations) || 1;
+                        const allMax = d3.max(yearRows.filter(d => topUsers.includes(d.road_user)), d => d.hospitalisations) || 1;
+                        const allCells = d3.rollups(yearRows, v => d3.sum(v, d => d.hospitalisations), d => d.road_user, d => d.age_group).flatMap(([user, group]) => group.map(([age, n]) => ({ user, age, n })));
+                        const scaleMax = d3.max(allCells.filter(d => topUsers.includes(d.user)), d => d.n) || Math.max(sexMax, allMax);
+                        const color = d3.scaleSequentialSqrt([0, scaleMax], d3.interpolateBlues);
+                        const highest = [...cells].sort((a, b) => b.value - a.value)[0];
+                        const total = d3.sum(filtered, d => d.hospitalisations);
+                        title.text(`Hospitalised road injuries by age and road user — ${state.year} (${state.sex})`);
+                        d3.select('#q4-insight').text(`Highest combination: ${highest.user}, age ${highest.age} (${fmt(highest.value)} hospitalisations). Total for ${state.sex.toLowerCase()} records in ${state.year}: ${fmt(total)}.`);
+                        const sexTop = ['Male', 'Female'].map(sex => {
+                            const s = yearRows.filter(d => d.sex === sex && d.age_group !== 'Missing' && topUsers.includes(d.road_user));
+                            const byPair = d3.rollups(s, v => d3.sum(v, d => d.hospitalisations), d => d.road_user, d => d.age_group)
+                                .flatMap(([user, groups]) => groups.map(([age, n]) => ({ user, age, n }))).sort((a, b) => b.n - a.n);
+                            return { sex, peak: byPair[0] };
+                        });
+                        d3.select('#q4-compare').text(sexTop.map(d => `${d.sex}: ${d.peak ? `${d.peak.user}, age ${d.peak.age} (${fmt(d.peak.n)})` : 'no records'}`).join('  •  '));
       const left=166, top=25, cw=77, ch=55, bottom=48, right=14;
       const width=left+ages.length*cw+right, height=top+topUsers.length*ch+bottom;
       const svg = svgHolder.html('').append('svg').attr('class','q4-svg').attr('viewBox',`0 0 ${width} ${height}`).attr('role','img').attr('aria-label',`Hospitalisation heatmap for ${state.year}, ${state.sex}`);
