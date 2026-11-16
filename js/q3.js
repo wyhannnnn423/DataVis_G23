@@ -135,10 +135,7 @@
             if (compact) {
                 W = Math.max(260, cw);
                 const mapH = Math.min(Math.round(W * 0.8), 340); // cap the map height on wide phones / small tablets
-                mapBox = [
-                    [ox, 58],
-                    [W - ox, 58 + mapH]
-                ];
+                mapBox = [[ox, 58], [W - ox, 58 + mapH]];
                 rowH = 34;
                 barX0 = 48;
                 barMax = Math.max(80, W - barX0 - 64);
@@ -152,10 +149,7 @@
             } else {
                 W = 980;
                 H = 470;
-                mapBox = [
-                    [ox + 6, 60],
-                    [452, 424]
-                ];
+                mapBox = [[ox + 6, 60], [452, 424]];
                 rowH = 32;
                 barX0 = 540;
                 barMax = 380;
@@ -464,9 +458,9 @@
             tg.html("");
             const fsA = compact ? 11 : 12; // axis font size
             tg.append("text").attr("x", mt.left).attr("y", 14).attr("font-size", compact ? 12.5 : 13.5).attr("font-weight", 700).attr("fill", "currentColor")
-                .text(compact ?
-                    (share_ ? `Share over time: ${S.sel} highlighted` : `Cases over time: ${S.sel} highlighted`) :
-                    (share_ ? `Share of national total over time: ${NAMES[S.sel] || S.sel} highlighted` : `Cases over time: ${NAMES[S.sel] || S.sel} highlighted`));
+                .text(compact
+                    ? (share_ ? `Share over time: ${S.sel} highlighted` : `Cases over time: ${S.sel} highlighted`)
+                    : (share_ ? `Share of national total over time: ${NAMES[S.sel] || S.sel} highlighted` : `Cases over time: ${NAMES[S.sel] || S.sel} highlighted`));
             tg.append("g").selectAll("line").data(ty.ticks(4)).join("line").attr("x1", mt.left).attr("x2", Wt - mt.right)
                 .attr("y1", d => ty(d)).attr("y2", d => ty(d)).attr("stroke", "currentColor").attr("opacity", 0.12).attr("stroke-dasharray", "3 5");
             tg.append("g").attr("transform", `translate(${mt.left},0)`).attr("font-size", fsA).attr("opacity", 0.8)
