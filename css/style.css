@@ -1328,9 +1328,9 @@ g.row,
     -webkit-tap-highlight-color: transparent;
 }
 
-@media (max-width: 640px) {
-
-    /* ---- Flow mode (set by main.js): tall interactive charts scroll normally instead of being pinned ---- */
+/* Flow mode (set by main.js on screens up to 1024px, for every story except Q1):
+   the stage is too tall to pin next to or above the step cards, so the chart scrolls normally and the cards follow it. */
+@media (max-width: 1024px) {
     .scrolly.is-flow {
         display: block;
         min-height: 0;
@@ -1350,6 +1350,10 @@ g.row,
         display: block;
         animation: none;
     }
+
+}
+
+@media (max-width: 640px) {
 
     /* ---- Controls ---- */
     /* Two year sliders: label | slider | value, one row each, so neither is cut off */
@@ -1568,9 +1572,17 @@ g.row,
     column-gap: 16px;
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 641px) {
     .q4-pair {
         grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Below 1025px the cards flow under the chart, so there is no height budget: let the trend line be larger */
+@media (max-width: 1024px) {
+    .q4-spark {
+        max-height: none;
+        max-width: 100%;
     }
 }
 
