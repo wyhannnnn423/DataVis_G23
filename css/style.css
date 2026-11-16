@@ -916,6 +916,7 @@ svg .pt:focus {
 
 
 /* Q4 Heatmap axis labels */
+
 #q4-chart svg text {
     fill: #f1f5f9;
 }
@@ -1320,14 +1321,18 @@ svg .pt:focus {
    14. Mobile Chart Fixes
    ========================================================================== */
 
+
 /* Tablet widths: Q1 still uses the scaled 960-wide viewBox, so cap its height to keep the pinned stage on screen */
+
 @media (min-width: 761px) and (max-width: 1024px) {
     #q1-chart svg {
         max-height: 36vh;
     }
 }
 
+
 /* No grey flash when tapping chart elements */
+
 .state-path,
 .brow,
 g.row,
@@ -1336,7 +1341,6 @@ g.row,
 }
 
 @media (max-width: 640px) {
-
     /* ---- Flow mode (set by main.js): tall interactive charts scroll normally instead of being pinned ---- */
     .scrolly.is-flow {
         display: block;
@@ -1357,7 +1361,6 @@ g.row,
         display: block;
         animation: none;
     }
-
     /* ---- Controls ---- */
     /* Two year sliders: label | slider | value, one row each, so neither is cut off */
     .slider-group {
@@ -1371,7 +1374,8 @@ g.row,
     .year-slider {
         width: 100%;
         min-width: 0;
-        height: 32px; /* taller hit area for the thumb */
+        height: 32px;
+        /* taller hit area for the thumb */
         margin: 0;
     }
     .year-out {
@@ -1392,7 +1396,6 @@ g.row,
     .chips {
         gap: 6px;
     }
-
     /* ---- Chart text and legend ---- */
     .chart-title {
         font-size: 16px;
@@ -1415,7 +1418,6 @@ g.row,
         display: block;
         margin: 10px auto 0;
     }
-
     /* Table view: scroll sideways, keep the first column visible */
     .data-table-wrap {
         -webkit-overflow-scrolling: touch;
@@ -1426,7 +1428,6 @@ g.row,
         left: 0;
         background: var(--surface);
     }
-
     /* ---- Back-to-top: keep it in the corner, clear of the home indicator, and let content show through ---- */
     .back-to-top {
         right: 12px;
