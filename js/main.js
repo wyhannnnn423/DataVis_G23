@@ -13,9 +13,10 @@
     const topbar = document.querySelector(".topbar");
     const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
     const isNarrow = () => window.matchMedia("(max-width: 1024px)").matches;
-    // Phones and tablets (<= 1024px): the stage of Q2+ is too tall to pin together with the step cards
-    // (the cards would sit below the fold), so those sections switch to "flow" mode: normal scrolling, no sticky stage.
-    const usesFlow = s => isNarrow() && s.id !== "q1";
+    // Phones: tall interactive charts (Q2+) are too big to pin inside the viewport,
+    // so those sections switch to "flow" mode (normal scrolling, no sticky stage).
+    const isPhone = () => window.matchMedia("(max-width: 640px)").matches;
+    const usesFlow = s => isPhone() && s.id !== "q1";
     const barHeight = () => (topbar ? topbar.offsetHeight : 56);
 
     // Each chart module (q1.js...) reads this object to get the initial progress
@@ -32,7 +33,7 @@
         { id: "q1", scale: { ref: 1536, max: 1.25 }, lockTo: "head", tail: 70 },
         { id: "q2", scale: { ref: 1745, max: 1.1 }, lockTo: "chart", tail: 55 },
         { id: "q3", scale: { ref: 1920, max: 1 }, lockTo: "chart", tail: 55 },
-        { id: "q4", scale: { ref: 1920, max: 1 }, lockTo: "chart", tail: 55 },
+        { id: "q4", scale: { ref: 1920, max: 1 }, lockTo: "chart", tail: 55 }, // Placeholder
         { id: "q5", scale: { ref: 1920, max: 1 }, lockTo: "chart", tail: 55 } // Placeholder
     ];
 
@@ -103,7 +104,6 @@
 
     function fitStory(s) {
         // Flow mode: no pinned stage, no extra scroll distance; all step cards are shown in order
-        s.stage.style.minHeight = ""; // reset before measuring (see "release together" below)
         const flow = usesFlow(s);
         s.flow = flow;
         s.scrolly.classList.toggle("is-flow", flow);
@@ -127,10 +127,6 @@
                 setScale(s.sec, k);
             }
         }
-
-        // Desktop: make the pinned stage at least as tall as the full step stack. Both are sticky, and a taller stack
-        // would otherwise reach the end of the section first and scroll away while the chart is still pinned.
-        if (!isNarrow()) s.stage.style.minHeight = fullStackHeight(s) + "px";
 
         const n = s.stepEls.length;
         s.scrolly.style.setProperty("--scrolly-length", (isNarrow() ? 120 + 60 * n : 40 + 60 * n) + "vh");
