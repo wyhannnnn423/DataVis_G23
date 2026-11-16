@@ -175,7 +175,7 @@
         </div>
     </section>
 
-    <!-- Q4 (Placeholder) -->
+    <!-- Q4: Age group x road user heatmap -->
     <section id="q4-section" class="scrolly-section">
         <div class="scrolly" id="q4">
             <div class="scrolly-stage">
@@ -185,20 +185,22 @@
                 </header>
                 <div class="chart-card">
                     <div class="controls" id="q4-controls"></div>
-                    <div id="q4-chart" class="placeholder">Q4 Visualisation Slot<small>Reserved for your customized D3 chart module</small></div>
+                    <div id="q4-chart" class="placeholder">Loading chart...<small>Needs data/q4_age_sex_road_user_by_year.csv</small></div>
                 </div>
             </div>
             <div class="scrolly-steps">
                 <div class="step-stack">
                     <div class="step is-shown is-active" data-step="0">
-                        <div class="step-card-content">
-                            <h3>Q4 Guidelines</h3>
-                            <p>This side-pane block is pre-reserved to support your next data story step.</p>
-                            <ul class="bullet-list">
-                                <li><strong>D3 Integration:</strong> Automatically bound to Q4 progress.</li>
-                                <li><strong>Layout Ready:</strong> Fully responsive on mobile.</li>
-                            </ul>
-                        </div>
+                        <h3>What it shows</h3>
+                        <p id="q4-insight">Loading&hellip;</p>
+                    </div>
+                    <div class="step" data-step="1">
+                        <h3>Find your profile</h3>
+                        <div class="q4-find" id="q4-find"></div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <h3>This group in detail</h3>
+                        <div class="q4-find" id="q4-detail"></div>
                     </div>
                 </div>
             </div>

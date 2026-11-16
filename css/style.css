@@ -625,7 +625,6 @@ section {
     border-radius: inherit;
     padding: 1.5px;
     background: linear-gradient(135deg, transparent 0%, color-mix(in srgb, var(--accent) 30%, transparent) 40%, color-mix(in srgb, var(--highlight-warm) 65%, transparent) 50%, color-mix(in srgb, var(--accent-bright) 40%, transparent) 60%, transparent 100%);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -912,12 +911,6 @@ svg .pt:focus {
 
 #q2-chart .row {
     outline: none;
-}
-
-
-/* Q4 Heatmap axis labels */
-#q4-chart svg text {
-    fill: #f1f5f9;
 }
 
 
@@ -1335,9 +1328,9 @@ g.row,
     -webkit-tap-highlight-color: transparent;
 }
 
-@media (max-width: 640px) {
-
-    /* ---- Flow mode (set by main.js): tall interactive charts scroll normally instead of being pinned ---- */
+/* Flow mode (set by main.js on screens up to 1024px, for every story except Q1):
+   the stage is too tall to pin next to or above the step cards, so the chart scrolls normally and the cards follow it. */
+@media (max-width: 1024px) {
     .scrolly.is-flow {
         display: block;
         min-height: 0;
@@ -1357,6 +1350,10 @@ g.row,
         display: block;
         animation: none;
     }
+
+}
+
+@media (max-width: 640px) {
 
     /* ---- Controls ---- */
     /* Two year sliders: label | slider | value, one row each, so neither is cut off */
@@ -1436,5 +1433,272 @@ g.row,
     }
     .back-to-top.is-visible {
         opacity: 0.75;
+    }
+}
+
+
+/* ==========================================================================
+   15. Q4 Heatmap (age group x road user) and "Find your profile"
+   ========================================================================== */
+
+.q4-helper {
+    margin: 0 0 calc(8 * var(--u));
+    font-size: calc(13 * var(--u));
+    color: var(--muted);
+}
+
+.q4-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.q4-rowlabel {
+    fill: currentColor;
+}
+
+.q4-col-label {
+    fill: var(--muted);
+    font-weight: 600;
+}
+
+.q4-count {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+}
+
+.q4-tile {
+    outline: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.q4-tile:focus-visible .q4-cell {
+    stroke: var(--highlight-warm);
+    stroke-width: 3;
+}
+
+/* The square picked in "Find your profile" glows and pulses */
+.q4-tile.q4-hl .q4-cell {
+    stroke: var(--highlight-warm);
+    stroke-width: 3;
+    filter: drop-shadow(0 0 6px var(--highlight-warm));
+    animation: q4pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes q4pulse {
+    50% {
+        stroke-opacity: 0.55;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .q4-tile.q4-hl .q4-cell {
+        animation: none;
+    }
+}
+
+.q4-legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: calc(8 * var(--u));
+    font-size: calc(12.5 * var(--u));
+    color: var(--muted);
+}
+
+.q4-gradient {
+    flex: 0 1 140px;
+    min-width: 80px;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #e0f2fe, #38bdf8, #1d4ed8); /* same palette as the heatmap squares */
+}
+
+/* "Find your profile" card: styled like the other step cards (they style <p>, this one holds controls) */
+.q4-find {
+    padding: calc(18 * var(--u)) calc(20 * var(--u));
+    background: var(--surface-elevated);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--line);
+    border-left: calc(4 * var(--u)) solid var(--highlight-warm);
+    border-radius: calc(15 * var(--u));
+    box-shadow: var(--shadow-sm);
+    font-size: calc(15 * var(--u));
+    line-height: 1.5;
+}
+
+.q4-find-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.q4-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: calc(8 * var(--u));
+}
+
+.q4-big {
+    font-size: 1.15em;
+}
+
+.q4-big strong {
+    font-size: 1.6em;
+    letter-spacing: -0.02em;
+}
+
+.q4-line {
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 0.92em;
+}
+
+.q4-block {
+    margin-top: calc(10 * var(--u));
+}
+
+.q4-pair {
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 16px;
+}
+
+@media (min-width: 641px) {
+    .q4-pair {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Below 1025px the cards flow under the chart, so there is no height budget: let the trend line be larger */
+@media (max-width: 1024px) {
+    .q4-spark {
+        max-height: none;
+        max-width: 100%;
+    }
+}
+
+.q4-cap {
+    margin-bottom: 5px;
+    font-size: 0.8em;
+    color: var(--muted);
+}
+
+.q4-track {
+    height: 10px;
+    border-radius: 5px;
+    background: rgba(148, 163, 184, 0.18);
+    overflow: hidden;
+}
+
+.q4-fill {
+    display: block;
+    height: 100%;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #38bdf8, #1d4ed8);
+}
+
+/* Male / female split bar: blue and amber, matching the app's accent colours */
+.q4-split {
+    display: flex;
+}
+
+.q4-male {
+    background: #38bdf8;
+}
+
+.q4-female {
+    background: var(--highlight-warm);
+}
+
+.q4-split-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin-top: 5px;
+    font-size: 0.82em;
+}
+
+.q4-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-right: 6px;
+    border-radius: 50%;
+}
+
+.q4-spark {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 340px;
+    max-height: calc(54 * var(--u)); /* keep the pinned card short so the page is not scaled down */
+    overflow: visible;
+}
+
+.q4-spark-line {
+    fill: none;
+    stroke: #38bdf8;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+}
+
+.q4-spark-dot {
+    fill: var(--highlight-warm);
+    stroke: var(--bg);
+    stroke-width: 2;
+}
+
+.q4-spark-label {
+    fill: var(--muted);
+    font-size: 10px;
+}
+
+.q4-caution {
+    margin-top: calc(10 * var(--u));
+    padding-top: calc(8 * var(--u));
+    border-top: 1px solid var(--line);
+    font-size: 0.78em;
+    color: var(--muted);
+}
+
+.q4-select {
+    font: inherit;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px 12px;
+    min-height: 40px;
+    max-width: 100%;
+    cursor: pointer;
+}
+
+.q4-select:focus-visible {
+    outline: 3px solid var(--highlight-warm);
+    outline-offset: 2px;
+}
+
+.q4-find-out small {
+    color: var(--muted);
+    font-size: 0.85em;
+}
+
+@media (max-width: 640px) {
+    .q4-find {
+        padding: 14px 16px;
+        font-size: 0.95rem;
+    }
+    .q4-select {
+        flex: 1 1 140px;
     }
 }
