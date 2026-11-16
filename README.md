@@ -1,8 +1,8 @@
 # Hero
-<img width="800" height="394" alt="ScreenRecording2026-11-16100532-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/f3fcc336-f8b7-45e6-abb5-973c85600005" />
+<img width="800" height="394" alt="ScreenRecording2026-11-16095842-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/63c33001-c5ac-45ce-8843-b8d76a85ace0" />
 
 # Q1
-<img width="800" height="394" alt="ScreenRecording2026-11-16095842-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/63c33001-c5ac-45ce-8843-b8d76a85ace0" />
+<img width="800" height="394" alt="ScreenRecording2026-11-16100532-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/f3fcc336-f8b7-45e6-abb5-973c85600005" />
 
 # Q2
 <img width="800" height="392" alt="Q2-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/d0e3bba0-55ed-430b-8891-e27a230e79e0" />
