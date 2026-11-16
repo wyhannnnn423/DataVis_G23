@@ -13,10 +13,9 @@
     const topbar = document.querySelector(".topbar");
     const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
     const isNarrow = () => window.matchMedia("(max-width: 1024px)").matches;
-    // Phones: tall interactive charts (Q2+) are too big to pin inside the viewport,
-    // so those sections switch to "flow" mode (normal scrolling, no sticky stage).
-    const isPhone = () => window.matchMedia("(max-width: 640px)").matches;
-    const usesFlow = s => isPhone() && s.id !== "q1";
+    // Phones and tablets (<= 1024px): the stage of Q2+ is too tall to pin together with the step cards
+    // (the cards would sit below the fold), so those sections switch to "flow" mode: normal scrolling, no sticky stage.
+    const usesFlow = s => isNarrow() && s.id !== "q1";
     const barHeight = () => (topbar ? topbar.offsetHeight : 56);
 
     // Each chart module (q1.js...) reads this object to get the initial progress
