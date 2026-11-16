@@ -1,14 +1,19 @@
 # Hero
-<img width="800" height="430" alt="HERO-1-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/a7ae1fab-64b1-4b6e-aa7f-c7a9f7566c2b" />
+<img width="800" height="394" alt="ScreenRecording2026-11-16100532-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/f3fcc336-f8b7-45e6-abb5-973c85600005" />
 
 # Q1
-<img width="800" height="430" alt="Q1-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/a99d91a0-3083-43ac-be82-6a79b65f83ba" />
+<img width="800" height="394" alt="ScreenRecording2026-11-16095842-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/63c33001-c5ac-45ce-8843-b8d76a85ace0" />
 
 # Q2
 <img width="800" height="392" alt="Q2-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/d0e3bba0-55ed-430b-8891-e27a230e79e0" />
 
 # Q3
 <img width="800" height="394" alt="Q3-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/e0699ba4-f5fb-4322-9aac-141c4befeb4b" />
+
+# Q4
+<img width="800" height="394" alt="ScreenRecording2026-11-16100626-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/6e044c2e-778c-4d5b-b030-681b3eb9569e" />
+
+# Q5
 
 # DataVis_G23
 
