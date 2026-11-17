@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="css/style.css">
     <script>
         document.documentElement.classList.add("js"); // Needed for fade-in animation
+        // Apply the saved colour theme before the first paint to avoid a flash
+        try {
+            var saved = localStorage.getItem("theme");
+            if (saved === "light" || saved === "dark") document.documentElement.setAttribute("data-theme", saved);
+        } catch (e) {}
     </script>
     <!-- Load D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -32,6 +37,10 @@
             <a href="#q5-section">First Nations peoples</a>
             <a href="#summary-section">Summary</a>
         </nav>
+        <button class="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode" aria-pressed="false">
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
     </header>
 
     <!-- Hero Section -->
@@ -241,14 +250,72 @@
     <section id="summary-section">
         <div class="summary-card reveal">
             <p class="eyebrow">Conclusion</p>
-            <h2>Summary of Key Road Safety Insights</h2>
-            <p>Our analysis of the 2011–2021 BITRE hospitalisation data reveals three crucial dimensions of road traffic injuries in Australia:</p>
-            <ul>
-                <li><strong>Rising Trend:</strong> Total hospitalised injuries rose by 16% over the decade (34,033 to 39,505), although part of the movement reflects changes in how Victoria and New South Wales record admissions.</li>
-                <li><strong>Pedal Cyclists:</strong> Pedal cyclists recorded the largest rise of any road user group (+2,772), accounting for 50.7% of the net increase.</li>
-                <li><strong>Geographic Concentration:</strong> Victoria, Queensland, and New South Wales dominate national totals, with shifting relative shares heavily influenced by changes in admission criteria.</li>
-            </ul>
-            <p>To view the full raw details or build custom analyses, please consult the official BITRE publications.</p>
+            <h2>What the data tells us</h2>
+            <p>Four findings from the 2011&ndash;2021 BITRE hospitalised injury data. Each one links back to the chart it comes from.</p>
+            <div class="takeaways">
+                <a class="takeaway" href="#q1-section">
+                    <span class="takeaway-q">Q1 &middot; National trend</span>
+                    <span class="takeaway-stat">+16%</span>
+                    <span class="takeaway-text">Hospitalisations rose from 34,033 to 39,505. They dipped to 37,966 in 2020, then rebounded. Part of the rise reflects recording changes in Victoria (2012) and NSW (2017).</span>
+                </a>
+                <a class="takeaway" href="#q2-section">
+                    <span class="takeaway-q">Q2 &middot; Road users</span>
+                    <span class="takeaway-stat">+2,772</span>
+                    <span class="takeaway-text">Pedal cyclists rose the most of any road user group, accounting for 50.7% of the net increase of 5,472.</span>
+                </a>
+                <a class="takeaway" href="#q3-section">
+                    <span class="takeaway-q">Q3 &middot; States and territories</span>
+                    <span class="takeaway-stat">28.2%</span>
+                    <span class="takeaway-text">Victoria had the largest share in 2021, ahead of Queensland (26.4%) and New South Wales (22.8%). These are shares of counts, not rates.</span>
+                </a>
+                <a class="takeaway" href="#q4-section">
+                    <span class="takeaway-q">Q4 &middot; Age, sex and road user</span>
+                    <span class="takeaway-stat">4,036</span>
+                    <span class="takeaway-text">Car drivers aged 40&ndash;64 were the largest age and road user group in 2021. Males made up 65% of records with a recorded sex.</span>
+                </a>
+            </div>
+            <p class="summary-note">Counts describe how many people were hospitalised. They do not show risk, because they are not adjusted for population or distance travelled.</p>
+        </div>
+
+        <div class="about-data reveal" id="about-data">
+            <p class="eyebrow">About the data</p>
+            <h2>Where the numbers come from, and what they can&rsquo;t tell you</h2>
+            <div class="about-grid">
+                <details class="about-item" open>
+                    <summary>Source and method</summary>
+                    <p>Bureau of Infrastructure and Transport Research Economics (BITRE), <a href="https://www.bitre.gov.au/publications/ongoing/hospitalised-injury" target="_blank" rel="noopener">Hospitalised Injury data</a>, covering 2011 to 2021. We counted non-fatal hospitalisations caused by road traffic crashes.</p>
+                    <p>The raw files were cleaned and aggregated in KNIME, exported as the CSV files listed below, and drawn in the browser with D3.js. Nothing is estimated or modelled.</p>
+                </details>
+                <details class="about-item">
+                    <summary>Limits to keep in mind</summary>
+                    <ul>
+                        <li><strong>Counts, not rates.</strong> Larger states and larger age groups have more people, so bigger counts do not mean higher risk.</li>
+                        <li><strong>Recording changes.</strong> Victoria (2012) and New South Wales (2017) changed how admissions are recorded, so trends across those years are not strictly comparable. They are marked with a dagger (&dagger;) on the state map.</li>
+                        <li><strong>Patterns, not causes.</strong> The 2020 dip coincides with COVID-19 restrictions, but the data cannot show why.</li>
+                        <li><strong>Missing values.</strong> Records without a recorded age are left out of the age axis, and the very small group with indeterminate or missing sex appears only under &ldquo;All&rdquo; in the age and sex chart. Both are still included in the totals.</li>
+                    </ul>
+                </details>
+                <details class="about-item">
+                    <summary>Glossary</summary>
+                    <dl>
+                        <dt>Hospitalisation</dt><dd>One recorded hospital admission after a road traffic injury. Deaths are not counted.</dd>
+                        <dt>Road user</dt><dd>The injured person&rsquo;s role on the road, for example car driver, pedal cyclist or pedestrian.</dd>
+                        <dt>Share</dt><dd>A group&rsquo;s percentage of the national total in the same year.</dd>
+                        <dt>Percentage points (pp)</dt><dd>The difference between two shares. A share moving from 20% to 23% is +3 pp.</dd>
+                        <dt>Net change</dt><dd>The total in the end year minus the total in the start year.</dd>
+                    </dl>
+                </details>
+                <details class="about-item">
+                    <summary>Download the data</summary>
+                    <p>Every chart also has a download button (top right of the chart) that saves what you are looking at as a CSV. The full cleaned files are here:</p>
+                    <ul class="dl-list">
+                        <li><a href="data/q1_national_trend.csv" download>National totals by year <span>CSV</span></a></li>
+                        <li><a href="data/q2_road_users_by_year.csv" download>Road users by year <span>CSV</span></a></li>
+                        <li><a href="data/q3_states_by_year.csv" download>States and territories by year <span>CSV</span></a></li>
+                        <li><a href="data/q4_age_sex_road_user_by_year.csv" download>Age, sex and road user by year <span>CSV</span></a></li>
+                    </ul>
+                </details>
+            </div>
         </div>
     </section>
 
