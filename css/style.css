@@ -19,6 +19,29 @@
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --bar-h: 56px;
     --u: 1px;
+    --map-stroke: var(--line); /* state outlines on the Q3 map */
+    --cell-stroke: transparent; /* outline of the Q4 heatmap squares */
+    color-scheme: dark;
+}
+
+/* Light theme: toggled by the button in the top bar (saved in localStorage) */
+:root[data-theme="light"] {
+    --bg: #f4f7fb;
+    --surface: #ffffff;
+    --surface-elevated: rgba(255, 255, 255, 0.92);
+    --text: #0f172a;
+    --muted: #475569;
+    --line: #d5dde8;
+    --accent: #0369a1;
+    --accent-bright: #2563eb;
+    --accent-soft: #e0f2fe;
+    --highlight-warm: #b45309;
+    --highlight-warm-soft: rgba(180, 83, 9, 0.14);
+    --shadow-sm: 0 4px 16px -2px rgba(15, 23, 42, 0.1);
+    --shadow-lg: 0 24px 48px -12px rgba(15, 23, 42, 0.18);
+    --map-stroke: #94a3b8;
+    --cell-stroke: rgba(15, 23, 42, 0.16);
+    color-scheme: light;
 }
 
 * {
@@ -1186,7 +1209,7 @@ svg .pt:focus {
     }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1100px) {
     .nav-toggle {
         display: flex;
     }
@@ -1475,6 +1498,10 @@ g.row,
     -webkit-tap-highlight-color: transparent;
 }
 
+.q4-cell {
+    stroke: var(--cell-stroke);
+}
+
 .q4-tile:focus-visible .q4-cell {
     stroke: var(--highlight-warm);
     stroke-width: 3;
@@ -1612,7 +1639,7 @@ g.row,
 }
 
 .q4-male {
-    background: #38bdf8;
+    background: var(--accent);
 }
 
 .q4-female {
@@ -1646,7 +1673,7 @@ g.row,
 
 .q4-spark-line {
     fill: none;
-    stroke: #38bdf8;
+    stroke: var(--accent);
     stroke-width: 2.5;
     stroke-linecap: round;
 }
@@ -1701,4 +1728,290 @@ g.row,
     .q4-select {
         flex: 1 1 140px;
     }
+}
+
+
+/* ==========================================================================
+   16. Theme toggle, chart tools (download CSV / expand), summary & about
+   ========================================================================== */
+
+/* ---- Theme toggle (top bar) ---- */
+.theme-toggle {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
+    color: var(--text);
+    cursor: pointer;
+    transition: color 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+}
+.theme-toggle:hover {
+    color: var(--highlight-warm);
+    border-color: var(--highlight-warm);
+}
+.theme-toggle svg {
+    width: 19px;
+    height: 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.theme-toggle .icon-moon,
+:root[data-theme="light"] .theme-toggle .icon-sun {
+    display: none;
+}
+:root[data-theme="light"] .theme-toggle .icon-moon {
+    display: block;
+}
+@media (max-width: 1100px) {
+    .theme-toggle {
+        margin-left: auto; /* push the theme and menu buttons to the right of the brand */
+        order: 2;
+    }
+    .nav-toggle {
+        order: 3;
+    }
+}
+
+/* ---- Chart tools: download CSV + expand (added by main.js) ---- */
+.card-tools {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 5;
+    display: flex;
+    gap: 6px;
+}
+.tool-btn {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+.tool-btn:hover {
+    color: var(--text);
+    border-color: var(--accent);
+}
+.tool-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+/* leave room for the two buttons next to the controls */
+.chart-card > .controls {
+    padding-right: 82px;
+}
+/* below 1025px the cards flow under the chart: put the buttons on their own row so they never cover controls */
+@media (max-width: 1024px) {
+    .chart-card:not(:has(#q1-chart)) .card-tools {
+        position: static;
+        justify-content: flex-end;
+        margin: -2px 0 8px;
+    }
+    .chart-card:not(:has(#q1-chart)) > .controls {
+        padding-right: 0;
+    }
+    .tool-btn {
+        width: 40px;
+        height: 40px;
+    }
+}
+@media (max-width: 640px) {
+    .chart-card:has(#q1-chart) .tool-btn {
+        width: 30px;
+        height: 30px;
+    }
+    .chart-card:has(#q1-chart) .card-tools {
+        top: 6px;
+        right: 6px;
+    }
+}
+
+/* Expanded chart: fills most of the screen, the rest of the page is dimmed by the box-shadow */
+.chart-card.is-expanded {
+    position: fixed;
+    z-index: 200;
+    top: calc(var(--bar-h) + 12px);
+    left: 3vw;
+    right: 3vw;
+    bottom: 3vh;
+    max-width: none;
+    margin: 0;
+    overflow: auto;
+    border-radius: 16px;
+    box-shadow: 0 0 0 200vmax rgba(2, 6, 12, 0.66);
+    transform: none;
+}
+.chart-card.is-expanded svg {
+    max-height: calc(100vh - 290px); /* keep the whole chart on screen */
+}
+html.has-expanded {
+    overflow: hidden;
+}
+/* The stage has its own stacking context, so lift it above the step cards while its chart is expanded */
+.scrolly-stage:has(.chart-card.is-expanded) {
+    z-index: 120;
+}
+
+/* ---- Summary: takeaway cards ---- */
+.takeaways {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+    margin: 26px 0 8px;
+}
+.takeaway {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    color: var(--text);
+    text-decoration: none;
+    transition: transform 0.25s var(--ease-out-expo), border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.takeaway:hover,
+.takeaway:focus-visible {
+    transform: translateY(-4px);
+    border-color: var(--highlight-warm);
+    box-shadow: var(--shadow-sm);
+}
+.takeaway-q {
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.takeaway-stat {
+    font-size: 2.1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--accent);
+}
+.takeaway-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--muted);
+}
+.summary-note {
+    margin-top: 18px;
+    font-size: 0.95rem;
+}
+
+/* ---- About the data: expandable items ---- */
+.about-data {
+    max-width: min(94vw, 1440px);
+    margin: 56px auto 0;
+}
+.about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: 14px;
+    align-items: start;
+    margin-top: 22px;
+}
+.about-item {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0 20px;
+}
+.about-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 0;
+    font-weight: 700;
+    font-size: 1.02rem;
+    cursor: pointer;
+    list-style: none;
+}
+.about-item summary::-webkit-details-marker {
+    display: none;
+}
+.about-item summary::after {
+    content: "";
+    flex: none;
+    width: 9px;
+    height: 9px;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(45deg);
+    transition: transform 0.25s var(--ease-out-expo);
+}
+.about-item[open] summary::after {
+    transform: rotate(-135deg);
+}
+.about-item > :not(summary) {
+    font-size: 0.95rem;
+    color: var(--muted);
+}
+.about-item > p,
+.about-item > ul,
+.about-item > dl {
+    margin: 0 0 16px;
+}
+.about-item ul {
+    padding-left: 20px;
+}
+.about-item li {
+    margin-bottom: 8px;
+}
+.about-item li strong,
+.about-item dt {
+    color: var(--text);
+}
+.about-item dt {
+    font-weight: 700;
+    margin-top: 10px;
+}
+.about-item dd {
+    margin: 2px 0 0;
+}
+.dl-list {
+    list-style: none;
+    padding-left: 0 !important;
+}
+.dl-list a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color 0.2s ease;
+}
+.dl-list a:hover {
+    border-color: var(--accent);
+}
+.dl-list a span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
 }

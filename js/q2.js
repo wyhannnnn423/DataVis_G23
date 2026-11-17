@@ -57,6 +57,18 @@
                     layout();
 
                     const S = { a: years[0], b: years[years.length - 1], mode: "count", table: false };
+                    // Download button (see ChartTools in main.js): the comparison for the currently selected years
+                    if (window.ChartTools) ChartTools.register("q2", () => ({
+                        filename: `q2_road_users_${S.a}_to_${S.b}.csv`,
+                        rows: cats.map(c => {
+                            const a = get(c, S.a), b = get(c, S.b);
+                            return {
+                                road_user: c, start_year: S.a, end_year: S.b,
+                                cases_start: a.road_user_cases, cases_end: b.road_user_cases, change: b.road_user_cases - a.road_user_cases,
+                                share_start_pct: +a.share_pct.toFixed(2), share_end_pct: +b.share_pct.toFixed(2), share_change_pp: +(b.share_pct - a.share_pct).toFixed(2)
+                            };
+                        }).sort((p, q) => q.change - p.change)
+                    }));
 
                     const grp = controls.append("div").attr("class", "control-group slider-group");
                     grp.append("label").attr("class", "control-label").attr("for", "q2-from").text("From");
@@ -126,8 +138,8 @@
                     const legend = container.append("div").attr("class", "legend-inline");
                     legend.html(`
             <span><i class="swatch" style="border:2px solid #94a3b8;background:transparent;border-radius:50%;width:10px;height:10px;"></i>Start Year</span>
-            <span><i class="swatch" style="background:#fbbf24;border-radius:50%;width:10px;height:10px;"></i>End Year (Increase)</span>
-            <span><i class="swatch" style="background:#38bdf8;border-radius:50%;width:10px;height:10px;"></i>End Year (Decrease)</span>
+            <span><i class="swatch" style="background:var(--highlight-warm);border-radius:50%;width:10px;height:10px;"></i>End Year (Increase)</span>
+            <span><i class="swatch" style="background:var(--accent);border-radius:50%;width:10px;height:10px;"></i>End Year (Decrease)</span>
         `);
                     const chartDiv = container.append("div");
                     const tableDiv = container.append("div").attr("class", "data-table-wrap").style("display", "none");

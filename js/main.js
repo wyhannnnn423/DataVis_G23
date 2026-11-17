@@ -434,3 +434,134 @@
     });
     setTimeout(window.Layout.refit, 600);
 })();
+
+/* ==========================================================================
+   Theme toggle (dark / light)
+   The inline script in <head> applies a saved choice before first paint; this wires up the button.
+   ========================================================================== */
+(function() {
+    const root = document.documentElement;
+    const btn = document.querySelector(".theme-toggle");
+    if (!btn) return;
+
+    function apply(theme) {
+        root.setAttribute("data-theme", theme);
+        const label = theme === "light" ? "Switch to dark mode" : "Switch to light mode";
+        btn.setAttribute("aria-pressed", String(theme === "light"));
+        btn.setAttribute("aria-label", label);
+        btn.title = label;
+    }
+
+    apply(root.getAttribute("data-theme") === "light" ? "light" : "dark"); // dark is the default design
+    btn.addEventListener("click", () => {
+        const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+        apply(next);
+        try { localStorage.setItem("theme", next); } catch (e) { /* storage may be blocked; the choice just won't persist */ }
+    });
+})();
+
+
+/* ==========================================================================
+   Chart tools: "Download CSV" and "Expand" buttons on each chart card.
+   A chart module calls ChartTools.register("q2", () => ({ filename, rows })) once its data has loaded;
+   that adds the two buttons to the card that holds #q2-chart. Charts without a registration get no buttons.
+   ========================================================================== */
+window.ChartTools = (function() {
+    const ICONS = {
+        csv: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg>',
+        expand: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+        close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+    };
+
+    // Rows (array of flat objects) -> CSV text, quoting values that contain commas, quotes or line breaks
+    function toCsv(rows) {
+        if (!rows.length) return "";
+        const cols = Object.keys(rows[0]);
+        const esc = v => {
+            const s = v == null ? "" : String(v);
+            return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+        };
+        return [cols.join(",")].concat(rows.map(r => cols.map(c => esc(r[c])).join(","))).join("\n");
+    }
+
+    function download(filename, rows) {
+        // The BOM makes Excel read the file as UTF-8
+        const blob = new Blob(["\ufeff" + toCsv(rows)], { type: "text/csv;charset=utf-8" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+
+    /* ---- Expand: the card becomes a fixed, near-fullscreen panel; a spacer keeps the page layout unchanged ---- */
+    let open = null; // { card, btn, spacer }
+
+    function collapse() {
+        if (!open) return;
+        const { card, btn, spacer } = open;
+        card.classList.remove("is-expanded");
+        document.documentElement.classList.remove("has-expanded");
+        spacer.remove();
+        btn.innerHTML = ICONS.expand;
+        btn.setAttribute("aria-label", "Expand chart");
+        btn.title = "Expand chart";
+        btn.setAttribute("aria-expanded", "false");
+        btn.focus({ preventScroll: true });
+        open = null;
+    }
+
+    function expand(card, btn, id) {
+        if (open) collapse();
+        // Charts that fade in on scroll: show them fully, otherwise an early expand would open an empty chart
+        const api = window[id.toUpperCase()];
+        if (api && typeof api.setProgress === "function") api.setProgress(1);
+        const spacer = document.createElement("div");
+        spacer.style.height = card.offsetHeight + "px"; // holds the card's place so the pinned stage does not jump
+        card.after(spacer);
+        card.classList.add("is-expanded");
+        document.documentElement.classList.add("has-expanded");
+        btn.innerHTML = ICONS.close;
+        btn.setAttribute("aria-label", "Close expanded chart");
+        btn.title = "Close (Esc)";
+        btn.setAttribute("aria-expanded", "true");
+        open = { card, btn, spacer };
+    }
+
+    document.addEventListener("keydown", e => { if (e.key === "Escape") collapse(); });
+    // Clicking the dimmed page behind an expanded chart closes it
+    document.addEventListener("pointerdown", e => { if (open && !open.card.contains(e.target)) collapse(); });
+
+    function makeButton(kind, label) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "tool-btn";
+        b.innerHTML = ICONS[kind];
+        b.setAttribute("aria-label", label);
+        b.title = label;
+        return b;
+    }
+
+    function register(id, getCsv) {
+        const chart = document.getElementById(id + "-chart");
+        const card = chart && chart.closest(".chart-card");
+        if (!card || card.querySelector(".card-tools")) return;
+
+        const tools = document.createElement("div");
+        tools.className = "card-tools";
+        const csvBtn = makeButton("csv", "Download this chart's data as CSV");
+        const expBtn = makeButton("expand", "Expand chart");
+        expBtn.setAttribute("aria-expanded", "false");
+        csvBtn.addEventListener("click", () => {
+            const { filename, rows } = getCsv(); // evaluated on click, so it reflects the current selection
+            download(filename, rows);
+        });
+        expBtn.addEventListener("click", () => (open && open.card === card ? collapse() : expand(card, expBtn, id)));
+        tools.append(csvBtn, expBtn);
+        card.prepend(tools); // first child: absolute top-right on desktop, a row above the chart on tablets and phones
+    }
+
+    return { register, toCsv, download };
+})();
