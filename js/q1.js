@@ -128,6 +128,8 @@
 
     d3.csv("data/q1_national_trend.csv", d3.autoType).then(function(data) {
         chartData = data;
+        // Download button (see ChartTools in main.js): the full national series
+        if (window.ChartTools) ChartTools.register("q1", () => ({ filename: "q1_national_trend.csv", rows: data }));
         const first = data[0],
             last = data[data.length - 1];
         const pct = (last.hospitalisations - first.hospitalisations) / first.hospitalisations * 100;
