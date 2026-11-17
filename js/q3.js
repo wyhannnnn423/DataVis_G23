@@ -38,6 +38,8 @@
         const cases = (s, y) => (cell.get(s + "|" + y) || {}).state_cases || 0;
         const share = (s, y) => (cell.get(s + "|" + y) || {}).state_share_pct || 0;
         const S = { year: last, metric: "share", sel: "NSW", timer: null, hover: null, lock: null };
+        // Download button (see ChartTools in main.js): the full state-by-year table
+        if (window.ChartTools) ChartTools.register("q3", () => ({ filename: "q3_states_by_year.csv", rows: raw.map(d => ({ year: d.year, state: d.state, state_cases: d.state_cases, state_share_pct: +d.state_share_pct.toFixed(2), national_total: d.national_total })) }));
         const mv = (s, y) => S.metric === "share" ? share(s, y) : cases(s, y);
         const mText = (s, y) => S.metric === "share" ? share(s, y).toFixed(1) + "%" : fmt(cases(s, y));
         const mText2 = (s, y) => S.metric === "share" ? fmt(cases(s, y)) : share(s, y).toFixed(1) + "%";
@@ -193,7 +195,7 @@
                 .join("path")
                 .attr("class", "state-path")
                 .attr("d", pathGenerator)
-                .attr("stroke", "var(--line)")
+                .attr("stroke", "var(--map-stroke)")
                 .attr("stroke-width", 1.5)
                 .attr("tabindex", 0)
                 .attr("role", "button")
@@ -220,7 +222,7 @@
                 p2 = projection(LABEL_AT.ACT);
             labelsGroup.append("line").attr("class", "act-leader")
                 .attr("x1", p1[0]).attr("y1", p1[1]).attr("x2", p2[0] - 16).attr("y2", p2[1] - 4)
-                .attr("stroke", "#f1f5f9").attr("stroke-width", 1).attr("opacity", 0.75);
+                .attr("stroke", "var(--muted)").attr("stroke-width", 1).attr("opacity", 0.9);
 
             labels = labelsGroup.selectAll("g.map-label")
                 .data(features)
@@ -405,13 +407,13 @@
 
             labels.select(".tc")
                 .text(d => d.abbr + dagger(d.abbr, S.year))
-                .attr("fill", d => (d.abbr === "ACT" || d.abbr === "Tas") ? "#f1f5f9" : (cScale(mv(d.abbr, S.year)) < 0.55 ? "#0b0f17" : "#f1f5f9"))
-                .attr("stroke", d => (d.abbr === "ACT" || d.abbr === "Tas") ? "#0b0f17" : "none").attr("stroke-width", 3).attr("paint-order", "stroke");
+                .attr("fill", d => (d.abbr === "ACT" || d.abbr === "Tas") ? "var(--text)" : (cScale(mv(d.abbr, S.year)) < 0.55 ? "#0b0f17" : "#f1f5f9"))
+                .attr("stroke", d => (d.abbr === "ACT" || d.abbr === "Tas") ? "var(--bg)" : "none").attr("stroke-width", 3).attr("paint-order", "stroke");
 
             labels.select(".tv")
                 .text(d => mText(d.abbr, S.year))
-                .attr("fill", d => (d.abbr === "ACT" || d.abbr === "Tas") ? "#f1f5f9" : (cScale(mv(d.abbr, S.year)) < 0.55 ? "#0b0f17" : "#f1f5f9"))
-                .attr("stroke", d => (d.abbr === "ACT" || d.abbr === "Tas") ? "#0b0f17" : "none").attr("stroke-width", 3).attr("paint-order", "stroke");
+                .attr("fill", d => (d.abbr === "ACT" || d.abbr === "Tas") ? "var(--text)" : (cScale(mv(d.abbr, S.year)) < 0.55 ? "#0b0f17" : "#f1f5f9"))
+                .attr("stroke", d => (d.abbr === "ACT" || d.abbr === "Tas") ? "var(--bg)" : "none").attr("stroke-width", 3).attr("paint-order", "stroke");
 
             const order = states.slice().sort((p, q) => mv(q, S.year) - mv(p, S.year));
             const rows = gBars.selectAll("g.brow").data(order, s => s).join(enter => {
@@ -479,11 +481,11 @@
             const series = s => years.map(y => ({ year: y, v: mv(s, y) }));
 
             states.filter(s => s !== S.sel).forEach(s => {
-                const stColor = color(cScale(mv(s, last)));
+                const stColor = color(Math.max(0.4, cScale(mv(s, last)))); // floor the colour so low-value lines stay visible on a light background
                 tg.append("path").datum(series(s)).attr("d", line)
                     .attr("fill", "none")
                     .attr("stroke", stColor)
-                    .attr("stroke-opacity", 0.6)
+                    .attr("stroke-opacity", 0.75)
                     .attr("stroke-width", 1.8);
             });
 
@@ -529,7 +531,7 @@
                     .attr("fill", s === S.sel ? selColor : "var(--muted)").attr("stroke", "var(--surface)").attr("stroke-width", 2);
             });
             tg.append("text").attr("x", tx(S.year)).attr("y", ty(mv(S.sel, S.year)) - 10).attr("text-anchor", S.year > last - 2 ? "end" : "middle")
-                .attr("font-size", 12).attr("font-weight", 700).attr("fill", "#f1f5f9").attr("stroke", "#0b0f17").attr("stroke-width", 2.5).attr("paint-order", "stroke").text(`${S.sel} ${mText(S.sel, S.year)}`);
+                .attr("font-size", 12).attr("font-weight", 700).attr("fill", "var(--text)").attr("stroke", "var(--bg)").attr("stroke-width", 2.5).attr("paint-order", "stroke").text(`${S.sel} ${mText(S.sel, S.year)}`);
 
             tg.append("rect").attr("x", mt.left).attr("y", mt.top).attr("width", Wt - mt.left - mt.right).attr("height", Ht - mt.top - mt.bottom)
                 .attr("fill", "transparent").style("cursor", "ew-resize").style("touch-action", "pan-y")
