@@ -39,6 +39,11 @@
             .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
 
         const S = { year: last, sex: "All", user: null, age: null };
+        // Download button (see ChartTools in main.js): every record of the selected year (all sexes, all road users)
+        if (window.ChartTools) ChartTools.register("q4", () => ({
+            filename: `q4_age_sex_road_user_${S.year}.csv`,
+            rows: rows.filter(d => d.year === S.year).map(d => ({ year: d.year, road_user: d.road_user, age_group: d.age_group, sex: d.sex, hospitalisations: d.hospitalisations }))
+        }));
 
         /* ---------- controls ---------- */
         const seg = controls.append("div").attr("class", "segmented").attr("role", "group").attr("aria-label", "Sex");
