@@ -23,17 +23,17 @@
 
 
     /* ======================================================================
-       1. Configuration
+       1. Standardized Configuration
        ====================================================================== */
 
-    const HERO_SCALE = { ref: 1536, max: 1.25 };
+    const HERO_SCALE = { ref: 1920, max: 1.1 };
 
     const STORY_CONFIGS = [
-        { id: "q1", scale: { ref: 1536, max: 1.25 }, lockTo: "head", tail: 70 },
-        { id: "q2", scale: { ref: 1745, max: 1.1 }, lockTo: "chart", tail: 55 },
-        { id: "q3", scale: { ref: 1920, max: 1 }, lockTo: "chart", tail: 55 },
-        { id: "q4", scale: { ref: 1920, max: 1 }, lockTo: "chart", tail: 55 },
-        { id: "q5", scale: { ref: 1920, max: 1 }, lockTo: "chart", tail: 55 } // Placeholder
+        { id: "q1", scale: { ref: 1920, max: 1.1 }, lockTo: "chart", tail: 55 },
+        { id: "q2", scale: { ref: 1920, max: 1.1 }, lockTo: "chart", tail: 55 },
+        { id: "q3", scale: { ref: 1920, max: 1.1 }, lockTo: "chart", tail: 55 },
+        { id: "q4", scale: { ref: 1920, max: 1.1 }, lockTo: "chart", tail: 55 },
+        { id: "q5", scale: { ref: 1920, max: 1.1 }, lockTo: "chart", tail: 55 }
     ];
 
     const MIN_SCALE = 0.72;
@@ -128,8 +128,7 @@
             }
         }
 
-        // Desktop: make the pinned stage at least as tall as the full step stack. Both are sticky, and a taller stack
-        // would otherwise reach the end of the section first and scroll away while the chart is still pinned.
+        // Desktop: make the pinned stage at least as tall as the full step stack.
         if (!isNarrow()) s.stage.style.minHeight = fullStackHeight(s) + "px";
 
         const n = s.stepEls.length;
@@ -262,7 +261,7 @@
 
 
     /* ======================================================================
-       4. Navigation
+       4. Navigation (Wired correctly for .takeaway Summary jumps)
        ====================================================================== */
 
     const navLinks = Array.from(document.querySelectorAll(".topbar nav a"));
@@ -323,6 +322,7 @@
         if (!href || href.charAt(0) !== "#") return;
         const id = href.slice(1);
         const inNav = !!link.closest(".topbar nav");
+        const isTakeaway = !!link.closest(".takeaway");
 
         if (!id) {
             e.preventDefault();
@@ -338,20 +338,22 @@
         const story = stories.find(s => s.sec === target);
         let y;
         if (story) {
-            y = inNav ? finishedY(story) : startY(story);
+            // Summary takeaways now jump directly to the completed state
+            y = (inNav || isTakeaway) ? finishedY(story) : startY(story);
         } else {
             y = Math.round(target.getBoundingClientRect().top + window.scrollY - barHeight() - 16);
         }
 
-        if (inNav) {
+        if (inNav || isTakeaway) {
             startInstantNav(y, story);
-            setActive(id);
+            if (inNav) setActive(id);
         }
         scrollToY(Math.max(0, y));
         if (history.pushState) history.pushState(null, "", href);
     }
 
-    navLinks.concat(Array.from(document.querySelectorAll(".brand, .cue, .back-to-top"))).forEach(link => {
+    // Now securely includes .takeaway to register click actions
+    navLinks.concat(Array.from(document.querySelectorAll(".brand, .cue, .back-to-top, .takeaway"))).forEach(link => {
         link.addEventListener("click", e => goTo(link, e));
     });
 
@@ -544,7 +546,7 @@ window.ChartTools = (function() {
         return b;
     }
 
-    function register(id, getCsv) {
+    function register(id, getCsv, onTable) {
         const chart = document.getElementById(id + "-chart");
         const card = chart && chart.closest(".chart-card");
         if (!card || card.querySelector(".card-tools")) return;
@@ -559,6 +561,28 @@ window.ChartTools = (function() {
             download(filename, rows);
         });
         expBtn.addEventListener("click", () => (open && open.card === card ? collapse() : expand(card, expBtn, id)));
+        // Table / Chart toggle (only when the chart module passes a callback)
+        let tableBtn = null;
+        if (typeof onTable === "function") {
+            let showTable = false;
+            tableBtn = document.createElement("button");
+            tableBtn.type = "button";
+            tableBtn.className = "tool-btn tool-btn-pill";
+            const syncTableBtn = () => {
+                const label = showTable ? "Show Chart" : "Show Table";
+                tableBtn.textContent = label;
+                tableBtn.setAttribute("aria-label", label);
+                tableBtn.title = label;
+                tableBtn.setAttribute("aria-pressed", showTable ? "true" : "false");
+            };
+            syncTableBtn();
+            tableBtn.addEventListener("click", () => {
+                showTable = !showTable;
+                syncTableBtn();
+                onTable(showTable);
+            });
+        }
+        if (tableBtn) tools.append(tableBtn);
         tools.append(csvBtn, expBtn);
         card.prepend(tools); // first child: absolute top-right on desktop, a row above the chart on tablets and phones
     }

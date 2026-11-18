@@ -19,12 +19,16 @@
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --bar-h: 56px;
     --u: 1px;
-    --map-stroke: var(--line); /* state outlines on the Q3 map */
-    --cell-stroke: transparent; /* outline of the Q4 heatmap squares */
+    --map-stroke: var(--line);
+    /* state outlines on the Q3 map */
+    --cell-stroke: transparent;
+    /* outline of the Q4 heatmap squares */
     color-scheme: dark;
 }
 
+
 /* Light theme: toggled by the button in the top bar (saved in localStorage) */
+
 :root[data-theme="light"] {
     --bg: #f4f7fb;
     --surface: #ffffff;
@@ -811,6 +815,8 @@ section {
 
 .data-table-wrap {
     overflow-x: auto;
+    margin-top: 36px;
+    /* Prevents table headers from overlapping absolute card-tools buttons */
 }
 
 .data-table {
@@ -1336,14 +1342,18 @@ svg .pt:focus {
    14. Mobile Chart Fixes
    ========================================================================== */
 
+
 /* Tablet widths: Q1 still uses the scaled 960-wide viewBox, so cap its height to keep the pinned stage on screen */
+
 @media (min-width: 761px) and (max-width: 1024px) {
     #q1-chart svg {
         max-height: 36vh;
     }
 }
 
+
 /* No grey flash when tapping chart elements */
+
 .state-path,
 .brow,
 g.row,
@@ -1351,8 +1361,10 @@ g.row,
     -webkit-tap-highlight-color: transparent;
 }
 
+
 /* Flow mode (set by main.js on screens up to 1024px, for every story except Q1):
    the stage is too tall to pin next to or above the step cards, so the chart scrolls normally and the cards follow it. */
+
 @media (max-width: 1024px) {
     .scrolly.is-flow {
         display: block;
@@ -1373,11 +1385,9 @@ g.row,
         display: block;
         animation: none;
     }
-
 }
 
 @media (max-width: 640px) {
-
     /* ---- Controls ---- */
     /* Two year sliders: label | slider | value, one row each, so neither is cut off */
     .slider-group {
@@ -1391,7 +1401,8 @@ g.row,
     .year-slider {
         width: 100%;
         min-width: 0;
-        height: 32px; /* taller hit area for the thumb */
+        height: 32px;
+        /* taller hit area for the thumb */
         margin: 0;
     }
     .year-out {
@@ -1412,7 +1423,6 @@ g.row,
     .chips {
         gap: 6px;
     }
-
     /* ---- Chart text and legend ---- */
     .chart-title {
         font-size: 16px;
@@ -1435,7 +1445,6 @@ g.row,
         display: block;
         margin: 10px auto 0;
     }
-
     /* Table view: scroll sideways, keep the first column visible */
     .data-table-wrap {
         -webkit-overflow-scrolling: touch;
@@ -1446,7 +1455,6 @@ g.row,
         left: 0;
         background: var(--surface);
     }
-
     /* ---- Back-to-top: keep it in the corner, clear of the home indicator, and let content show through ---- */
     .back-to-top {
         right: 12px;
@@ -1507,7 +1515,9 @@ g.row,
     stroke-width: 3;
 }
 
+
 /* The square picked in "Find your profile" glows and pulses */
+
 .q4-tile.q4-hl .q4-cell {
     stroke: var(--highlight-warm);
     stroke-width: 3;
@@ -1542,10 +1552,13 @@ g.row,
     min-width: 80px;
     height: 10px;
     border-radius: 5px;
-    background: linear-gradient(90deg, #e0f2fe, #38bdf8, #1d4ed8); /* same palette as the heatmap squares */
+    background: linear-gradient(90deg, #e0f2fe, #38bdf8, #1d4ed8);
+    /* same palette as the heatmap squares */
 }
 
+
 /* "Find your profile" card: styled like the other step cards (they style <p>, this one holds controls) */
+
 .q4-find {
     padding: calc(18 * var(--u)) calc(20 * var(--u));
     background: var(--surface-elevated);
@@ -1605,7 +1618,9 @@ g.row,
     }
 }
 
+
 /* Below 1025px the cards flow under the chart, so there is no height budget: let the trend line be larger */
+
 @media (max-width: 1024px) {
     .q4-spark {
         max-height: none;
@@ -1633,7 +1648,9 @@ g.row,
     background: linear-gradient(90deg, #38bdf8, #1d4ed8);
 }
 
+
 /* Male / female split bar: blue and amber, matching the app's accent colours */
+
 .q4-split {
     display: flex;
 }
@@ -1667,7 +1684,8 @@ g.row,
     width: 100%;
     height: auto;
     max-width: 340px;
-    max-height: calc(54 * var(--u)); /* keep the pinned card short so the page is not scaled down */
+    max-height: calc(54 * var(--u));
+    /* keep the pinned card short so the page is not scaled down */
     overflow: visible;
 }
 
@@ -1735,7 +1753,9 @@ g.row,
    16. Theme toggle, chart tools (download CSV / expand), summary & about
    ========================================================================== */
 
+
 /* ---- Theme toggle (top bar) ---- */
+
 .theme-toggle {
     flex: none;
     width: 40px;
@@ -1750,10 +1770,12 @@ g.row,
     cursor: pointer;
     transition: color 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
 }
+
 .theme-toggle:hover {
     color: var(--highlight-warm);
     border-color: var(--highlight-warm);
 }
+
 .theme-toggle svg {
     width: 19px;
     height: 19px;
@@ -1763,16 +1785,20 @@ g.row,
     stroke-linecap: round;
     stroke-linejoin: round;
 }
+
 .theme-toggle .icon-moon,
 :root[data-theme="light"] .theme-toggle .icon-sun {
     display: none;
 }
+
 :root[data-theme="light"] .theme-toggle .icon-moon {
     display: block;
 }
+
 @media (max-width: 1100px) {
     .theme-toggle {
-        margin-left: auto; /* push the theme and menu buttons to the right of the brand */
+        margin-left: auto;
+        /* push the theme and menu buttons to the right of the brand */
         order: 2;
     }
     .nav-toggle {
@@ -1780,7 +1806,9 @@ g.row,
     }
 }
 
+
 /* ---- Chart tools: download CSV + expand (added by main.js) ---- */
+
 .card-tools {
     position: absolute;
     top: 10px;
@@ -1789,6 +1817,7 @@ g.row,
     display: flex;
     gap: 6px;
 }
+
 .tool-btn {
     width: 32px;
     height: 32px;
@@ -1802,10 +1831,12 @@ g.row,
     cursor: pointer;
     transition: color 0.2s ease, border-color 0.2s ease;
 }
+
 .tool-btn:hover {
     color: var(--text);
     border-color: var(--accent);
 }
+
 .tool-btn svg {
     width: 16px;
     height: 16px;
@@ -1815,18 +1846,24 @@ g.row,
     stroke-linecap: round;
     stroke-linejoin: round;
 }
+
+
 /* leave room for the two buttons next to the controls */
-.chart-card > .controls {
-    padding-right: 82px;
+
+.chart-card>.controls {
+    padding-right: 170px; /* Show Table pill + CSV + expand */
 }
+
+
 /* below 1025px the cards flow under the chart: put the buttons on their own row so they never cover controls */
+
 @media (max-width: 1024px) {
     .chart-card:not(:has(#q1-chart)) .card-tools {
         position: static;
         justify-content: flex-end;
         margin: -2px 0 8px;
     }
-    .chart-card:not(:has(#q1-chart)) > .controls {
+    .chart-card:not(:has(#q1-chart))>.controls {
         padding-right: 0;
     }
     .tool-btn {
@@ -1834,6 +1871,7 @@ g.row,
         height: 40px;
     }
 }
+
 @media (max-width: 640px) {
     .chart-card:has(#q1-chart) .tool-btn {
         width: 30px;
@@ -1845,7 +1883,9 @@ g.row,
     }
 }
 
+
 /* Expanded chart: fills most of the screen, the rest of the page is dimmed by the box-shadow */
+
 .chart-card.is-expanded {
     position: fixed;
     z-index: 200;
@@ -1860,24 +1900,33 @@ g.row,
     box-shadow: 0 0 0 200vmax rgba(2, 6, 12, 0.66);
     transform: none;
 }
+
 .chart-card.is-expanded svg {
-    max-height: calc(100vh - 290px); /* keep the whole chart on screen */
+    max-height: calc(100vh - 290px);
+    /* keep the whole chart on screen */
 }
+
 html.has-expanded {
     overflow: hidden;
 }
+
+
 /* The stage has its own stacking context, so lift it above the step cards while its chart is expanded */
+
 .scrolly-stage:has(.chart-card.is-expanded) {
     z-index: 120;
 }
 
+
 /* ---- Summary: takeaway cards ---- */
+
 .takeaways {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 16px;
     margin: 26px 0 8px;
 }
+
 .takeaway {
     display: flex;
     flex-direction: column;
@@ -1890,12 +1939,14 @@ html.has-expanded {
     text-decoration: none;
     transition: transform 0.25s var(--ease-out-expo), border-color 0.25s ease, box-shadow 0.25s ease;
 }
+
 .takeaway:hover,
 .takeaway:focus-visible {
     transform: translateY(-4px);
     border-color: var(--highlight-warm);
     box-shadow: var(--shadow-sm);
 }
+
 .takeaway-q {
     font-size: 0.74rem;
     font-weight: 700;
@@ -1903,6 +1954,7 @@ html.has-expanded {
     text-transform: uppercase;
     color: var(--muted);
 }
+
 .takeaway-stat {
     font-size: 2.1rem;
     font-weight: 800;
@@ -1910,21 +1962,26 @@ html.has-expanded {
     line-height: 1.1;
     color: var(--accent);
 }
+
 .takeaway-text {
     font-size: 0.95rem;
     line-height: 1.5;
     color: var(--muted);
 }
+
 .summary-note {
     margin-top: 18px;
     font-size: 0.95rem;
 }
 
+
 /* ---- About the data: expandable items ---- */
+
 .about-data {
     max-width: min(94vw, 1440px);
     margin: 56px auto 0;
 }
+
 .about-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
@@ -1932,12 +1989,14 @@ html.has-expanded {
     align-items: start;
     margin-top: 22px;
 }
+
 .about-item {
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 14px;
     padding: 0 20px;
 }
+
 .about-item summary {
     display: flex;
     align-items: center;
@@ -1949,9 +2008,11 @@ html.has-expanded {
     cursor: pointer;
     list-style: none;
 }
+
 .about-item summary::-webkit-details-marker {
     display: none;
 }
+
 .about-item summary::after {
     content: "";
     flex: none;
@@ -1962,39 +2023,49 @@ html.has-expanded {
     transform: rotate(45deg);
     transition: transform 0.25s var(--ease-out-expo);
 }
+
 .about-item[open] summary::after {
     transform: rotate(-135deg);
 }
-.about-item > :not(summary) {
+
+.about-item> :not(summary) {
     font-size: 0.95rem;
     color: var(--muted);
 }
-.about-item > p,
-.about-item > ul,
-.about-item > dl {
+
+.about-item>p,
+.about-item>ul,
+.about-item>dl {
     margin: 0 0 16px;
 }
+
 .about-item ul {
     padding-left: 20px;
 }
+
 .about-item li {
     margin-bottom: 8px;
 }
+
 .about-item li strong,
 .about-item dt {
     color: var(--text);
 }
+
 .about-item dt {
     font-weight: 700;
     margin-top: 10px;
 }
+
 .about-item dd {
     margin: 2px 0 0;
 }
+
 .dl-list {
     list-style: none;
     padding-left: 0 !important;
 }
+
 .dl-list a {
     display: flex;
     align-items: center;
@@ -2007,11 +2078,43 @@ html.has-expanded {
     text-decoration: none;
     transition: border-color 0.2s ease;
 }
+
 .dl-list a:hover {
     border-color: var(--accent);
 }
+
 .dl-list a span {
     font-size: 0.75rem;
     font-weight: 700;
     color: var(--accent);
+}
+
+
+/* ==========================================================================
+   Standardized Pill Tool Button (Table Button inside card-tools)
+   ========================================================================== */
+
+.tool-btn-pill {
+    width: auto !important;
+    padding: 0 14px !important;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border-radius: 999px !important;
+    background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
+    border: 1px solid var(--line) !important;
+    color: var(--muted) !important;
+    transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease !important;
+}
+
+.tool-btn-pill:hover {
+    color: var(--text) !important;
+    border-color: var(--accent) !important;
+    background: var(--accent-soft) !important;
+}
+
+.tool-btn-pill[aria-label^="Show Chart"] {
+    color: var(--accent) !important;
+    border-color: var(--accent) !important;
+    background: var(--accent-soft) !important;
 }

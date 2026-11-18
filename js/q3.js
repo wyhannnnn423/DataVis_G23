@@ -23,6 +23,7 @@
     container.classed("placeholder", false).html("").style("position", "relative").text("Loading chart data\u2026");
     const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+    let showTable = false;
     Promise.all([
         d3.csv("data/q3_states_by_year.csv", d3.autoType),
         d3.json("data/aus-states.json")
@@ -37,9 +38,19 @@
         const states = Array.from(new Set(raw.map(d => d.state)));
         const cases = (s, y) => (cell.get(s + "|" + y) || {}).state_cases || 0;
         const share = (s, y) => (cell.get(s + "|" + y) || {}).state_share_pct || 0;
-        const S = { year: last, metric: "share", sel: "NSW", timer: null, hover: null, lock: null };
-        // Download button (see ChartTools in main.js): the full state-by-year table
-        if (window.ChartTools) ChartTools.register("q3", () => ({ filename: "q3_states_by_year.csv", rows: raw.map(d => ({ year: d.year, state: d.state, state_cases: d.state_cases, state_share_pct: +d.state_share_pct.toFixed(2), national_total: d.national_total })) }));
+        const S = { year: last, metric: "share", sel: "NSW", timer: null, hover: null, lock: null, table: false };
+
+        // Unified registration with toolbar Table callback
+        if (window.ChartTools) {
+            ChartTools.register("q3",
+                () => ({ filename: "q3_states_by_year.csv", rows: raw.map(d => ({ year: d.year, state: d.state, state_cases: d.state_cases, state_share_pct: +d.state_share_pct.toFixed(2), national_total: d.national_total })) }),
+                (showTableState) => {
+                    S.table = showTableState;
+                    draw();
+                }
+            );
+        }
+
         const mv = (s, y) => S.metric === "share" ? share(s, y) : cases(s, y);
         const mText = (s, y) => S.metric === "share" ? share(s, y).toFixed(1) + "%" : fmt(cases(s, y));
         const mText2 = (s, y) => S.metric === "share" ? fmt(cases(s, y)) : share(s, y).toFixed(1) + "%";
@@ -95,18 +106,14 @@
             }, 900);
         }
 
-        /* ---------- Responsive layout ----------
-           Desktop keeps the original 980-unit viewBox (scaled by CSS).
-           Phones use "compact" mode: the SVG is drawn at its real pixel width so text keeps its true size,
-           and the map, the ranking bars and the trend line are stacked vertically. */
-        const COMPACT_BP = 760; // container width (px) below which compact mode is used
+        const COMPACT_BP = 760;
         const ox = 20;
         let compact = false,
             W = 980,
             H = 470,
             mapBox, barX0, barMax, rowH, barY0, Wt, Ht, mt, B;
         let svg, mapTitle, barTitle, projection, pathGenerator, legMax, mapGroup, paths, labelsGroup, labels, gBars, xBar, trendWrap, tsvg, tx, tg;
-        let lens = []; // stroke lengths of the state outlines (used by the entrance animation)
+        let lens = [];
 
         const LABEL_AT = {
             WA: [122, -26],
@@ -127,21 +134,23 @@
         const color = v => colorScale(Math.max(0, Math.min(1, v)));
         let cScale = d => d;
 
-        // Everything the SVGs draw lives inside this host, so build() can wipe and redraw it on resize.
         const host = container.append("div");
+        const tableDiv = container.append("div").attr("class", "data-table-wrap").style("display", "none");
 
-        // Compute sizes for the current container width.
         function layout() {
             const cw = Math.round(host.node().clientWidth || container.node().clientWidth || 980);
             compact = cw < COMPACT_BP;
             if (compact) {
                 W = Math.max(260, cw);
-                const mapH = Math.min(Math.round(W * 0.8), 340); // cap the map height on wide phones / small tablets
-                mapBox = [[ox, 58], [W - ox, 58 + mapH]];
+                const mapH = Math.min(Math.round(W * 0.8), 340);
+                mapBox = [
+                    [ox, 58],
+                    [W - ox, 58 + mapH]
+                ];
                 rowH = 34;
                 barX0 = 48;
                 barMax = Math.max(80, W - barX0 - 64);
-                const barTop = 58 + mapH + 14; // ranking section starts below the map
+                const barTop = 58 + mapH + 14;
                 barY0 = barTop + 26;
                 H = barY0 + states.length * rowH + 6;
                 Wt = W;
@@ -151,7 +160,10 @@
             } else {
                 W = 980;
                 H = 470;
-                mapBox = [[ox + 6, 60], [452, 424]];
+                mapBox = [
+                    [ox + 6, 60],
+                    [452, 424]
+                ];
                 rowH = 32;
                 barX0 = 540;
                 barMax = 380;
@@ -163,7 +175,6 @@
             }
         }
 
-        // (Re)build the map, the ranking bars and the trend SVG for the current layout.
         function build() {
             layout();
             host.html("");
@@ -182,13 +193,11 @@
             lg.append("stop").attr("offset", "50%").attr("stop-color", MID);
             lg.append("stop").attr("offset", "100%").attr("stop-color", HIGH);
 
-            // Colour legend bar
             const legW = compact ? 150 : 200;
             svg.append("rect").attr("x", ox).attr("y", 28).attr("width", legW).attr("height", 8).attr("rx", 4).attr("fill", "url(#q3-grad)");
             legMax = svg.append("text").attr("x", ox + legW).attr("y", 50).attr("text-anchor", "end").attr("font-size", 11.5).attr("fill", "var(--muted)");
             svg.append("text").attr("x", ox).attr("y", 50).attr("font-size", 11.5).attr("fill", "var(--muted)").text("0");
 
-            // Choropleth map
             mapGroup = svg.append("g").attr("class", "map-group");
             paths = mapGroup.selectAll("path.state-path")
                 .data(features)
@@ -213,11 +222,9 @@
                     }
                 });
 
-            // State labels (abbreviation + value); pointer events pass through to the paths
             labelsGroup = svg.append("g").attr("class", "labels-group").style("pointer-events", "none");
             const getLabelPosition = d => projection(LABEL_AT[d.abbr]);
 
-            // Leader line from the tiny ACT area to its label
             const p1 = projection(ACT_POINT),
                 p2 = projection(LABEL_AT.ACT);
             labelsGroup.append("line").attr("class", "act-leader")
@@ -231,9 +238,8 @@
                 .attr("transform", d => `translate(${getLabelPosition(d)[0]},${getLabelPosition(d)[1]})`);
             labels.append("text").attr("class", "tc").attr("text-anchor", "middle").attr("font-size", compact ? 10 : 10.5).attr("font-weight", 800);
             labels.append("text").attr("class", "tv").attr("text-anchor", "middle").attr("y", 11).attr("font-size", 9)
-                .style("display", compact ? "none" : null); // on phones the value lives in the ranking bars and the tooltip
+                .style("display", compact ? "none" : null);
 
-            // ACT label gets a larger invisible touch target
             labels.filter(d => d.abbr === "ACT")
                 .style("pointer-events", "all").style("cursor", "pointer")
                 .on("pointermove", (e, d) => onHover(e, d.abbr))
@@ -241,11 +247,9 @@
                 .on("click", (e, d) => onClick(e, d.abbr))
                 .insert("circle", ":first-child").attr("r", compact ? 22 : 18).attr("fill", "transparent");
 
-            // Ranking bars
             xBar = d3.scaleLinear().range([0, barMax]);
             gBars = svg.append("g");
 
-            // Trend line (separate SVG below the map and bars)
             trendWrap = host.append("div").style("margin-top", "16px");
             tsvg = trendWrap.append("svg").attr("viewBox", `0 0 ${Wt} ${Ht}`).attr("width", "100%").attr("role", "img")
                 .style("display", "block").style("height", "auto").style("overflow", "visible");
@@ -385,6 +389,29 @@
 
         function draw() {
             const share_ = S.metric === "share";
+
+            host.style("display", S.table ? "none" : null);
+            tableDiv.style("display", S.table ? null : "none");
+
+            if (S.table) {
+                const order = states.slice().sort((p, q) => mv(q, S.year) - mv(p, S.year));
+                tableDiv.html("");
+                const cols = ["State / Territory", "Cases", "National Share"];
+                const tb = tableDiv.append("table").attr("class", "data-table");
+                tb.append("thead").append("tr").selectAll("th").data(cols).join("th").text(d => d);
+                const trs = tb.append("tbody").selectAll("tr").data(order).join("tr");
+                trs.selectAll("td").data(s => [
+                    NAMES[s] || s,
+                    fmt(cases(s, S.year)),
+                    share(s, S.year).toFixed(1) + "%"
+                ]).join("td").text(d => d);
+
+                slider.property("value", S.year);
+                yearOut.text(S.year);
+                seg.selectAll("button").attr("aria-pressed", function() { return this.dataset.mode === S.metric; });
+                title.text(share_ ? `Share of national total, ${S.year}` : `Hospitalised injuries, ${S.year}`);
+                return;
+            }
             const t = d3.transition().duration(firstDraw ? 0 : dur).ease(d3.easeCubicOut);
             const mx = maxOf();
             cScale = v => v / mx;
@@ -458,11 +485,11 @@
             const ymax = d3.max(raw, d => share_ ? d.state_share_pct : d.state_cases);
             const ty = d3.scaleLinear().domain([0, ymax * 1.05]).nice().range([Ht - mt.bottom, mt.top]);
             tg.html("");
-            const fsA = compact ? 11 : 12; // axis font size
+            const fsA = compact ? 11 : 12;
             tg.append("text").attr("x", mt.left).attr("y", 14).attr("font-size", compact ? 12.5 : 13.5).attr("font-weight", 700).attr("fill", "currentColor")
-                .text(compact
-                    ? (share_ ? `Share over time: ${S.sel} highlighted` : `Cases over time: ${S.sel} highlighted`)
-                    : (share_ ? `Share of national total over time: ${NAMES[S.sel] || S.sel} highlighted` : `Cases over time: ${NAMES[S.sel] || S.sel} highlighted`));
+                .text(compact ?
+                    (share_ ? `Share over time: ${S.sel} highlighted` : `Cases over time: ${S.sel} highlighted`) :
+                    (share_ ? `Share of national total over time: ${NAMES[S.sel] || S.sel} highlighted` : `Cases over time: ${NAMES[S.sel] || S.sel} highlighted`));
             tg.append("g").selectAll("line").data(ty.ticks(4)).join("line").attr("x1", mt.left).attr("x2", Wt - mt.right)
                 .attr("y1", d => ty(d)).attr("y2", d => ty(d)).attr("stroke", "currentColor").attr("opacity", 0.12).attr("stroke-dasharray", "3 5");
             tg.append("g").attr("transform", `translate(${mt.left},0)`).attr("font-size", fsA).attr("opacity", 0.8)
@@ -481,7 +508,7 @@
             const series = s => years.map(y => ({ year: y, v: mv(s, y) }));
 
             states.filter(s => s !== S.sel).forEach(s => {
-                const stColor = color(Math.max(0.4, cScale(mv(s, last)))); // floor the colour so low-value lines stay visible on a light background
+                const stColor = color(Math.max(0.4, cScale(mv(s, last))));
                 tg.append("path").datum(series(s)).attr("d", line)
                     .attr("fill", "none")
                     .attr("stroke", stColor)
@@ -580,7 +607,7 @@
         const stage = (p, lo, hi) => Math.max(0, Math.min(1, (p - lo) / (hi - lo)));
         const cnt = (s, e) => S.metric === "share" ? (share(s, S.year) * e).toFixed(1) + "%" : fmt(Math.round(cases(s, S.year) * e));
         let done = false;
-        let curP = (window.chartProgress || {}).q3 || 0; // last scroll progress, re-applied after a rebuild
+        let curP = (window.chartProgress || {}).q3 || 0;
 
         function setProgress(p) {
             curP = p;
@@ -621,8 +648,6 @@
             setProgress((window.chartProgress || {}).q3 || 0);
         }
 
-        // Rebuild when the container crosses the compact breakpoint, or (in compact mode) changes width.
-        // Desktop width changes need no rebuild because the SVG simply scales.
         let lastW = Math.round(container.node().clientWidth),
             lastCompact = compact,
             resizeTimer = null;
@@ -639,7 +664,10 @@
                 firstDraw = true;
                 draw();
                 firstDraw = false;
-                if (!reduce && !done) setProgress(curP); // keep the entrance animation state in sync
+                if (!reduce) {
+                    done = false;
+                    setProgress(curP);
+                }
                 if (window.Layout) window.Layout.refit();
             }, 150);
         }).observe(container.node());

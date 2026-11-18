@@ -57,18 +57,34 @@
                     layout();
 
                     const S = { a: years[0], b: years[years.length - 1], mode: "count", table: false };
-                    // Download button (see ChartTools in main.js): the comparison for the currently selected years
-                    if (window.ChartTools) ChartTools.register("q2", () => ({
-                        filename: `q2_road_users_${S.a}_to_${S.b}.csv`,
-                        rows: cats.map(c => {
-                            const a = get(c, S.a), b = get(c, S.b);
-                            return {
-                                road_user: c, start_year: S.a, end_year: S.b,
-                                cases_start: a.road_user_cases, cases_end: b.road_user_cases, change: b.road_user_cases - a.road_user_cases,
-                                share_start_pct: +a.share_pct.toFixed(2), share_end_pct: +b.share_pct.toFixed(2), share_change_pp: +(b.share_pct - a.share_pct).toFixed(2)
-                            };
-                        }).sort((p, q) => q.change - p.change)
-                    }));
+
+                    // Unified registration with toolbar Table callback
+                    if (window.ChartTools) {
+                        ChartTools.register("q2",
+                            () => ({
+                                filename: `q2_road_users_${S.a}_to_${S.b}.csv`,
+                                rows: cats.map(c => {
+                                    const a = get(c, S.a),
+                                        b = get(c, S.b);
+                                    return {
+                                        road_user: c,
+                                        start_year: S.a,
+                                        end_year: S.b,
+                                        cases_start: a.road_user_cases,
+                                        cases_end: b.road_user_cases,
+                                        change: b.road_user_cases - a.road_user_cases,
+                                        share_start_pct: +a.share_pct.toFixed(2),
+                                        share_end_pct: +b.share_pct.toFixed(2),
+                                        share_change_pp: +(b.share_pct - a.share_pct).toFixed(2)
+                                    };
+                                }).sort((p, q) => q.change - p.change)
+                            }),
+                            (showTableState) => {
+                                S.table = showTableState;
+                                update();
+                            }
+                        );
+                    }
 
                     const grp = controls.append("div").attr("class", "control-group slider-group");
                     grp.append("label").attr("class", "control-label").attr("for", "q2-from").text("From");
@@ -103,12 +119,6 @@
                             S.mode = k;
                             update();
                         }));
-
-                    const tblBtn = controls.append("button").attr("type", "button").attr("class", "chip push-right").text("Table")
-                        .on("click", () => {
-                            S.table = !S.table;
-                            update();
-                        });
 
                     function fixYears(changed) {
                         if (S.a === S.b) {
@@ -205,7 +215,6 @@
                 .style("transform", "translateX(-50%)");
         }
         const hideTip = () => tip.style("opacity", 0);
-        // Tapping anywhere outside a row dismisses the tooltip (needed on touch screens)
         d3.select(document).on("pointerdown.q2tip", e => {
             if (!(e.target.closest && e.target.closest("g.row"))) hideTip();
         });
@@ -217,12 +226,10 @@
             
             rows.sort((p, q) => valEnd(q) - valEnd(p));
 
-            // On narrow screens only the top rows are drawn unless "Show all" is on
             const shown = narrow && !showAll ? rows.slice(0, TOP_N) : rows;
             moreBtn.style("display", narrow && rows.length > TOP_N && !S.table ? null : "none")
                 .text(showAll ? `Show top ${TOP_N} only` : `Show all ${rows.length} road users`);
 
-            // Chart height follows the number of visible rows
             H = m.top + shown.length * rowH + m.bottom;
             svg.attr("viewBox", `0 0 ${W} ${H}`);
             x.range([m.left, W - m.right]);
@@ -231,7 +238,7 @@
             selA.property("value", S.a); outA.text(S.a); selB.property("value", S.b); outB.text(S.b);
             seg.selectAll("button").attr("aria-pressed", function () { return this.dataset.mode === S.mode; });
             chips.selectAll("button").attr("aria-pressed", d => d[0] === S.a && d[1] === S.b);
-            tblBtn.attr("aria-pressed", S.table).text(S.table ? "Chart" : "Table");
+
             chartDiv.style("display", S.table ? "none" : null);
             legend.style("display", S.table ? "none" : null);
             tableDiv.style("display", S.table ? null : "none");
@@ -243,7 +250,7 @@
             x.domain([Math.max(0, lo - pad), hi + pad]).nice();
             
             const tickFmt = count ? (narrow ? d3.format(".2~s") : fmt) : v => v.toFixed(1) + "%";
-            const ticks = x.ticks(narrow ? 4 : 7); // fewer ticks on narrow screens
+            const ticks = x.ticks(narrow ? 4 : 7);
 
             gGrid.selectAll("line").data(ticks).join("line").attr("y1", m.top).attr("y2", H - m.bottom)
                 .attr("stroke", "currentColor").attr("opacity", 0.08)
@@ -282,11 +289,10 @@
 
                     g.append("rect").attr("class", "hit").attr("x", 0).attr("y", -rowH / 2).attr("width", W).attr("height", rowH).attr("fill", "transparent");
                     
-                    // pointerenter covers mouse hover, pointerdown covers taps on touch screens
                     g.on("pointerenter", function (e, d) { showTip(d, this.querySelector(".circle-end")); })
                         .on("pointerdown", function (e, d) { showTip(d, this.querySelector(".circle-end")); })
                         .on("focus", function (e, d) { showTip(d, this.querySelector(".circle-end")); })
-                        .on("pointerleave", function (e) { if (e.pointerType === "mouse") hideTip(); }) // touch: keep the tip until the next tap
+                        .on("pointerleave", function (e) { if (e.pointerType === "mouse") hideTip(); })
                         .on("blur", hideTip);
                     return g;
                 });
@@ -332,18 +338,19 @@
                 `<strong>${esc(top.cat)}</strong> ${top.change >= 0 ? "rose" : "fell"} by <strong>${fmt(Math.abs(top.change))}</strong> between ${S.a} and ${S.b}, ${rel}. ` +
                 `Its share went from ${top.sa.toFixed(1)}% to ${top.sb.toFixed(1)}%. ` +
                 (opp ? `The largest move the other way was ${esc(opp.cat)} (${signed(opp.change, fmt)}).` : ""));
-        }
 
-        let firstDraw = true;
-        update();
-        firstDraw = false;
+            if (!reduce) {
+                done = false;
+                setProgress(curP);
+            }
+        }
 
         const ease = d3.easeCubicOut, back = d3.easeBackOut.overshoot(1.5);
         const stage = (p, lo, hi) => Math.max(0, Math.min(1, (p - lo) / (hi - lo)));
         const cntText = (d, e) => S.mode === "count" ? signed(Math.round(d.change * e), fmt) : signed(+(d.dShare * e).toFixed(1), v => v.toFixed(1)) + " pp";
         let done = false;
 
-        let curP = (window.chartProgress || {}).q2 || 0; // last scroll progress, re-applied after a relayout
+        let curP = (window.chartProgress || {}).q2 || 0;
         function setProgress(p) {
             curP = p;
             if (done && p >= 1) return;
@@ -409,8 +416,9 @@
             setProgress((window.chartProgress || {}).q2 || 0);
         }
 
-        // Redraw when the container crosses the narrow breakpoint, or (when narrow) changes width.
-        // Desktop width changes need no redraw because the SVG simply scales.
+        let firstDraw = true;
+        update();
+        firstDraw = false;
         let lastW = Math.round(container.node().clientWidth),
             lastNarrow = narrow,
             resizeTimer = null;
@@ -424,12 +432,15 @@
                 lastNarrow = willNarrow;
                 lastW = cw;
                 layout();
-                gRows.selectAll("*").remove(); // rows are rebuilt with the new geometry
+                gRows.selectAll("*").remove();
                 gGrid.selectAll("*").remove();
                 firstDraw = true;
                 update();
                 firstDraw = false;
-                if (!reduce && !done) setProgress(curP);
+                if (!reduce) {
+                    done = false;
+                    setProgress(curP);
+                }
                 if (window.Layout) window.Layout.refit();
             }, 150);
         }).observe(container.node());
