@@ -78,10 +78,12 @@
                     <p class="eyebrow">National trend</p>
                     <h2 id="q1-h">How did non-fatal hospitalised road traffic injury counts change from 2011 to 2021, and how did the pattern in 2019–2021 compare with earlier years?</h2>
                 </header>
-                <figure class="chart-card">
+                <!-- Standardized layout card with Q1 controls header -->
+                <div class="chart-card">
+                    <div class="controls" id="q1-controls"></div>
                     <div id="q1-chart"></div>
-                    <figcaption>National annual hospitalisations (counts). Hover over or tap the markers (or drag a finger along the chart) to see year-over-year changes.</figcaption>
-                </figure>
+                    <p class="chart-note">National annual hospitalisations (counts). Hover over or tap the markers (or drag a finger along the chart) to see year-over-year changes.</p>
+                </div>
             </div>
             <div class="scrolly-steps">
                 <div class="step-stack">
@@ -283,26 +285,35 @@
             <div class="about-grid">
                 <details class="about-item" open>
                     <summary>Source and method</summary>
-                    <p>Bureau of Infrastructure and Transport Research Economics (BITRE), <a href="https://www.bitre.gov.au/publications/ongoing/hospitalised-injury" target="_blank" rel="noopener">Hospitalised Injury data</a>, covering 2011 to 2021. We counted non-fatal hospitalisations caused by road traffic crashes.</p>
+                    <p>Bureau of Infrastructure and Transport Research Economics (BITRE), <a href="https://www.bitre.gov.au/publications/ongoing/hospitalised-injury" target="_blank" rel="noopener">Hospitalised Injury data</a>, covering 2011 to 2021. We counted
+                        non-fatal hospitalisations caused by road traffic crashes.</p>
                     <p>The raw files were cleaned and aggregated in KNIME, exported as the CSV files listed below, and drawn in the browser with D3.js. Nothing is estimated or modelled.</p>
                 </details>
                 <details class="about-item">
                     <summary>Limits to keep in mind</summary>
                     <ul>
                         <li><strong>Counts, not rates.</strong> Larger states and larger age groups have more people, so bigger counts do not mean higher risk.</li>
-                        <li><strong>Recording changes.</strong> Victoria (2012) and New South Wales (2017) changed how admissions are recorded, so trends across those years are not strictly comparable. They are marked with a dagger (&dagger;) on the state map.</li>
+                        <li><strong>Recording changes.</strong> Victoria (2012) and New South Wales (2017) changed how admissions are recorded, so trends across those years are not strictly comparable. They are marked with a dagger (&dagger;) on the state
+                            map.
+                        </li>
                         <li><strong>Patterns, not causes.</strong> The 2020 dip coincides with COVID-19 restrictions, but the data cannot show why.</li>
-                        <li><strong>Missing values.</strong> Records without a recorded age are left out of the age axis, and the very small group with indeterminate or missing sex appears only under &ldquo;All&rdquo; in the age and sex chart. Both are still included in the totals.</li>
+                        <li><strong>Missing values.</strong> Records without a recorded age are left out of the age axis, and the very small group with indeterminate or missing sex appears only under &ldquo;All&rdquo; in the age and sex chart. Both are still
+                            included in the totals.</li>
                     </ul>
                 </details>
                 <details class="about-item">
                     <summary>Glossary</summary>
                     <dl>
-                        <dt>Hospitalisation</dt><dd>One recorded hospital admission after a road traffic injury. Deaths are not counted.</dd>
-                        <dt>Road user</dt><dd>The injured person&rsquo;s role on the road, for example car driver, pedal cyclist or pedestrian.</dd>
-                        <dt>Share</dt><dd>A group&rsquo;s percentage of the national total in the same year.</dd>
-                        <dt>Percentage points (pp)</dt><dd>The difference between two shares. A share moving from 20% to 23% is +3 pp.</dd>
-                        <dt>Net change</dt><dd>The total in the end year minus the total in the start year.</dd>
+                        <dt>Hospitalisation</dt>
+                        <dd>One recorded hospital admission after a road traffic injury. Deaths are not counted.</dd>
+                        <dt>Road user</dt>
+                        <dd>The injured person&rsquo;s role on the road, for example car driver, pedal cyclist or pedestrian.</dd>
+                        <dt>Share</dt>
+                        <dd>A group&rsquo;s percentage of the national total in the same year.</dd>
+                        <dt>Percentage points (pp)</dt>
+                        <dd>The difference between two shares. A share moving from 20% to 23% is +3 pp.</dd>
+                        <dt>Net change</dt>
+                        <dd>The total in the end year minus the total in the start year.</dd>
                     </dl>
                 </details>
                 <details class="about-item">
