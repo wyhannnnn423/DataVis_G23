@@ -419,6 +419,7 @@
         let firstDraw = true;
         update();
         firstDraw = false;
+        
         let lastW = Math.round(container.node().clientWidth),
             lastNarrow = narrow,
             resizeTimer = null;
