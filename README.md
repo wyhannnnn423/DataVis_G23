@@ -1,28 +1,81 @@
-# Overview
-<img width="800" height="394" alt="ScreenRecording2026-11-16095842-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/63c33001-c5ac-45ce-8843-b8d76a85ace0" />
+<div align="center">
 
-# Q1
-<img width="800" height="394" alt="ScreenRecording2026-11-16100532-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/f3fcc336-f8b7-45e6-abb5-973c85600005" />
+#DataVis_G23: Hospitalised Road Traffic Injuries in Australia (2011–2021)
 
-# Q2
-<img width="800" height="392" alt="Q2-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/d0e3bba0-55ed-430b-8891-e27a230e79e0" />
+**COS30045 Data Visualisation · Project (2026 S2) · Group 23**
 
-# Q3
-<img width="800" height="394" alt="Q3-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/e0699ba4-f5fb-4322-9aac-141c4befeb4b" />
+An interactive D3.js data story investigating national trends, demographic distributions, and jurisdictional variations in hospitalised road traffic injuries across Australia.
 
-# Q4
-<img width="800" height="394" alt="ScreenRecording2026-11-16100626-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/6e044c2e-778c-4d5b-b030-681b3eb9569e" />
+[![Live Demo](https://img.shields.io/badge/Vercel-Live%20Site-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://datavisgroup23.vercel.app/)
+[![Data Source](https://img.shields.io/badge/Data-BITRE%20Australia-0052CC?style=for-the-badge)](https://www.bitre.gov.au/publications/ongoing/hospitalised-injury)
 
-# Q5
+<br />
 
-# DataVis_G23
+<img width="800" alt="Overview Preview" src="https://github.com/user-attachments/assets/63c33001-c5ac-45ce-8843-b8d76a85ace0" />
 
-COS30045 Data Visualisation, Project (2026 S2), Group 23.
-An interactive D3 data story investigating hospitalised road traffic injuries across Australia from 2011 to 2021.
+</div>
 
-Data source: Bureau of Infrastructure and Transport Research Economics (BITRE), Hospitalised Injury data
-(https://www.bitre.gov.au/publications/ongoing/hospitalised-injury).
+---
 
+## Interactive Visualizations & Research Questions
+
+Click any section below to expand the interactive chart preview:
+
+<details open>
+<summary><strong>Q1 · National Trend (Owner: Yan Han)</strong></summary>
+<br />
+
+> *How did non-fatal hospitalised road traffic injury counts change from 2011 to 2021, and how did the pattern in 2019–2021 compare with earlier years?*
+
+* **Visualization:** Scroll-driven area + line chart with historical recording-break annotations (2012 VIC, 2017 NSW).
+
+<img width="800" alt="Q1 Preview" src="https://github.com/user-attachments/assets/f3fcc336-f8b7-45e6-abb5-973c85600005" />
+</details>
+
+<details>
+<summary><strong>Q2 · Road Users (Owner: Yan Han)</strong></summary>
+<br />
+
+> *Which road user groups contributed most to the change in national counts between two selected years, and how did their shares of all road traffic injuries change?*
+
+* **Visualization:** Interactive dumbbell / slope chart with category breakdown controls.
+
+<img width="800" alt="Q2 Preview" src="https://github.com/user-attachments/assets/d0e3bba0-55ed-430b-8891-e27a230e79e0" />
+</details>
+
+<details>
+<summary><strong>Q3 · States and Territories (Owner: Yan Han)</strong></summary>
+<br />
+
+> *How are hospitalised injury counts distributed across states and territories, and how has each jurisdiction’s share of the national total changed over time?*
+
+* **Visualization:** Interactive choropleth map paired with multi-series temporal breakdown[cite: 2, 3].
+
+<img width="800" alt="Q3 Preview" src="https://github.com/user-attachments/assets/e0699ba4-f5fb-4322-9aac-141c4befeb4b" />
+</details>
+
+<details>
+<summary><strong>Q4 · Age and Sex (Owner: George)</strong></summary>
+<br />
+
+> *Which combinations of age group and road user type account for the largest numbers of hospitalised injuries at the national level, and how do these differ between males and females?*
+
+* **Visualization:** Grouped comparison chart / heatmap matrix with sex filtering.
+
+<img width="800" alt="Q4 Preview" src="https://github.com/user-attachments/assets/6e044c2e-778c-4d5b-b030-681b3eb9569e" />
+</details>
+
+<details>
+<summary><strong>Q5 · First Nations Peoples (Owner: Shan Kai)</strong></summary>
+<br />
+
+> *How does the composition of hospitalised injuries among First Nations people (by road user type and age group) compare with that of non-Indigenous people?*
+
+* **Visualization:** 100% normalized stacked proportion visual comparing demographic structures.
+* *(Preview coming soon)*
+</details>
+
+---
 ## Team
 
 | Member | Role | Core Responsibilities |
