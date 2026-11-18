@@ -14,11 +14,16 @@
     --accent-soft: #0c2a40;
     --highlight-warm: #fbbf24;
     --highlight-warm-soft: rgba(251, 191, 36, 0.18);
+    --warm-text: var(--highlight-warm);
     --shadow-sm: 0 4px 16px -2px rgba(0, 0, 0, 0.35);
     --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.55);
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --bar-h: 56px;
     --u: 1px;
+    --scale-low: #e0f2fe;
+    --scale-mid: #38bdf8;
+    --scale-high: #1d4ed8;
+    --sel-color: #38bdf8;
     --map-stroke: var(--line);
     /* state outlines on the Q3 map */
     --cell-stroke: transparent;
@@ -30,21 +35,29 @@
 /* Light theme: toggled by the button in the top bar (saved in localStorage) */
 
 :root[data-theme="light"] {
-    --bg: #f4f7fb;
-    --surface: #ffffff;
-    --surface-elevated: rgba(255, 255, 255, 0.92);
-    --text: #0f172a;
-    --muted: #475569;
-    --line: #d5dde8;
-    --accent: #0369a1;
-    --accent-bright: #2563eb;
-    --accent-soft: #e0f2fe;
-    --highlight-warm: #b45309;
-    --highlight-warm-soft: rgba(180, 83, 9, 0.14);
-    --shadow-sm: 0 4px 16px -2px rgba(15, 23, 42, 0.1);
-    --shadow-lg: 0 24px 48px -12px rgba(15, 23, 42, 0.18);
-    --map-stroke: #94a3b8;
-    --cell-stroke: rgba(15, 23, 42, 0.16);
+    --bg: #f6f1e7;
+    --surface: #fffcf6;
+    --surface-elevated: rgba(255, 252, 246, 0.92);
+    --text: #221d3a;
+    --muted: #6b6478;
+    --line: #e8dfcf;
+    --accent: #28235a;
+    /* deep navy, chart fills / links */
+    --accent-bright: #4338ca;
+    --accent-soft: #efeaf6;
+    --highlight-warm: #f2a93b;
+    /* golden amber, fills and strokes */
+    --highlight-warm-soft: rgba(245, 176, 65, 0.24);
+    --warm-text: #b45309;
+    /* darker amber for small text on white (contrast) */
+    --shadow-sm: 0 1px 3px rgba(26, 26, 62, 0.05), 0 4px 12px rgba(26, 26, 62, 0.04);
+    --shadow-lg: 0 24px 48px -12px rgba(26, 26, 62, 0.2);
+    --scale-low: #f1f0fb;
+    --scale-mid: #6d68b8;
+    --scale-high: #1e1b4b;
+    --sel-color: #28235a;
+    --map-stroke: #b8ad9b;
+    --cell-stroke: rgba(26, 26, 62, 0.14);
     color-scheme: light;
 }
 
@@ -138,7 +151,7 @@ a {
 }
 
 .brand:hover {
-    color: var(--highlight-warm);
+    color: var(--warm-text);
     transform: translateY(-1px);
 }
 
@@ -163,7 +176,7 @@ a {
 }
 
 .topbar nav a:hover {
-    color: var(--highlight-warm);
+    color: var(--warm-text);
     background: var(--highlight-warm-soft);
     border-color: color-mix(in srgb, var(--highlight-warm) 50%, transparent);
     transform: translateY(-2px);
@@ -178,9 +191,9 @@ a {
 }
 
 .topbar nav a.is-active:hover {
-    color: var(--highlight-warm);
+    color: var(--warm-text);
     background: var(--highlight-warm-soft);
-    border-color: var(--highlight-warm);
+    border-color: var(--warm-text);
 }
 
 .nav-toggle {
@@ -202,7 +215,7 @@ a {
 
 .nav-toggle:hover,
 .nav-toggle[aria-expanded="true"] {
-    color: var(--highlight-warm);
+    color: var(--warm-text);
     border-color: color-mix(in srgb, var(--highlight-warm) 55%, transparent);
 }
 
@@ -357,12 +370,12 @@ section {
 
 .kpi:hover {
     transform: translateY(-6px) scale(1.015);
-    border-color: var(--highlight-warm);
+    border-color: var(--warm-text);
     box-shadow: 0 16px 32px -8px color-mix(in srgb, var(--highlight-warm) 25%, rgba(0, 0, 0, 0.25));
 }
 
 .kpi:hover .kpi-num {
-    color: var(--highlight-warm);
+    color: var(--warm-text);
 }
 
 .kpi-num {
@@ -398,9 +411,9 @@ section {
 }
 
 .cue:hover {
-    color: var(--highlight-warm);
+    color: var(--warm-text);
     background: var(--highlight-warm-soft);
-    border-color: var(--highlight-warm);
+    border-color: var(--warm-text);
     transform: translateY(3px);
     box-shadow: 0 8px 20px -4px color-mix(in srgb, var(--highlight-warm) 35%, transparent);
 }
@@ -542,7 +555,7 @@ section {
 }
 
 .step p.highlight-card {
-    border-left-color: var(--highlight-warm);
+    border-left-color: var(--warm-text);
 }
 
 .step.is-shown:not(.is-active) p {
@@ -552,7 +565,7 @@ section {
 }
 
 .step.is-active p {
-    border-left-color: var(--highlight-warm);
+    border-left-color: var(--warm-text);
     box-shadow: 0 14px 32px -6px color-mix(in srgb, var(--highlight-warm) 35%, rgba(0, 0, 0, 0.35)), 0 0 18px -2px color-mix(in srgb, var(--highlight-warm) 25%, transparent);
 }
 
@@ -744,7 +757,7 @@ section {
 }
 
 .chip[aria-pressed="true"] {
-    color: var(--highlight-warm);
+    color: var(--warm-text);
     border-color: color-mix(in srgb, var(--highlight-warm) 55%, transparent);
     background: var(--highlight-warm-soft);
 }
@@ -869,7 +882,7 @@ section {
 }
 
 .chart-tip--detail.is-locked {
-    border-color: var(--highlight-warm);
+    border-color: var(--warm-text);
 }
 
 .tip-title {
@@ -891,7 +904,7 @@ section {
 .tip-warn {
     margin-top: 5px;
     font-size: calc(12 * var(--u));
-    color: var(--highlight-warm);
+    color: var(--warm-text);
 }
 
 .tip-hint {
@@ -903,7 +916,7 @@ section {
 }
 
 .is-locked .tip-hint {
-    color: var(--highlight-warm);
+    color: var(--warm-text);
 }
 
 svg text {
@@ -1086,7 +1099,7 @@ svg .pt:focus {
 }
 
 .back-to-top:hover {
-    color: var(--highlight-warm);
+    color: var(--warm-text);
     transform: translateY(-4px) scale(1.07);
     box-shadow: 0 12px 28px -4px color-mix(in srgb, var(--highlight-warm) 40%, rgba(0, 0, 0, 0.4));
 }
@@ -1552,7 +1565,7 @@ g.row,
     min-width: 80px;
     height: 10px;
     border-radius: 5px;
-    background: linear-gradient(90deg, #e0f2fe, #38bdf8, #1d4ed8);
+    background: linear-gradient(90deg, var(--scale-low), var(--scale-mid), var(--scale-high));
     /* same palette as the heatmap squares */
 }
 
@@ -1645,7 +1658,7 @@ g.row,
     display: block;
     height: 100%;
     border-radius: 5px;
-    background: linear-gradient(90deg, #38bdf8, #1d4ed8);
+    background: linear-gradient(90deg, var(--scale-mid), var(--scale-high));
 }
 
 
@@ -1772,8 +1785,8 @@ g.row,
 }
 
 .theme-toggle:hover {
-    color: var(--highlight-warm);
-    border-color: var(--highlight-warm);
+    color: var(--warm-text);
+    border-color: var(--warm-text);
 }
 
 .theme-toggle svg {
@@ -1851,7 +1864,8 @@ g.row,
 /* leave room for the two buttons next to the controls */
 
 .chart-card>.controls {
-    padding-right: 170px; /* Show Table pill + CSV + expand */
+    padding-right: 170px;
+    /* Show Table pill + CSV + expand */
 }
 
 
@@ -1943,7 +1957,7 @@ html.has-expanded {
 .takeaway:hover,
 .takeaway:focus-visible {
     transform: translateY(-4px);
-    border-color: var(--highlight-warm);
+    border-color: var(--warm-text);
     box-shadow: var(--shadow-sm);
 }
 

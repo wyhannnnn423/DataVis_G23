@@ -14,9 +14,11 @@
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const fmt = d3.format(",");
     const fmtCompact = v => (v >= 1000 ? d3.format(".2~s")(v) : String(v));
-    const LOW = "#e0f2fe",
-        MID = "#38bdf8",
-        HIGH = "#1d4ed8";
+    // Colour scale comes from CSS variables so it follows the light / dark theme
+    const cssVar = (n, fb) => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || fb;
+    let LOW = cssVar("--scale-low", "#e0f2fe"),
+        MID = cssVar("--scale-mid", "#38bdf8"),
+        HIGH = cssVar("--scale-high", "#1d4ed8");
     const NARROW_BP = 560;
     const TOP_N = 6;
     const SEXES = ["All", "Male", "Female"];
@@ -70,7 +72,7 @@
         const yearOut = yr.append("output").attr("class", "year-out").attr("for", "q4-year");
 
         const title = container.append("h4").attr("class", "chart-title");
-        container.append("p").attr("class", "q4-helper").text("Each square is one age group and road user type: deeper blue means more hospitalisations, faint grey means none. Use Year and All / Male / Female to compare, or tap a square to select it.");
+        container.append("p").attr("class", "q4-helper").text("Each square is one age group and road user type: deeper colour means more hospitalisations, faint grey means none. Use Year and All / Male / Female to compare, or tap a square to select it.");
         const holder = container.append("div");
         const tableDiv = container.append("div").attr("class", "data-table-wrap").style("display", "none");
         const legend = container.append("div").attr("class", "q4-legend");
@@ -415,6 +417,13 @@
         if (!reduce) window.Q4 = { setProgress };
 
         render();
+
+        window.addEventListener("themechange", () => {
+            LOW = cssVar("--scale-low", LOW);
+            MID = cssVar("--scale-mid", MID);
+            HIGH = cssVar("--scale-high", HIGH);
+            render();
+        });
 
         let lastW = Math.round(container.node().clientWidth),
             lastNarrow = narrow,
