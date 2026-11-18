@@ -106,29 +106,6 @@ DataVis_G23/
 │ └── q5_first_nations.csv # Comparative metrics for Indigenous status
 └── docs/ # Design Book assets, wireframes, and usability test protocols
 ```
----
-
-## Research Questions & Chart Ownership
-
-1. **Q1 · National Trend (Owner: Yan Han)**
-   *How did non-fatal hospitalised road traffic injury counts change from 2011 to 2021, and how did the pattern in 2019–2021 compare with earlier years?*
-   *Visualization:* Scroll-driven area + line chart with historical recording-break annotations (2012 VIC, 2017 NSW).
-
-2. **Q2 · Road Users (Owner: Yan Han)**
-   *Which road user groups contributed most to the change in national counts between two selected years, and how did their shares of all road traffic injuries change?*
-   *Visualization:* Interactive dumbbell / slope chart with category breakdown controls.
-
-3. **Q3 · States and Territories (Owner: Yan Han)**
-   *How are hospitalised injury counts distributed across states and territories, and how has each jurisdiction’s share of the national total changed over time?*
-   *Visualization:* Multi-series temporal chart / proportional representation illustrating state contributions.
-
-4. **Q4 · Age and Sex (Owner: George)**
-   *Which combinations of age group and road user type account for the largest numbers of hospitalised injuries at the national level, and how do these differ between males and females?*
-   *Visualization:* Grouped comparison chart / heatmap matrix with sex filtering.
-
-5. **Q5 · First Nations Peoples (Owner: Shan Kai)**
-   *How does the composition of hospitalised injuries among First Nations people (by road user type and age group) compare with that of non-Indigenous people?*
-   *Visualization:* 100% normalized stacked proportion visual comparing demographic structures.
 
 ---
 
