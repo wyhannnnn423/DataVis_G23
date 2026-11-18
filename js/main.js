@@ -452,6 +452,8 @@
         btn.setAttribute("aria-pressed", String(theme === "light"));
         btn.setAttribute("aria-label", label);
         btn.title = label;
+        // Lets charts that use JS colour scales (Q3, Q4) redraw with the new palette
+        window.dispatchEvent(new CustomEvent("themechange", { detail: theme }));
     }
 
     apply(root.getAttribute("data-theme") === "light" ? "light" : "dark"); // dark is the default design
