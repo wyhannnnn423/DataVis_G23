@@ -232,7 +232,7 @@
                 .attr("text-anchor", "end")
                 .attr("font-size", compact ? 11.5 : 12.5)
                 .attr("font-weight", 700)
-                .attr("fill", "var(--highlight-warm)")
+                .attr("fill", "var(--warm-text)")
                 .style("opacity", 0)
                 .text(compact ? "COVID dip & rebound" : "2019–2021: COVID Dip & Rebound");
 
