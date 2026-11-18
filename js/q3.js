@@ -16,9 +16,11 @@
     const NAMES = { NSW: "New South Wales", Vic: "Victoria", Qld: "Queensland", WA: "Western Australia", SA: "South Australia", Tas: "Tasmania", NT: "Northern Territory", ACT: "Australian Capital Territory" };
     const BREAK = { Vic: 2012, NSW: 2017 };
 
-    const LOW = "#e0f2fe",
-        MID = "#38bdf8",
-        HIGH = "#1d4ed8";
+    // Colour scale comes from CSS variables so it follows the light / dark theme
+    const cssVar = (n, fb) => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || fb;
+    let LOW = cssVar("--scale-low", "#e0f2fe"),
+        MID = cssVar("--scale-mid", "#38bdf8"),
+        HIGH = cssVar("--scale-high", "#1d4ed8");
 
     container.classed("placeholder", false).html("").style("position", "relative").text("Loading chart data\u2026");
     const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -500,10 +502,10 @@
             Object.entries(BREAK).forEach(([s, y]) => {
                 tg.append("line").attr("x1", tx(y)).attr("x2", tx(y)).attr("y1", mt.top).attr("y2", Ht - mt.bottom)
                     .attr("stroke", "var(--highlight-warm)").attr("stroke-dasharray", "4 4").attr("opacity", 0.55);
-                tg.append("text").attr("x", tx(y) + 4).attr("y", mt.top + 10).attr("font-size", 11).attr("fill", "var(--highlight-warm)").text(`${y} ${s}\u2020`);
+                tg.append("text").attr("x", tx(y) + 4).attr("y", mt.top + 10).attr("font-size", 11).attr("fill", "var(--warm-text)").text(`${y} ${s}\u2020`);
             });
 
-            const selColor = "#38bdf8";
+            const selColor = cssVar("--sel-color", "#38bdf8");
             const line = d3.line().x(d => tx(d.year)).y(d => ty(d.v)).curve(d3.curveMonotoneX);
             const series = s => years.map(y => ({ year: y, v: mv(s, y) }));
 
@@ -521,7 +523,7 @@
                 .attr("stroke", selColor)
                 .attr("stroke-width", 3.5)
                 .attr("stroke-linecap", "round")
-                .style("filter", "drop-shadow(0 0 6px rgba(56, 189, 248, 0.5))");
+                .style("filter", document.documentElement.getAttribute("data-theme") === "light" ? "none" : "drop-shadow(0 0 6px rgba(56, 189, 248, 0.5))");
 
             const minSpacing = 14;
             const endPos = states.map(st => ({ st, y: ty(mv(st, last)) })).sort((a, b) => a.y - b.y);
@@ -647,6 +649,20 @@
             window.Q3 = { setProgress };
             setProgress((window.chartProgress || {}).q3 || 0);
         }
+
+        window.addEventListener("themechange", () => {
+            LOW = cssVar("--scale-low", LOW);
+            MID = cssVar("--scale-mid", MID);
+            HIGH = cssVar("--scale-high", HIGH);
+            colorScale.range([LOW, MID, HIGH]);
+            const stops = d3.select("#q3-grad").selectAll("stop").nodes();
+            if (stops.length === 3) {
+                stops[0].setAttribute("stop-color", LOW);
+                stops[1].setAttribute("stop-color", MID);
+                stops[2].setAttribute("stop-color", HIGH);
+            }
+            draw();
+        });
 
         let lastW = Math.round(container.node().clientWidth),
             lastCompact = compact,
