@@ -1,6 +1,6 @@
 <div align="center">
 
-## DataVis_G23: Hospitalised Road Traffic Injuries in Australia (2011–2021)
+#DataVis_G23: Hospitalised Road Traffic Injuries in Australia (2011–2021)
 
 **COS30045 Data Visualisation · Project (2026 S2) · Group 23**
 
