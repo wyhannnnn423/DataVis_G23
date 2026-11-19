@@ -1809,18 +1809,11 @@ g.row,
 
 /* 3. Chart Title and Description */
 
-#q5-chart .chart-title {
-    color: var(--text);
-    margin: 6px 0 5px;
-    font-size: clamp(15px, 1.2vw, 19px);
-    font-weight: 750;
-}
-
+/* Title uses the shared .chart-title; subtitle matches Q4's .q4-helper */
 #q5-chart .q5-subtitle {
+    margin: 0 0 calc(8 * var(--u));
+    font-size: calc(13 * var(--u));
     color: var(--muted);
-    font-size: 0.88rem;
-    line-height: 1.5;
-    margin: 0 0 10px;
 }
 
 
@@ -1861,12 +1854,12 @@ g.row,
 
 #q5-chart .q5-axis text {
     fill: var(--muted);
-    font: 14px system-ui, sans-serif;
+    font: 16px system-ui, sans-serif;
 }
 
 #q5-chart .q5-axis-title {
     fill: var(--muted);
-    font: 13px system-ui, sans-serif;
+    font: 15px system-ui, sans-serif;
 }
 
 
@@ -1874,12 +1867,12 @@ g.row,
 
 #q5-chart .q5-group-label {
     fill: var(--text);
-    font: 700 19px system-ui, sans-serif;
+    font: 700 22px system-ui, sans-serif;
 }
 
 #q5-chart .q5-group-small {
     fill: var(--muted);
-    font: 14px system-ui, sans-serif;
+    font: 16px system-ui, sans-serif;
 }
 
 
@@ -1887,7 +1880,7 @@ g.row,
 
 #q5-chart .q5-in-bar {
     fill: #ffffff;
-    font: 700 13px system-ui, sans-serif;
+    font: 700 15px system-ui, sans-serif;
 
     paint-order: stroke fill;
     stroke: rgba(10, 18, 32, 0.75);
@@ -1945,7 +1938,7 @@ g.row,
     cursor: pointer;
 
     font: inherit;
-    font-size: 12px;
+    font-size: calc(12 * var(--u));
     line-height: 1.4;
 
     transition:
@@ -2000,12 +1993,12 @@ g.row,
 
 #q5-chart .q5-insight strong {
     color: var(--text);
-    font-size: 13px;
+    font-size: calc(13 * var(--u));
 }
 
 #q5-chart .q5-insight p {
     color: var(--text);
-    font-size: 13px;
+    font-size: calc(13 * var(--u));
     margin: 4px 0 0;
     line-height: 1.5;
 }
@@ -2015,7 +2008,7 @@ g.row,
 
 #q5-chart .q5-caution {
     color: var(--muted);
-    font-size: 12px;
+    font-size: calc(12 * var(--u));
     line-height: 1.55;
     margin: 10px 0 0;
 }
@@ -2042,13 +2035,13 @@ g.row,
     color: var(--text);
     background: var(--surface);
 
-    font-size: 12px;
+    font-size: calc(12 * var(--u));
     line-height: 1.65;
 }
 
 #q5-chart .q5-tooltip strong {
     color: var(--accent);
-    font-size: 13px;
+    font-size: calc(13 * var(--u));
 }
 
 
@@ -2066,7 +2059,7 @@ g.row,
 #q5-chart .q5-data-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12.5px;
+    font-size: calc(12.5 * var(--u));
 }
 
 #q5-chart .q5-data-table th,
@@ -2093,7 +2086,7 @@ g.row,
 #q5-chart .q5-table-note {
     margin: 10px 0;
     color: var(--muted);
-    font-size: 12px;
+    font-size: calc(12 * var(--u));
 }
 
 
@@ -2117,7 +2110,7 @@ g.row,
     }
 
     #q5-chart .q5-legend-item {
-        font-size: 11px;
+        font-size: calc(11 * var(--u));
     }
 
 }
@@ -2126,14 +2119,6 @@ g.row,
 /* 17. Responsive Design - Mobile */
 
 @media (max-width: 640px) {
-
-    #q5-chart .chart-title {
-        font-size: 15px;
-    }
-
-    #q5-chart .q5-subtitle {
-        font-size: 12px;
-    }
 
     #q5-chart .q5-svg {
         min-width: 0;
@@ -2144,7 +2129,7 @@ g.row,
     }
 
     #q5-chart .q5-legend-item {
-        font-size: 11px;
+        font-size: calc(11 * var(--u));
         padding: 4px 7px;
     }
 
@@ -2153,11 +2138,11 @@ g.row,
     }
 
     #q5-chart .q5-tooltip {
-        font-size: 11px;
+        font-size: calc(11 * var(--u));
     }
 
     #q5-chart .q5-data-table {
-        font-size: 11px;
+        font-size: calc(11 * var(--u));
     }
 
     #q5-chart .q5-data-table th,
@@ -2553,35 +2538,4 @@ html.has-expanded {
     color: var(--accent) !important;
     border-color: var(--accent) !important;
     background: var(--accent-soft) !important;
-}
-
-
-/* ==========================================
-   Q5 ONLY - Storytelling Highlight Improvement
-   Does not affect Q1, Q2, Q3 or Q4
-   ========================================== */
-
-/* Remove strong yellow glow from Q5 story cards */
-#q5-section .step.is-active .step-card-content p {
-    border-left-color: var(--accent);
-    box-shadow: var(--shadow-sm);
-}
-
-/* Disable the yellow shine animation in Q5 */
-#q5-section .step.is-active .step-card-content p::after {
-    display: none;
-}
-
-/* Highlight only the first paragraph of the active step */
-#q5-section .step.is-active .step-card-content p:first-of-type {
-    background: var(--accent-soft);
-    border-left-color: var(--accent);
-
-    box-shadow:
-        0 0 0 1px color-mix(
-            in srgb,
-            var(--accent) 30%,
-            transparent
-        ),
-        var(--shadow-sm);
 }
