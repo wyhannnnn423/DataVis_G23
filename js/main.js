@@ -128,13 +128,10 @@
             }
         }
 
-
-        // Q5: keep its natural height so the chart stays sticky.
-        // Q1–Q4: preserve their existing layout.
-        if (!isNarrow() && s.id !== "q5") {
+        // Standardized sticky height alignment for Q1-Q5
+        if (!isNarrow()) {
             s.stage.style.minHeight = fullStackHeight(s) + "px";
         }
-
 
         const n = s.stepEls.length;
         s.scrolly.style.setProperty("--scrolly-length", (isNarrow() ? 120 + 60 * n : 40 + 60 * n) + "vh");
@@ -357,7 +354,6 @@
         if (history.pushState) history.pushState(null, "", href);
     }
 
-    // Now securely includes .takeaway to register click actions
     navLinks.concat(Array.from(document.querySelectorAll(".brand, .cue, .back-to-top, .takeaway"))).forEach(link => {
         link.addEventListener("click", e => goTo(link, e));
     });
@@ -369,6 +365,7 @@
         navLinks.forEach(a => a.classList.toggle("is-active", a.getAttribute("href") === "#" + sectionId));
     }
 
+    // ScrollSpy active link mapping
     function updateSpy() {
         if (nav.active) return;
         const line = window.innerHeight * 0.4;
@@ -457,7 +454,7 @@
         btn.setAttribute("aria-pressed", String(theme === "light"));
         btn.setAttribute("aria-label", label);
         btn.title = label;
-        // Lets charts that use JS colour scales (Q3, Q4) redraw with the new palette
+        // Lets charts that use JS colour scales redraw with the new palette
         window.dispatchEvent(new CustomEvent("themechange", { detail: theme }));
     }
 
