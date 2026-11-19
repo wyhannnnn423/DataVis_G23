@@ -128,7 +128,7 @@
             }
         }
 
-        
+
         // Q5: keep its natural height so the chart stays sticky.
         // Q1–Q4: preserve their existing layout.
         if (!isNarrow() && s.id !== "q5") {

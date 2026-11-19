@@ -1,11 +1,10 @@
-
 /*
  Q5 - First Nations and Non-Indigenous comparison
  Data: data/q5_first_nations_composition_by_year.csv
  Uses original KNIME percentage shares without renormalising.
 */
 
-(function () {
+(function() {
     "use strict";
 
     const container = d3.select("#q5-chart");
@@ -75,11 +74,10 @@
     d3.csv(
         "data/q5_first_nations_composition_by_year.csv",
         d3.autoType
-    ).then(function (input) {
+    ).then(function(input) {
 
         const rows = input.filter(d =>
-            GROUPS.includes(d.population_group) &&
-            ["age_group", "road_user"].includes(d.dimension) &&
+            GROUPS.includes(d.population_group) && ["age_group", "road_user"].includes(d.dimension) &&
             Number.isFinite(d.year) &&
             Number.isFinite(d.cases) &&
             Number.isFinite(d.group_total) &&
@@ -124,7 +122,7 @@
             .join("button")
             .attr("type", "button")
             .text(d => d[1])
-            .on("click", function (event, d) {
+            .on("click", function(event, d) {
                 state.dimension = d[0];
                 state.focus = null;
                 render();
@@ -146,7 +144,7 @@
             .attr("max", years[years.length - 1])
             .attr("step", 1)
             .property("value", state.year)
-            .on("input", function () {
+            .on("input", function() {
                 state.year = Number(this.value);
                 render();
             });
@@ -209,8 +207,7 @@
                 "q5",
 
                 () => ({
-                    filename:
-                        `q5_${state.dimension}_${state.year}.csv`,
+                    filename: `q5_${state.dimension}_${state.year}.csv`,
 
                     rows: currentRows().map(d => ({
                         year: d.year,
@@ -335,9 +332,9 @@
 
             tooltip.append("div")
                 .text(
-                    d.missing
-                        ? "Categories not represented in the processed data"
-                        : fmtCases(d.cases) + " hospitalisations"
+                    d.missing ?
+                    "Categories not represented in the processed data" :
+                    fmtCases(d.cases) + " hospitalisations"
                 );
 
             tooltip.style("display", "block");
@@ -368,9 +365,9 @@
                 .style("left", left + "px")
                 .style(
                     "top",
-                    (above > 5
-                        ? above
-                        : rect.bottom - chartBox.top + 8
+                    (above > 5 ?
+                        above :
+                        rect.bottom - chartBox.top + 8
                     ) + "px"
                 );
         }
@@ -389,9 +386,9 @@
             tableHolder.append("h4")
                 .text(
                     state.year + " — " +
-                    (state.dimension === "age_group"
-                        ? "Age groups"
-                        : "Road users")
+                    (state.dimension === "age_group" ?
+                        "Age groups" :
+                        "Road users")
                 );
 
             const table = tableHolder.append("table")
@@ -423,9 +420,9 @@
                 d => d.remainder > 0.005
             );
 
-            const displayed = hasRemainder
-                ? [...categories, MISSING]
-                : categories;
+            const displayed = hasRemainder ?
+                [...categories, MISSING] :
+                categories;
 
             const trs = tbody.selectAll("tr")
                 .data(displayed)
@@ -434,7 +431,7 @@
             trs.append("th")
                 .text(d => d);
 
-            trs.each(function (category) {
+            trs.each(function(category) {
                 const tr = d3.select(this);
 
                 GROUPS.forEach(group => {
@@ -516,9 +513,9 @@
 
             title.text(
                 `${state.year} Hospitalisation Composition — ` +
-                (state.dimension === "age_group"
-                    ? "Age Groups"
-                    : "Road Users")
+                (state.dimension === "age_group" ?
+                    "Age Groups" :
+                    "Road Users")
             );
 
             graph.style(
@@ -630,9 +627,9 @@
                     .attr("y", y + 26)
                     .attr("text-anchor", "end")
                     .text(
-                        i === 0
-                            ? "First Nations"
-                            : "Non-Indigenous"
+                        i === 0 ?
+                        "First Nations" :
+                        "Non-Indigenous"
                     );
 
                 svg.append("text")
@@ -673,9 +670,9 @@
                     .attr("height", barHeight)
                     .attr(
                         "fill",
-                        d => d.missing
-                            ? "url(#q5-hatch)"
-                            : colors.get(d.category)
+                        d => d.missing ?
+                        "url(#q5-hatch)" :
+                        colors.get(d.category)
                     )
                     .attr("stroke", "var(--q5-border)")
                     .attr("stroke-width", 1)
@@ -684,29 +681,29 @@
                     .attr(
                         "aria-label",
                         d =>
-                            `${d.group}, ${d.category}, ` +
-                            fmtPct(d.share)
+                        `${d.group}, ${d.category}, ` +
+                        fmtPct(d.share)
                     )
-                    .on("pointerenter", function (event, d) {
+                    .on("pointerenter", function(event, d) {
                         showTooltip(d, this);
                     })
-                    .on("pointermove", function (event, d) {
+                    .on("pointermove", function(event, d) {
                         showTooltip(d, this);
                     })
                     .on("pointerleave", hideTooltip)
-                    .on("focus", function (event, d) {
+                    .on("focus", function(event, d) {
                         showTooltip(d, this);
                     })
                     .on("blur", hideTooltip)
-                    .on("click", function (event, d) {
+                    .on("click", function(event, d) {
                         state.focus =
-                            state.focus === d.category
-                                ? null
-                                : d.category;
+                            state.focus === d.category ?
+                            null :
+                            d.category;
 
                         applyFocus();
                     })
-                    .on("keydown", function (event, d) {
+                    .on("keydown", function(event, d) {
                         if (
                             event.key === "Enter" ||
                             event.key === " "
@@ -714,9 +711,9 @@
                             event.preventDefault();
 
                             state.focus =
-                                state.focus === d.category
-                                    ? null
-                                    : d.category;
+                                state.focus === d.category ?
+                                null :
+                                d.category;
 
                             applyFocus();
                         }
@@ -724,8 +721,8 @@
 
                 // Label larger segments
                 segments.filter(d =>
-                    !d.missing && d.share >= 9
-                ).append("text")
+                        !d.missing && d.share >= 9
+                    ).append("text")
                     .attr("class", "q5-in-bar")
                     .attr(
                         "x",
@@ -788,11 +785,11 @@
                 .join("button")
                 .attr("type", "button")
                 .attr("class", "q5-legend-item")
-                .on("click", function (event, d) {
+                .on("click", function(event, d) {
                     state.focus =
-                        state.focus === d.category
-                            ? null
-                            : d.category;
+                        state.focus === d.category ?
+                        null :
+                        d.category;
 
                     applyFocus();
                 });
@@ -800,15 +797,15 @@
             buttons.append("span")
                 .attr(
                     "class",
-                    d => d.color === "missing"
-                        ? "q5-swatch q5-hatched"
-                        : "q5-swatch"
+                    d => d.color === "missing" ?
+                    "q5-swatch q5-hatched" :
+                    "q5-swatch"
                 )
                 .style(
                     "background",
-                    d => d.color === "missing"
-                        ? null
-                        : d.color
+                    d => d.color === "missing" ?
+                    null :
+                    d.color
                 );
 
             buttons.append("span")
@@ -843,15 +840,14 @@
                         category,
                         a: a.share_pct,
                         b: b.share_pct,
-                        difference:
-                            a.share_pct - b.share_pct
+                        difference: a.share_pct - b.share_pct
                     };
                 })
                 .filter(Boolean)
                 .sort(
                     (a, b) =>
-                        Math.abs(b.difference) -
-                        Math.abs(a.difference)
+                    Math.abs(b.difference) -
+                    Math.abs(a.difference)
                 );
 
             insight.html("");
@@ -881,34 +877,34 @@
                 .filter(d => d.remainder > 0.005)
                 .map(
                     d =>
-                        `${d.group}: ` +
-                        fmtPct(d.remainder)
+                    `${d.group}: ` +
+                    fmtPct(d.remainder)
                 );
 
             caution.text(
-                remainders.length
-                    ? "Hatched areas show shares not represented " +
-                      "in the processed data (" +
-                      remainders.join("; ") +
-                      "). They may include suppressed or " +
-                      "incomplete categories. These are not zero. " +
-                      "Source: BITRE (2023), processed in KNIME."
-                    : "Percentages describe the composition " +
-                      "of hospitalisations within each group, " +
-                      "not population-adjusted injury rates. " +
-                      "Source: BITRE (2023), processed in KNIME."
+                remainders.length ?
+                "Hatched areas show shares not represented " +
+                "in the processed data (" +
+                remainders.join("; ") +
+                "). They may include suppressed or " +
+                "incomplete categories. These are not zero. " +
+                "Source: BITRE (2023), processed in KNIME." :
+                "Percentages describe the composition " +
+                "of hospitalisations within each group, " +
+                "not population-adjusted injury rates. " +
+                "Source: BITRE (2023), processed in KNIME."
             );
 
             const sideInsight = d3.select("#q5-insight");
 
             if (!sideInsight.empty()) {
                 sideInsight.text(
-                    differences.length
-                        ? `In ${state.year}, the largest reported ` +
-                          `difference was ${differences[0].category}, ` +
-                          `${fmtDifference(differences[0].difference)} ` +
-                          `(First Nations minus Non-Indigenous).`
-                        : "Select a year to explore the comparison."
+                    differences.length ?
+                    `In ${state.year}, the largest reported ` +
+                    `difference was ${differences[0].category}, ` +
+                    `${fmtDifference(differences[0].difference)} ` +
+                    `(First Nations minus Non-Indigenous).` :
+                    "Select a year to explore the comparison."
                 );
             }
 
@@ -929,16 +925,16 @@
                 .classed(
                     "is-dimmed",
                     d =>
-                        state.focus !== null &&
-                        d.category !== state.focus
+                    state.focus !== null &&
+                    d.category !== state.focus
                 );
 
             legend.selectAll(".q5-legend-item")
                 .classed(
                     "is-dimmed",
                     d =>
-                        state.focus !== null &&
-                        d.category !== state.focus
+                    state.focus !== null &&
+                    d.category !== state.focus
                 )
                 .attr(
                     "aria-pressed",
@@ -959,12 +955,12 @@
 
             progressRect.attr(
                 "width",
-                reducedMotion
-                    ? width
-                    : width * Math.max(
-                        0,
-                        Math.min(1, state.progress)
-                    )
+                reducedMotion ?
+                width :
+                width * Math.max(
+                    0,
+                    Math.min(1, state.progress)
+                )
             );
         }
 
@@ -982,7 +978,7 @@
         // Initial render
         render();
 
-        if (Number.isFinite(window.chartProgress?.q5)) {
+        if (Number.isFinite(window.chartProgress ? .q5)) {
             setProgress(window.chartProgress.q5);
         }
 
@@ -991,7 +987,7 @@
             () => render()
         );
 
-    }).catch(function (error) {
+    }).catch(function(error) {
         console.error("Q5 chart error:", error);
 
         container.html("");
