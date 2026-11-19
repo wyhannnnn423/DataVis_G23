@@ -128,8 +128,13 @@
             }
         }
 
-        // Desktop: make the pinned stage at least as tall as the full step stack.
-        if (!isNarrow()) s.stage.style.minHeight = fullStackHeight(s) + "px";
+        
+        // Q5: keep its natural height so the chart stays sticky.
+        // Q1–Q4: preserve their existing layout.
+        if (!isNarrow() && s.id !== "q5") {
+            s.stage.style.minHeight = fullStackHeight(s) + "px";
+        }
+
 
         const n = s.stepEls.length;
         s.scrolly.style.setProperty("--scrolly-length", (isNarrow() ? 120 + 60 * n : 40 + 60 * n) + "vh");
