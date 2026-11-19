@@ -218,7 +218,7 @@
         </div>
     </section>
 
-    <!-- Q5 (Placeholder) -->
+    <!-- Q5: 100% stacked comparison (First Nations vs non-Indigenous) -->
     <section id="q5-section" class="scrolly-section">
         <div class="scrolly" id="q5">
             <div class="scrolly-stage">
@@ -228,20 +228,30 @@
                 </header>
                 <div class="chart-card">
                     <div class="controls" id="q5-controls"></div>
-                    <div id="q5-chart" class="placeholder">Q5 Visualisation Slot<small>Reserved for your customized D3 chart module</small></div>
+                    <div id="q5-chart" class="placeholder">Loading Q5 visualisation...<small>Needs data/q5_first_nations_composition_by_year.csv</small></div>
                 </div>
             </div>
             <div class="scrolly-steps">
                 <div class="step-stack">
                     <div class="step is-shown is-active" data-step="0">
-                        <div class="step-card-content">
-                            <h3>Q5 Guidelines</h3>
-                            <p>This side-pane block completes your 5-step structured story sequence.</p>
-                            <ul class="bullet-list">
-                                <li><strong>Final Insight:</strong> Summarize demographic or environmental road conditions.</li>
-                                <li><strong>Unified Experience:</strong> Coordinated with topbar navigation Spy.</li>
-                            </ul>
-                        </div>
+                        <h3>How to Read This</h3>
+                        <p>
+                            <strong>Bars:</strong> Each bar is 100% of one group&rsquo;s hospitalisations.<br>
+                            <strong>Controls:</strong> Switch between <em>Age group</em> and <em>Road user</em>, and drag the year slider.<br>
+                            <strong>Hover:</strong> Hover a segment for the exact share and count; click a legend item to highlight it in both groups.
+                        </p>
+                    </div>
+                    <div class="step" data-step="1">
+                        <h3>Key Takeaways (2021)</h3>
+                        <p class="highlight-card">
+                            <strong>Ages 17&ndash;25:</strong> <strong>30.90%</strong> of First Nations hospitalisations, compared with <strong>19.66%</strong> for non-Indigenous people.<br>
+                            <strong>Ages 65+:</strong> <strong>2.03%</strong> of First Nations hospitalisations, compared with <strong>14.59%</strong> for non-Indigenous people.<br>
+                            These are within-group shares, not injury rates.
+                        </p>
+                    </div>
+                    <div class="step" data-step="2">
+                        <h3>What it shows</h3>
+                        <p id="q5-insight" aria-live="polite">Loading&hellip;</p>
                     </div>
                 </div>
             </div>
@@ -253,7 +263,7 @@
         <div class="summary-card reveal">
             <p class="eyebrow">Conclusion</p>
             <h2>What the data tells us</h2>
-            <p>Four findings from the 2011&ndash;2021 BITRE hospitalised injury data. Each one links back to the chart it comes from.</p>
+            <p>Five findings from the 2011&ndash;2021 BITRE hospitalised injury data. Each one links back to the chart it comes from.</p>
             <div class="takeaways">
                 <a class="takeaway" href="#q1-section">
                     <span class="takeaway-q">Q1 &middot; National trend</span>
@@ -274,6 +284,11 @@
                     <span class="takeaway-q">Q4 &middot; Age, sex and road user</span>
                     <span class="takeaway-stat">4,036</span>
                     <span class="takeaway-text">Car drivers aged 40&ndash;64 were the largest age and road user group in 2021. Males made up 65% of records with a recorded sex.</span>
+                </a>
+                <a class="takeaway" href="#q5-section">
+                    <span class="takeaway-q">Q5 &middot; First Nations peoples</span>
+                    <span class="takeaway-stat">30.90%</span>
+                    <span class="takeaway-text">In 2021, people aged 17&ndash;25 accounted for 30.90% of First Nations hospitalisations, compared with 19.66% for non-Indigenous people. These are within-group percentages.</span>
                 </a>
             </div>
             <p class="summary-note">Counts describe how many people were hospitalised. They do not show risk, because they are not adjusted for population or distance travelled.</p>
@@ -299,6 +314,7 @@
                         <li><strong>Patterns, not causes.</strong> The 2020 dip coincides with COVID-19 restrictions, but the data cannot show why.</li>
                         <li><strong>Missing values.</strong> Records without a recorded age are left out of the age axis, and the very small group with indeterminate or missing sex appears only under &ldquo;All&rdquo; in the age and sex chart. Both are still
                             included in the totals.</li>
+                        <li><strong>First Nations categories.</strong> Unpublished or incomplete categories were excluded during KNIME processing, so the Q5 shares are of the published records only.</li>
                     </ul>
                 </details>
                 <details class="about-item">
@@ -324,6 +340,7 @@
                         <li><a href="data/q2_road_users_by_year.csv" download>Road users by year <span>CSV</span></a></li>
                         <li><a href="data/q3_states_by_year.csv" download>States and territories by year <span>CSV</span></a></li>
                         <li><a href="data/q4_age_sex_road_user_by_year.csv" download>Age, sex and road user by year <span>CSV</span></a></li>
+                        <li><a href="data/q5_first_nations_composition_by_year.csv" download>First Nations composition by year <span>CSV</span></a></li>
                     </ul>
                 </details>
             </div>
@@ -347,6 +364,7 @@
     <script src="js/q2.js"></script>
     <script src="js/q3.js"></script>
     <script src="js/q4.js"></script>
+    <script src="js/q5.js"></script>
 </body>
 
 </html>
