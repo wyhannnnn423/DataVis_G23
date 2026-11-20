@@ -11,7 +11,7 @@ An interactive D3.js data story investigating national trends, demographic distr
 
 <br />
 
-<img width="800" alt="Overview Preview" src="https://github.com/user-attachments/assets/63c33001-c5ac-45ce-8843-b8d76a85ace0" />
+<img width="800" height="394" alt="1120-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/13482437-84bc-4a9f-a60f-f192c7003e20" />
 
 </div>
 
@@ -40,7 +40,7 @@ Click any section below to expand the interactive chart preview:
 
 * **Visualization:** Interactive dumbbell / slope chart with category breakdown controls.
 
-<img width="800" alt="Q2 Preview" src="https://github.com/user-attachments/assets/d0e3bba0-55ed-430b-8891-e27a230e79e0" />
+<img width="800" height="430" alt="Q2-1-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/b8150550-92ad-40c6-9a06-0e854e0dcfc4" />
 </details>
 
 <details>
@@ -51,7 +51,7 @@ Click any section below to expand the interactive chart preview:
 
 * **Visualization:** Interactive choropleth map paired with multi-series temporal breakdown[cite: 2, 3].
 
-<img width="800" alt="Q3 Preview" src="https://github.com/user-attachments/assets/e0699ba4-f5fb-4322-9aac-141c4befeb4b" />
+<img width="800" height="430" alt="Q3-11-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/100330f7-6037-4a75-880b-3b5223508971" />
 </details>
 
 <details>
@@ -62,7 +62,7 @@ Click any section below to expand the interactive chart preview:
 
 * **Visualization:** Grouped comparison chart / heatmap matrix with sex filtering.
 
-<img width="800" alt="Q4 Preview" src="https://github.com/user-attachments/assets/6e044c2e-778c-4d5b-b030-681b3eb9569e" />
+<img width="800" height="430" alt="Q4-1-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/fa7b4adf-5bed-404d-aa2c-99daae7efbda" />
 </details>
 
 <details>
@@ -72,7 +72,8 @@ Click any section below to expand the interactive chart preview:
 > *How does the composition of hospitalised injuries among First Nations people (by road user type and age group) compare with that of non-Indigenous people?*
 
 * **Visualization:** 100% normalized stacked proportion visual comparing demographic structures.
-* *(Preview coming soon)*
+
+<img width="800" height="430" alt="Q5-1-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/440f8216-0df4-4687-aa9b-aa6941ec4f74" />
 </details>
 
 ---
