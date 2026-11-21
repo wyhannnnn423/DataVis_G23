@@ -29,8 +29,7 @@ Click any section below to expand the interactive chart preview:
 
 * **Visualization:** Scroll-driven area + line chart with historical recording-break annotations (2012 VIC, 2017 NSW).
 
-<img width="800" alt="Q1 Preview" src="https://github.com/user-attachments/assets/f3fcc336-f8b7-45e6-abb5-973c85600005" />
-</details>
+<img width="800" height="430" alt="Q1-1-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/fa63156a-9eaf-49cc-aab3-3eedda110986" /></details>
 
 <details>
 <summary><strong>Q2 · Road Users (Owner: Yan Han)</strong></summary>
